@@ -17,14 +17,12 @@ public class CaptchaPushBo implements Serializable {
 
     int type;
 
-    String country_code;
+    String countryCode;
 
     String phone;
 
-    //String template_id;
+    String mail;
 
-    //String template_param;
-
-    String email;
+    String language;
 
 }

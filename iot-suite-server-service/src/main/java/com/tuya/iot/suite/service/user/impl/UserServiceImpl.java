@@ -1,23 +1,27 @@
 package com.tuya.iot.suite.service.user.impl;
 
-
-import com.tuya.iot.suite.ability.notification.model.SmsPushRequest;
 import com.tuya.iot.suite.ability.user.ability.UserAbility;
 import com.tuya.iot.suite.ability.user.model.MobileCountries;
 import com.tuya.iot.suite.ability.user.model.UserModifyRequest;
 import com.tuya.iot.suite.ability.user.model.UserRegisteredRequest;
 import com.tuya.iot.suite.ability.user.model.UserToken;
-import com.tuya.iot.suite.core.constant.NotificationType;
+import com.tuya.iot.suite.core.constant.CaptchaType;
+import com.tuya.iot.suite.core.constant.NoticeType;
+import com.tuya.iot.suite.core.exception.ServiceLogicException;
+import com.tuya.iot.suite.service.notice.template.CaptchaNoticeTemplate;
+import com.tuya.iot.suite.service.user.CaptchaService;
 import com.tuya.iot.suite.service.user.UserService;
 import com.tuya.iot.suite.service.user.model.CaptchaPushBo;
+import com.tuya.iot.suite.service.user.model.ResetPasswordBo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
-import java.util.Objects;
+import static com.tuya.iot.suite.core.constant.ErrorCode.*;
 
 /**
- * @Description 用户实现类$
+ * @Description 用户实现类
  * @Author bade
  * @Since 2021/3/15 8:46 下午
  */
@@ -28,11 +32,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserAbility userAbility;
 
-    //@Autowired
-    //private SmsService smsService;
-
-    //@Autowired
-    //private MailService mailService;
+    @Autowired
+    private CaptchaService captchaService;
 
     /**
      * 修改用户密码
@@ -67,40 +68,61 @@ public class UserServiceImpl implements UserService {
         return userAbility.loginUser(request);
     }
 
-    public boolean getCaptcha() {
-        return false;
-    }
-
-
-    @Override
-    public boolean captchaPush(CaptchaPushBo bo) {
-        NotificationType type = NotificationType.getType(bo.getType());
-        if (Objects.isNull(type)) {
-            log.info("captcha type incorrect!, type:[{}]", bo.getType());
-            return false;
-        }
-        switch (type) {
-            case SMS :
-                SmsPushRequest smsPushRequest = new SmsPushRequest();
-                smsPushRequest.setCountry_code(bo.getCountry_code());
-                smsPushRequest.setPhone(bo.getPhone());
-                smsPushRequest.setTemplate_id(type.getTemplate().getTemplateId());
-                //smsPushRequest.setTemplatep_aram(type.getTemplate().getTemplate_param());
-                //smsService.push();
-                break;
-            case MAIL:
-
-                break;
-            default:
-                log.info("captcha push type not support!, type:[{}]", bo.getType());
-                return false;
-        }
-        return false;
-    }
-
     @Override
     public MobileCountries selectMobileCountries() {
         return userAbility.selectMobileCountries();
+    }
+
+    @Override
+    public boolean sendRestPasswordCaptcha(CaptchaPushBo bo) {
+        NoticeType type;
+        String code;
+        CaptchaNoticeTemplate template;
+        long timeout = 30;
+        String unionId;
+        if (!StringUtils.isEmpty(bo.getPhone()) && !StringUtils.isEmpty(bo.getCountryCode())) {
+            unionId = bo.getCountryCode() + bo.getPhone();
+            type = NoticeType.SMS;
+            code = captchaService.generateCaptchaNoRepeat(CaptchaType.PASSWORD_REST, unionId, timeout * 60);
+            template = CaptchaNoticeTemplate.restPasswordSms(bo.getLanguage(), code, timeout);
+        } else if (!StringUtils.isEmpty(bo.getMail())) {
+            unionId = bo.getMail();
+            type = NoticeType.MAIL;
+            code = captchaService.generateCaptchaNoRepeat(CaptchaType.PASSWORD_REST, bo.getMail(), timeout * 60);
+            template = CaptchaNoticeTemplate.restPasswordMail(bo.getLanguage(), code, timeout);
+        } else {
+            log.info("captcha error! param:{}", bo.toString());
+            return false;
+        }
+        bo.setType(type.getCode());
+        // 发送失败，删除缓存的captcha
+        boolean result = captchaService.captchaPush(bo, template, code);
+        if (!result) {
+            captchaService.removeCaptchaFromCache(CaptchaType.PASSWORD_REST, unionId);
+        }
+        return result;
+    }
+
+    @Override
+    public boolean resetPassword(ResetPasswordBo bo) {
+        String unionId;
+        if (!StringUtils.isEmpty(bo.getPhone()) && !StringUtils.isEmpty(bo.getCountryCode())) {
+            unionId = bo.getCountryCode() + bo.getPhone();
+        } else if (!StringUtils.isEmpty(bo.getMail())) {
+            unionId = bo.getMail();
+        } else {
+            log.info("resetPassword error! param:{}", bo.toString());
+            throw new ServiceLogicException(PARAM_ERROR);
+        }
+        boolean result = captchaService.captchaValidate(CaptchaType.PASSWORD_REST, unionId, bo.getCode());
+        if (!result) {
+            log.error("captcha validate failed! unionId:[{}] code:[{}]", unionId, bo.getCode());
+            throw new ServiceLogicException(CAPTCHA_ERROR);
+        }
+        // TODO 重置用户密码接口
+
+
+        return true;
     }
 }
 

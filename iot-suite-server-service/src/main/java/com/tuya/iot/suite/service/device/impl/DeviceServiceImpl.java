@@ -64,11 +64,6 @@ public class DeviceServiceImpl implements DeviceService {
         return result;
     }
 
-    public static void main(String[] args) {
-        List<String> deviceIdList = new ArrayList<>();
-        System.out.println(StringUtils.join(deviceIdList, ","));
-    }
-
     @Override
     public DeviceSpecification selectDeviceSpecification(String deviceId) {
         return deviceAbility.selectDeviceSpecification(deviceId);

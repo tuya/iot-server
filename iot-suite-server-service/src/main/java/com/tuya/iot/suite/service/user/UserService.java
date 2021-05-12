@@ -4,6 +4,7 @@ package com.tuya.iot.suite.service.user;
 import com.tuya.iot.suite.ability.user.model.MobileCountries;
 import com.tuya.iot.suite.ability.user.model.UserToken;
 import com.tuya.iot.suite.service.user.model.CaptchaPushBo;
+import com.tuya.iot.suite.service.user.model.ResetPasswordBo;
 
 /**
  * @Description 用户service$
@@ -32,16 +33,23 @@ public interface UserService {
     UserToken login(String userName, String password);
 
     /**
-     * 发送验证码
-     *
-     * @param captchaPushBo
-     * @return
-     */
-    boolean captchaPush(CaptchaPushBo captchaPushBo);
-
-    /**
      * 获取手机号城市编码
      * @return
      */
     MobileCountries selectMobileCountries();
+
+    /**
+     * 发送密码重置验证码
+     * @param bo
+     * @return
+     */
+    boolean sendRestPasswordCaptcha(CaptchaPushBo bo);
+
+    /**
+     * 重置密码
+     *
+     * @param resetPasswordBo
+     * @return
+     */
+    boolean resetPassword(ResetPasswordBo resetPasswordBo);
 }

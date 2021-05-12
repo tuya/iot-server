@@ -10,6 +10,7 @@ import com.tuya.iot.suite.web.i18n.I18nMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -31,6 +32,15 @@ public class GlobalExceptionHandler {
     @Autowired
     private I18nMessage i18NMessage;
 
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseBody
+    public Response MethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        log.error("全局拦截Exception异常:", e);
+        log.error(e.getBindingResult().getFieldError().getDefaultMessage());
+        return Response
+                .buildFailure(ErrorCode.PARAM_ERROR.getCode(),
+                        getI18nMessageByCode(ErrorCode.PARAM_ERROR.getCode(), ErrorCode.PARAM_ERROR.getMsg()));
+    }
 
     @ExceptionHandler(NoHandlerFoundException.class)
     @ResponseBody
