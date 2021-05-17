@@ -2,6 +2,7 @@ package com.tuya.iot.suite.web.controller;
 
 import com.tuya.iot.suite.ability.user.model.MobileCountries;
 import com.tuya.iot.suite.core.constant.Response;
+import com.tuya.iot.suite.core.exception.ServiceLogicException;
 import com.tuya.iot.suite.core.util.LibPhoneNumberUtil;
 import com.tuya.iot.suite.core.util.MixUtil;
 import com.tuya.iot.suite.service.user.UserService;
@@ -106,26 +107,8 @@ public class UserController {
 
     @ApiOperation(value = "获取密码重置验证码")
     @PostMapping(value = "/user/password/reset/captcha")
-    public Response<Boolean> restPasswordCaptcha(@RequestBody ResetPasswordCaptchaReq req) {
-        if (StringUtils.isEmpty(req.getMail())
-                && StringUtils.isEmpty(req.getCountryCode())
-                && StringUtils.isEmpty(req.getPhone())) {
-            return Response.buildFailure(PARAM_ERROR);
-        }
-        // 验证手机格式
-        if (!StringUtils.isEmpty(req.getCountryCode())
-                && !StringUtils.isEmpty(req.getPhone())) {
-            if (!LibPhoneNumberUtil.doValid(req.getPhone(), req.getCountryCode())) {
-                log.info("telephone format error! =>{}{}", req.getCountryCode(), req.getPhone());
-                return Response.buildFailure(TELEPHONE_FORMAT_ERROR.getCode(),
-                        i18nMessage.getMessage(TELEPHONE_FORMAT_ERROR.getCode(), TELEPHONE_FORMAT_ERROR.getMsg()));
-            }
-        }
-        // 验证邮箱格式
-        if (!StringUtils.isEmpty(req.getMail()) && !MixUtil.mailFormatValidate(req.getMail())) {
-            log.info("mail format error! => [{}]", req.getMail());
-            return Response.buildFailure(PARAM_ERROR);
-        }
+    public Response<Boolean> restPasswordCaptcha(@RequestBody ResetPasswordReq req) {
+        resetPasswordCheck(req);
         CaptchaPushBo captchaPushBo = new CaptchaPushBo();
         captchaPushBo.setLanguage(req.getLanguage());
         captchaPushBo.setCountryCode(req.getCountryCode());
@@ -137,14 +120,17 @@ public class UserController {
     @ApiOperation(value = "用户密码重置")
     @PutMapping(value = "/user/password/reset")
     public Response<Boolean> resetPassword(@RequestBody @Valid ResetPasswordReq req) {
-        // TODO 数据校验
-
+        // 参数校验
+        resetPasswordCheck(req);
+        if (StringUtils.isEmpty(req.getCode()) || StringUtils.isEmpty(req.getNewPassword())) {
+            return Response.buildFailure(PARAM_ERROR);
+        }
         ResetPasswordBo resetPasswordBo = new ResetPasswordBo();
         resetPasswordBo.setLanguage(req.getLanguage());
         resetPasswordBo.setMail(req.getMail());
         resetPasswordBo.setCountryCode(req.getCountryCode());
         resetPasswordBo.setPhone(req.getPhone());
-        resetPasswordBo.setPassword(req.getPassword());
+        resetPasswordBo.setPassword(req.getNewPassword());
         resetPasswordBo.setCode(req.getCode());
         return Response.buildSuccess(userService.resetPassword(resetPasswordBo));
     }
@@ -153,6 +139,32 @@ public class UserController {
     @GetMapping(value = "/mobile/countries")
     public Response<MobileCountries> selectMobileCountries() {
         return new Response<>(userService.selectMobileCountries());
+    }
+
+    /**
+     * 重置密码参数校验
+     *
+     * @param req
+     */
+    public void resetPasswordCheck(ResetPasswordReq req) {
+        if (StringUtils.isEmpty(req.getMail())
+                && StringUtils.isEmpty(req.getCountryCode())
+                && StringUtils.isEmpty(req.getPhone())) {
+            throw new ServiceLogicException(PARAM_ERROR);
+        }
+        // 验证手机格式
+        if (!StringUtils.isEmpty(req.getCountryCode())
+                && !StringUtils.isEmpty(req.getPhone())) {
+            if (!LibPhoneNumberUtil.doValid(req.getPhone(), req.getCountryCode())) {
+                log.info("telephone format error! =>{}{}", req.getCountryCode(), req.getPhone());
+                throw new ServiceLogicException(TELEPHONE_FORMAT_ERROR);
+            }
+        }
+        // 验证邮箱格式
+        if (!StringUtils.isEmpty(req.getMail()) && !MixUtil.mailFormatValidate(req.getMail())) {
+            log.info("mail format error! => [{}]", req.getMail());
+            throw new ServiceLogicException(PARAM_ERROR);
+        }
     }
 
 }

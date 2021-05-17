@@ -1,5 +1,6 @@
 package com.tuya.iot.suite.web.model;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
@@ -14,11 +15,15 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ResetPasswordCaptchaReq {
 
+    @ApiModelProperty(value = "语言")
     String language;
 
+    @ApiModelProperty(value = "邮件")
     String mail;
 
+    @ApiModelProperty(value = "国家码")
     String countryCode;
 
+    @ApiModelProperty(value = "手机号")
     String phone;
 }
