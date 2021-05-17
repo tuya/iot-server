@@ -3,8 +3,8 @@ package com.tuya.iot.suite.service.asset.impl;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.Lists;
-import com.tuya.iot.suite.ability.asset.ability.AssetAbility;
 import com.tuya.connector.open.api.model.PageResult;
+import com.tuya.iot.suite.ability.asset.ability.AssetAbility;
 import com.tuya.iot.suite.ability.asset.model.*;
 import com.tuya.iot.suite.core.constant.Response;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
@@ -398,6 +398,7 @@ public class AssetServiceImpl implements AssetService {
                 .level(authedAsset.getLevel())
                 .asset_name(authedAsset.getAssetName())
                 .asset_full_name(authedAsset.getAssetName())
+                .is_authorized(true)
                 .subAssets(new ArrayList<>())
                 .build()).collect(Collectors.toList());
 
@@ -433,6 +434,7 @@ public class AssetServiceImpl implements AssetService {
                                             .level(asset.getLevel())
                                             .asset_name(asset.getAsset_name())
                                             .asset_full_name(asset.getAsset_name())
+                                            .is_authorized(false)
                                             .subAssets(new ArrayList<>())
                                             .build()
                             ).collect(Collectors.toList()));
@@ -721,6 +723,25 @@ public class AssetServiceImpl implements AssetService {
         stopWatch.stop();
         long totalTimeMillis = stopWatch.getTotalTimeMillis();
         log.info("take [{}] ms for refreshing asset tress", totalTimeMillis);
+    }
+
+    @Override
+    public List<AssetDTO>  getTreeFast(String assetId, String userId) {
+        List<Asset> assetList = getChildAssetsBy(assetId);
+        if (!CollectionUtils.isEmpty(assetList)) {
+            List<AssetDTO> result = AssetConvertor.$.toAssetDTOList(assetList);
+            List<String> authorizedAssetIds = listAuthorizedAssetIds(userId);
+            if (!CollectionUtils.isEmpty(authorizedAssetIds)) {
+                for (AssetDTO asset : result) {
+                    if (authorizedAssetIds.contains(asset.getAsset_id())) {
+                        asset.setIs_authorized(true);
+                    }
+                }
+            }
+            return result;
+        }
+
+        return Collections.EMPTY_LIST;
     }
 
 }

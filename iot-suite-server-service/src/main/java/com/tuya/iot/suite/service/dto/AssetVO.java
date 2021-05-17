@@ -40,6 +40,11 @@ public class AssetVO implements Serializable {
      * 子设备数量
      */
     private Integer child_device_count;
+    /**
+     * 是否有权限 true-有 false-无
+     */
+    private Boolean is_authorized;
+
 
     /**
      * 子资产
