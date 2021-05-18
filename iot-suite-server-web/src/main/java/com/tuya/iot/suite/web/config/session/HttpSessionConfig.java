@@ -16,7 +16,7 @@ import org.springframework.session.config.annotation.web.http.EnableSpringHttpSe
 @EnableSpringHttpSession
 public class HttpSessionConfig {
 
-    @Value("${smart.office.http.session.timeout:7200}")
+    @Value("${iot-suite-server.session.timeout:7200}")
     private Integer timeout;
 
     /**

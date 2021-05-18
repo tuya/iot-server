@@ -2,19 +2,21 @@ package com.tuya.iot.suite.service.user.impl;
 
 import com.tuya.iot.suite.core.constant.NoticeType;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
+import com.tuya.iot.suite.core.util.LocalDateTimeUtil;
 import com.tuya.iot.suite.core.util.RandomUtil;
 import com.tuya.iot.suite.service.notice.NoticeService;
 import com.tuya.iot.suite.service.notice.model.MailPushBo;
 import com.tuya.iot.suite.service.notice.model.SmsPushBo;
 import com.tuya.iot.suite.service.notice.template.CaptchaNoticeTemplate;
 import com.tuya.iot.suite.service.user.CaptchaService;
+import com.tuya.iot.suite.service.user.model.CaptchaCache;
 import com.tuya.iot.suite.service.user.model.CaptchaPushBo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
@@ -48,18 +50,31 @@ public class CaptchaServiceImpl implements CaptchaService {
     public String generateCaptcha(String type, String unionId, long timeout) {
         String key = getCaptchaKey(type, unionId);
         String code = RandomUtil.getStringWithNumber(CAPTCHA_NUMBER);
+        CaptchaCache captchaCache = new CaptchaCache(code, type, LocalDateTime.now());
         if (timeout > 0) {
-            redisTemplate.opsForValue().set(key, code, timeout, TimeUnit.SECONDS);
+            redisTemplate.opsForValue().set(key, captchaCache, timeout, TimeUnit.SECONDS);
         }else {
-            redisTemplate.opsForValue().set(key, code);
+            redisTemplate.opsForValue().set(key, captchaCache);
         }
         return code;
     }
 
     @Override
+    public String generateCaptchaInPermitTime(String type, String unionId, long timeout, long permitTime) {
+        CaptchaCache cache = getCaptcha(type, unionId);
+        if (!Objects.isNull(cache)
+                && LocalDateTimeUtil.calculateSecondBetween(cache.getCreateTime(), LocalDateTime.now()) < permitTime) {
+            throw new ServiceLogicException(CAPTCHA_ALREADY_EXITS);
+        }
+        else {
+            return generateCaptcha(type, unionId, timeout);
+        }
+    }
+
+    @Override
     public String generateCaptchaNoRepeat(String type, String unionId, long timeout) {
-        String captcha = getCaptcha(type, unionId);
-        if (!StringUtils.isEmpty(captcha)) {
+        CaptchaCache cache = getCaptcha(type, unionId);
+        if (!Objects.isNull(cache)) {
             throw new ServiceLogicException(CAPTCHA_ALREADY_EXITS);
         }else {
             return generateCaptcha(type, unionId, timeout);
@@ -67,20 +82,20 @@ public class CaptchaServiceImpl implements CaptchaService {
     }
 
     @Override
-    public String getCaptcha(String type, String unionId) {
-        return (String) redisTemplate.opsForValue().get(getCaptchaKey(type, unionId));
+    public CaptchaCache getCaptcha(String type, String unionId) {
+        Object object = redisTemplate.opsForValue().get(getCaptchaKey(type, unionId));
+        return Objects.isNull(object) ? null : (CaptchaCache) object;
     }
 
     @Override
     public boolean captchaValidate(String type, String unionId, String code) {
-        String captcha = getCaptcha(type, unionId);
-        if (StringUtils.isEmpty(captcha)) {
+        CaptchaCache cache = getCaptcha(type, unionId);
+        if (Objects.isNull(cache)) {
             log.error("captcha does not exist! type:[{}] - unionId:[{}]", type, unionId);
             throw new ServiceLogicException(CAPTCHA_NOT_EXITS);
         }
-        return captcha.equals(code);
+        return code.equals(cache.getCode());
     }
-
 
     @Override
     public void removeCaptchaFromCache(String type, String unionId) {
