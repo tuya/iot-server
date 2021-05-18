@@ -735,6 +735,8 @@ public class AssetServiceImpl implements AssetService {
                 for (AssetDTO asset : result) {
                     if (authorizedAssetIds.contains(asset.getAsset_id())) {
                         asset.setIs_authorized(true);
+                    }else{
+                        asset.setIs_authorized(false);
                     }
                 }
             }
