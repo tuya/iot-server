@@ -69,4 +69,6 @@ public interface AssetService {
     PageDataVO<DeviceDTO> getChildDeviceInfoPage(String assetId, Integer pageNo, Integer pageSize);
 
     void refreshTree();
+
+    List<AssetDTO> getTreeFast(String assetId, String userId);
 }

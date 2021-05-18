@@ -83,12 +83,12 @@ public class UserServiceImpl implements UserService {
         if (!StringUtils.isEmpty(bo.getPhone()) && !StringUtils.isEmpty(bo.getCountryCode())) {
             unionId = bo.getCountryCode() + bo.getPhone();
             type = NoticeType.SMS;
-            code = captchaService.generateCaptchaNoRepeat(CaptchaType.PASSWORD_REST, unionId, timeout * 60);
+            code = captchaService.generateCaptchaInPermitTime(CaptchaType.PASSWORD_REST, unionId, timeout * 60, 60);
             template = CaptchaNoticeTemplate.restPasswordSms(bo.getLanguage(), code, timeout);
         } else if (!StringUtils.isEmpty(bo.getMail())) {
             unionId = bo.getMail();
             type = NoticeType.MAIL;
-            code = captchaService.generateCaptchaNoRepeat(CaptchaType.PASSWORD_REST, bo.getMail(), timeout * 60);
+            code = captchaService.generateCaptchaInPermitTime(CaptchaType.PASSWORD_REST, bo.getMail(), timeout * 60, 60);
             template = CaptchaNoticeTemplate.restPasswordMail(bo.getLanguage(), code, timeout);
         } else {
             log.info("captcha error! param:{}", bo.toString());

@@ -53,6 +53,10 @@ public class AssetDTO {
      * 层级号
      */
     private int level;
+    /**
+     * 是否有权限 true-有 false-无
+     */
+    private Boolean is_authorized;
 
     /**
      * 子资产

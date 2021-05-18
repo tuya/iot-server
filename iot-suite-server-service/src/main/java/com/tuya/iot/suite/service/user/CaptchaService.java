@@ -1,6 +1,7 @@
 package com.tuya.iot.suite.service.user;
 
 import com.tuya.iot.suite.service.notice.template.CaptchaNoticeTemplate;
+import com.tuya.iot.suite.service.user.model.CaptchaCache;
 import com.tuya.iot.suite.service.user.model.CaptchaPushBo;
 
 /**
@@ -22,6 +23,17 @@ public interface CaptchaService {
     String generateCaptcha(String bizType, String userId, long timeout);
 
     /**
+     * generate captcha in permitTIme
+     *
+     * @param type
+     * @param unionId
+     * @param timeout
+     * @param permitTime
+     * @return
+     */
+    String generateCaptchaInPermitTime(String type, String unionId, long timeout, long permitTime);
+
+    /**
      *
      *
      * @param type
@@ -38,7 +50,7 @@ public interface CaptchaService {
      * @param unionId
      * @return
      */
-    String getCaptcha(String type, String unionId);
+    CaptchaCache getCaptcha(String type, String unionId);
 
     /**
      * 验证码校验

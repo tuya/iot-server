@@ -28,7 +28,7 @@ import java.util.Objects;
  */
 @RequestMapping("/assets")
 @RestController
-@Api(description = "资产管理")
+@Api(value = "资产管理")
 public class AssetController {
 
     @Resource
@@ -76,6 +76,13 @@ public class AssetController {
         String userId = getUserId(session);
         return new Response(AssetConvertor.$.toAssetVO(assetService.getTreeByV2(assetId, userId)));
     }
+    @ApiOperation(value = "资产树接口")
+    @GetMapping(value = "/tree-fast/{asset_id}")
+    Response getTreeFastBy(@PathVariable("asset_id") String assetId) {
+        String userId = getUserId(session);
+        return new Response(AssetConvertor.$.toAssetVOList(assetService.getTreeFast(assetId, userId)));
+    }
+
 
     @ApiOperation(value = "通过资产名称获取资产列表")
     @ApiImplicitParams({
