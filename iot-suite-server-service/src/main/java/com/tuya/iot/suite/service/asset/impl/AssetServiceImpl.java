@@ -406,7 +406,7 @@ public class AssetServiceImpl implements AssetService {
         Map<String, AssetDTO> assetMap = assetList.stream().collect(Collectors.toMap(
                 AssetDTO::getAsset_id, Function.identity()
         ));
-        if (!assetMap.containsKey(targetAssetId)) {
+        if (!"-1".equals(targetAssetId) && !assetMap.containsKey(targetAssetId)) {
             Asset asset = assetAbility.selectAsset(targetAssetId);
             AssetDTO assetDTO = AssetDTO.builder()
                     .asset_id(asset.getAsset_id())
