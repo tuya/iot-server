@@ -97,7 +97,7 @@ public class AssetController {
     @ApiOperation(value = "通过资产ID获取子资产")
     @GetMapping(value = "/{asset_id}")
     Response getChildAssetListBy(@PathVariable("asset_id") String assetId) {
-        return new Response(AssetConvertor.$.toAssetVOList(assetService.getChildAssetListBy(assetId)));
+        return new Response(AssetConvertor.$.toAssetVOList(assetService.getTreeFast(assetId, getUserId(session))));
     }
 
     @ApiOperation(value = "通过资产ID获取下级设备信息")
@@ -112,7 +112,7 @@ public class AssetController {
         PageDataVO<DeviceInfoVO> vo = new PageDataVO<>();
         vo.setPage_no(pageNo);
         vo.setPage_size(pageSize);
-        PageDataVO<DeviceDTO> resultPage = assetService.getChildDeviceInfoPage(assetId, pageNo, pageSize);
+        PageDataVO<DeviceDTO> resultPage = assetService.getChildDeviceInfoPage(getUserId(session),assetId, pageNo, pageSize);
         vo.setTotal(resultPage.getTotal());
         vo.setData(DeviceInfoConvert.INSTANCE.deviceDTO2VO(resultPage.getData()));
         return Response.buildSuccess(vo);

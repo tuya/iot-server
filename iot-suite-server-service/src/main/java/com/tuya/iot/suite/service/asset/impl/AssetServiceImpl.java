@@ -401,16 +401,29 @@ public class AssetServiceImpl implements AssetService {
                 .is_authorized(true)
                 .subAssets(new ArrayList<>())
                 .build()).collect(Collectors.toList());
-
+        int maxLevel = maxOfAuthorizedAsset(list);
         // 便于设置资产下设备数量
         Map<String, AssetDTO> assetMap = assetList.stream().collect(Collectors.toMap(
                 AssetDTO::getAsset_id, Function.identity()
         ));
-
+        if (!assetMap.containsKey(targetAssetId)) {
+            Asset asset = assetAbility.selectAsset(targetAssetId);
+            AssetDTO assetDTO = AssetDTO.builder()
+                    .asset_id(asset.getAsset_id())
+                    .parent_asset_id(asset.getParent_asset_id())
+                    .level(asset.getLevel())
+                    .asset_name(asset.getAsset_name())
+                    .asset_full_name(asset.getAsset_full_name())
+                    .is_authorized(false)
+                    .subAssets(new ArrayList<>())
+                    .build();
+            assetMap.put(targetAssetId, assetDTO);
+            assetList.add(assetDTO);
+        }
         // 从底层向上补全资产树
         Map<Integer, List<AssetDTO>> levelMap = assetList.stream().collect(Collectors.groupingBy(AssetDTO::getLevel)); // TODO 是否包含-1
-        int targetLevel = "-1".equals(targetAssetId) ? 0 : assetMap.get(targetAssetId).getLevel() + 1;
-        for (int i = 4; i > targetLevel; i--) {
+        int targetLevel = "-1".equals(targetAssetId) ? 0 : assetMap.get(targetAssetId).getLevel() ;
+        for (int i = maxLevel; i > targetLevel; i--) {
             List<AssetDTO> assetDTOS = levelMap.get(i);
             if (CollectionUtils.isEmpty(assetDTOS)) {
                 continue;
@@ -448,7 +461,7 @@ public class AssetServiceImpl implements AssetService {
         Map<String, AssetDTO> treeMap = levelMap.values().stream().flatMap(Collection::stream).collect(Collectors.toMap(
                 AssetDTO::getAsset_id, Function.identity()
         ));
-        for (int i = 4; i > targetLevel; i--) {
+        for (int i = maxLevel; i > targetLevel; i--) {
             List<AssetDTO> curLevelAssets = levelMap.get(i);
             if (CollectionUtils.isEmpty(curLevelAssets)) {
                 continue;
@@ -486,6 +499,16 @@ public class AssetServiceImpl implements AssetService {
             );
         }
         return targetAsset;
+    }
+
+    private int maxOfAuthorizedAsset(List<AuthorizedAsset> list) {
+        int level = 0;
+        for (AuthorizedAsset authorizedAsset : list) {
+            if (authorizedAsset.getLevel() != null && authorizedAsset.getLevel().intValue() > level) {
+                level = authorizedAsset.getLevel();
+            }
+        }
+        return level;
     }
 
     /**
@@ -583,14 +606,19 @@ public class AssetServiceImpl implements AssetService {
     }
 
     @Override
-    public PageDataVO<DeviceDTO> getChildDeviceInfoPage(String assetId, Integer pageNo, Integer pageSize) {
+    public PageDataVO<DeviceDTO> getChildDeviceInfoPage(String userId, String assetId, Integer pageNo, Integer pageSize) {
         PageDataVO<DeviceDTO> vo = new PageDataVO<>();
         vo.setPage_no(pageNo);
         vo.setPage_size(pageSize);
         vo.setData(Lists.newArrayList());
+        vo.setTotal(0);
+        //判断授权
+        List<String> authList = listAuthorizedAssetIds(userId);
+        if (CollectionUtils.isEmpty(authList) || !authList.contains(assetId)) {
+            return vo;
+        }
         List<String> deviceIdList = getChildDeviceIdsBy(assetId);
         if (CollectionUtils.isEmpty(deviceIdList)) {
-            vo.setTotal(0);
             return vo;
         }
         vo.setTotal(deviceIdList.size());
@@ -726,24 +754,9 @@ public class AssetServiceImpl implements AssetService {
     }
 
     @Override
-    public List<AssetDTO>  getTreeFast(String assetId, String userId) {
-        List<Asset> assetList = getChildAssetsBy(assetId);
-        if (!CollectionUtils.isEmpty(assetList)) {
-            List<AssetDTO> result = AssetConvertor.$.toAssetDTOList(assetList);
-            List<String> authorizedAssetIds = listAuthorizedAssetIds(userId);
-            if (!CollectionUtils.isEmpty(authorizedAssetIds)) {
-                for (AssetDTO asset : result) {
-                    if (authorizedAssetIds.contains(asset.getAsset_id())) {
-                        asset.setIs_authorized(true);
-                    }else{
-                        asset.setIs_authorized(false);
-                    }
-                }
-            }
-            return result;
-        }
-
-        return Collections.EMPTY_LIST;
+    public List<AssetDTO> getTreeFast(String assetId, String userId) {
+        AssetDTO assetDTO = buildAuthedAssetTree(listAuthorizedAssets(userId), assetId, true);
+        return assetDTO.getSubAssets();
     }
 
 }
