@@ -1,4 +1,4 @@
-package com.tuya.iot.suite.starter;
+package com.tuya.iot.suite.web;
 
 import com.tuya.connector.spring.annotations.ConnectorScan;
 import org.springframework.boot.SpringApplication;

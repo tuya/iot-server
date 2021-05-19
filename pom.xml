@@ -9,7 +9,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <revision>1.1.1-SNAPSHOT</revision>
+        <revision>local-1.1.1-SNAPSHOT</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
@@ -32,7 +32,6 @@
         <module>iot-suite-server-service</module>
         <module>iot-suite-server-ability</module>
         <module>iot-suite-server-web</module>
-        <module>iot-suite-server-starter</module>
     </modules>
 
     <dependencyManagement>

@@ -1,7 +1,7 @@
-package com.tuya.iot.suite.starter.ability;
+package com.tuya.iot.suite.web.ability;
 
 import com.tuya.iot.suite.ability.user.ability.UserAbility;
-import com.tuya.iot.suite.starter.BaseTest;
+import com.tuya.iot.suite.web.BaseTest;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
