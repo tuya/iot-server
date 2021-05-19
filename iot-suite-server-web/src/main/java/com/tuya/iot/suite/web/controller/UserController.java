@@ -118,7 +118,7 @@ public class UserController {
     }
 
     @ApiOperation(value = "用户密码重置")
-    @PutMapping(value = "/user/password/reset")
+    @PostMapping(value = "/user/password/reset")
     public Response<Boolean> resetPassword(@RequestBody @Valid ResetPasswordReq req) {
         // 参数校验
         resetPasswordCheck(req);
