@@ -41,6 +41,8 @@ public class LoginInterceptor implements HandlerInterceptor {
                         .excludePathPatterns("/mobile/countries")
                         .excludePathPatterns("/hc.do")
                         .excludePathPatterns("/v2/api-docs")
+                        .excludePathPatterns("/user/password/reset/captcha")
+                        .excludePathPatterns("/user/password/reset")
                         /*swagger2*/
                         //拦截路径
                         .addPathPatterns("/**");
