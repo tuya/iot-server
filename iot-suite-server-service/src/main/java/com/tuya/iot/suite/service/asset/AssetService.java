@@ -66,7 +66,7 @@ public interface AssetService {
 
     List<DeviceDTO> getChildDeviceInfoBy(String assetId);
 
-    PageDataVO<DeviceDTO> getChildDeviceInfoPage(String assetId, Integer pageNo, Integer pageSize);
+    PageDataVO<DeviceDTO> getChildDeviceInfoPage(String userId, String assetId, Integer pageNo, Integer pageSize);
 
     void refreshTree();
 
