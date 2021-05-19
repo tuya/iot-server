@@ -2,6 +2,7 @@ package com.tuya.iot.suite.ability.user.connector;
 
 import com.tuya.connector.api.annotations.*;
 import com.tuya.connector.open.api.model.PageResult;
+import com.tuya.iot.suite.ability.notice.model.ResetPasswordReq;
 import com.tuya.iot.suite.ability.user.ability.UserAbility;
 import com.tuya.iot.suite.ability.user.model.*;
 
@@ -40,4 +41,8 @@ public interface UserConnector extends UserAbility {
     @Override
     @GET("/v1.0/all-countries")
     MobileCountries selectMobileCountries();
+
+    @Override
+    @PUT("/v1.0/iot-02/users/reset-password")
+    Boolean resetPassword(@Body ResetPasswordReq resetPasswordReq);
 }

@@ -1,5 +1,6 @@
 package com.tuya.iot.suite.service.user.impl;
 
+import com.tuya.iot.suite.ability.notice.model.ResetPasswordReq;
 import com.tuya.iot.suite.ability.user.ability.UserAbility;
 import com.tuya.iot.suite.ability.user.model.MobileCountries;
 import com.tuya.iot.suite.ability.user.model.UserModifyRequest;
@@ -119,10 +120,9 @@ public class UserServiceImpl implements UserService {
             log.error("captcha validate failed! unionId:[{}] code:[{}]", unionId, bo.getCode());
             throw new ServiceLogicException(CAPTCHA_ERROR);
         }
-        // TODO 重置用户密码接口
-
-
-        return true;
+        // 重置用户密码
+        result = userAbility.resetPassword(new ResetPasswordReq(unionId, bo.getPassword()));
+        return result;
     }
 }
 

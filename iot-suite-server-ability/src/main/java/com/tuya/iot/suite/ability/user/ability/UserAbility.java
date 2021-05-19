@@ -1,6 +1,8 @@
 package com.tuya.iot.suite.ability.user.ability;
 
+import com.tuya.connector.api.annotations.Body;
 import com.tuya.connector.open.api.model.PageResult;
+import com.tuya.iot.suite.ability.notice.model.ResetPasswordReq;
 import com.tuya.iot.suite.ability.user.model.*;
 
 /**
@@ -62,5 +64,11 @@ public interface UserAbility {
      */
     MobileCountries selectMobileCountries();
 
-
+    /**
+     * reset password
+     *
+     * @param resetPasswordReq
+     * @return
+     */
+    Boolean resetPassword(@Body ResetPasswordReq resetPasswordReq);
 }
