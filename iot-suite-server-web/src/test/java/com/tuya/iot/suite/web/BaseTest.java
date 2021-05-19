@@ -1,4 +1,4 @@
-package com.tuya.iot.suite.starter;
+package com.tuya.iot.suite.web;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

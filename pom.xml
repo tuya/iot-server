@@ -32,7 +32,6 @@
         <module>iot-suite-server-service</module>
         <module>iot-suite-server-ability</module>
         <module>iot-suite-server-web</module>
-        <module>iot-suite-server-starter</module>
     </modules>
 
     <dependencyManagement>
