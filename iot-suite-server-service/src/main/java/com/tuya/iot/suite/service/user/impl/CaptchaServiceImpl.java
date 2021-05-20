@@ -92,7 +92,7 @@ public class CaptchaServiceImpl implements CaptchaService {
         CaptchaCache cache = getCaptcha(type, unionId);
         if (Objects.isNull(cache)) {
             log.error("captcha does not exist! type:[{}] - unionId:[{}]", type, unionId);
-            throw new ServiceLogicException(CAPTCHA_NOT_EXITS);
+            throw new ServiceLogicException(CAPTCHA_ERROR);
         }
         return code.equals(cache.getCode());
     }

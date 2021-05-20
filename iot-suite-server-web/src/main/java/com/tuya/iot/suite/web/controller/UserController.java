@@ -3,15 +3,15 @@ package com.tuya.iot.suite.web.controller;
 import com.tuya.iot.suite.ability.user.model.MobileCountries;
 import com.tuya.iot.suite.core.constant.Response;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
+import com.tuya.iot.suite.core.model.UserToken;
+import com.tuya.iot.suite.core.util.ContextUtil;
 import com.tuya.iot.suite.core.util.LibPhoneNumberUtil;
 import com.tuya.iot.suite.core.util.MixUtil;
 import com.tuya.iot.suite.service.user.UserService;
 import com.tuya.iot.suite.service.user.model.CaptchaPushBo;
 import com.tuya.iot.suite.service.user.model.ResetPasswordBo;
 import com.tuya.iot.suite.web.i18n.I18nMessage;
-import com.tuya.iot.suite.web.model.ResetPasswordCaptchaReq;
 import com.tuya.iot.suite.web.model.ResetPasswordReq;
-import com.tuya.iot.suite.web.model.UserToken;
 import com.tuya.iot.suite.web.model.criteria.UserCriteria;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -41,7 +41,6 @@ public class UserController {
     private HttpSession session;
     @Autowired
     private I18nMessage i18nMessage;
-
 
     /**
      * 账号密码登录
@@ -79,9 +78,9 @@ public class UserController {
      */
     @ApiOperation(value = "用户登出")
     @PostMapping(value = "/logout")
-    public Response logout() {
+    public Response<Boolean> logout() {
         session.invalidate();
-        return new Response(true);
+        return Response.buildSuccess(true);
     }
 
     /**
@@ -93,14 +92,13 @@ public class UserController {
     @SneakyThrows
     @PutMapping(value = "/user/password")
     public Response modifyLoginPassword(@RequestBody UserCriteria criteria) {
-        UserToken userToken = (UserToken) session.getAttribute("token");
         String userName = criteria.getUser_name();
         String currentPassword = criteria.getCurrent_password();
         String newPassword = criteria.getNew_password();
-        if (!userName.equals(userToken.getNickName())) {
+        if (!userName.equals(ContextUtil.getNickName())) {
             return Response.buildFailure(USER_NOT_EXIST);
         }
-        Boolean modifyLoginPassword = userService.modifyLoginPassword(userToken.getUserId(), currentPassword, newPassword);
+        Boolean modifyLoginPassword = userService.modifyLoginPassword(ContextUtil.getUserId(), currentPassword, newPassword);
         return modifyLoginPassword ? Response.buildSuccess(true) :
                 Response.buildFailure(USER_NOT_EXIST.getCode(), i18nMessage.getMessage(USER_NOT_EXIST.getCode(), USER_NOT_EXIST.getMsg()));
     }
