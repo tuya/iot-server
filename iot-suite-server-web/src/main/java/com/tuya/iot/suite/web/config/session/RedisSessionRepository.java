@@ -1,6 +1,6 @@
 package com.tuya.iot.suite.web.config.session;
 
-import com.tuya.iot.suite.web.model.UserToken;
+import com.tuya.iot.suite.core.model.UserToken;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;

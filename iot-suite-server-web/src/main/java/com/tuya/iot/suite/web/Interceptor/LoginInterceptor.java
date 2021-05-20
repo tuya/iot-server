@@ -1,19 +1,17 @@
-package com.tuya.iot.suite.web.config.session;
+package com.tuya.iot.suite.web.Interceptor;
 
 import com.alibaba.fastjson.JSON;
 import com.tuya.iot.suite.core.constant.ErrorCode;
 import com.tuya.iot.suite.core.constant.Response;
+import com.tuya.iot.suite.core.model.UserToken;
+import com.tuya.iot.suite.core.util.ContextUtil;
 import com.tuya.iot.suite.web.i18n.I18nMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -30,26 +28,6 @@ public class LoginInterceptor implements HandlerInterceptor {
     @Autowired
     private I18nMessage i18nMessage;
 
-    @Bean
-    WebMvcConfigurer createWebMvcConfigurer() {
-        return new WebMvcConfigurerAdapter() {
-            @Override
-            public void addInterceptors(InterceptorRegistry registry) {
-                registry.addInterceptor(new LoginInterceptor(i18nMessage))
-                        //排除拦截
-                        .excludePathPatterns("/login")
-                        .excludePathPatterns("/mobile/countries")
-                        .excludePathPatterns("/hc.do")
-                        .excludePathPatterns("/v2/api-docs")
-                        .excludePathPatterns("/user/password/reset/captcha")
-                        .excludePathPatterns("/user/password/reset")
-                        /*swagger2*/
-                        //拦截路径
-                        .addPathPatterns("/**");
-            }
-        };
-    }
-
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object o) throws Exception {
         log.info("preHandle {}...", request.getRequestURI());
@@ -59,6 +37,7 @@ public class LoginInterceptor implements HandlerInterceptor {
             Object token = session.getAttribute("token");
             //判断session中是否有用户数据，如果有，则返回true，继续向下执行
             if (token != null) {
+                ContextUtil.setUserToken((UserToken) token);
                 return true;
             }
         }

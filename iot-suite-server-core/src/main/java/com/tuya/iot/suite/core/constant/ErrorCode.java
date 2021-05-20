@@ -41,7 +41,6 @@ public enum ErrorCode {
 
     CAPTCHA_ALREADY_EXITS("1108", "验证码已发送"),
 
-    CAPTCHA_NOT_EXITS("1109", "验证码不存在"),
     /**
      * WITHOUT_PERMISSION
      */

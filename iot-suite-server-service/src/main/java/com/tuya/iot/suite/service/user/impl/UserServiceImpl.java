@@ -79,7 +79,7 @@ public class UserServiceImpl implements UserService {
         NoticeType type;
         String code;
         CaptchaNoticeTemplate template;
-        long timeout = 30;
+        long timeout = 5;
         String unionId;
         if (!StringUtils.isEmpty(bo.getPhone()) && !StringUtils.isEmpty(bo.getCountryCode())) {
             unionId = bo.getCountryCode() + bo.getPhone();
@@ -120,7 +120,10 @@ public class UserServiceImpl implements UserService {
             log.error("captcha validate failed! unionId:[{}] code:[{}]", unionId, bo.getCode());
             throw new ServiceLogicException(CAPTCHA_ERROR);
         }
-        // 重置用户密码
+        // 重置用户密码 TODO  手机号不需要加国家码
+        if (unionId.startsWith(bo.getCountryCode())) {
+            unionId = unionId.substring(bo.getCountryCode().length());
+        }
         result = userAbility.resetPassword(new ResetPasswordReq(unionId, bo.getPassword()));
         return result;
     }
