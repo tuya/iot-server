@@ -1,8 +1,9 @@
 package com.tuya.iot.suite.service.notice.template;
 
+import com.tuya.iot.suite.core.constant.LanguageConstant;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
 import com.tuya.iot.suite.core.util.ApplicationUtil;
-import com.tuya.iot.suite.core.util.MixUtil;
+import com.tuya.iot.suite.core.util.ContextUtil;
 import org.springframework.util.StringUtils;
 
 import static com.tuya.iot.suite.core.constant.ErrorCode.PARAM_ERROR;
@@ -23,7 +24,7 @@ public class CaptchaNoticeTemplate extends NoticeTemplate {
         if (StringUtils.isEmpty(language)) {
             throw new ServiceLogicException(PARAM_ERROR);
         }
-        return MixUtil.COUNTRY_EN.equalsIgnoreCase(language) ? new CaptchaNoticeTemplateEn() : new CaptchaNoticeTemplateCn();
+        return LanguageConstant.CN.equals(ContextUtil.getLanguage()) ? new CaptchaNoticeTemplateCn() : new CaptchaNoticeTemplateEn();
     }
 
     public static CaptchaNoticeTemplate restPasswordMail(String language, Object... param) {
