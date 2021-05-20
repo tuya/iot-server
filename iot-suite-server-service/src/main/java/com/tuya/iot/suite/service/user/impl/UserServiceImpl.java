@@ -120,7 +120,9 @@ public class UserServiceImpl implements UserService {
             log.error("captcha validate failed! unionId:[{}] code:[{}]", unionId, bo.getCode());
             throw new ServiceLogicException(CAPTCHA_ERROR);
         }
-        // 重置用户密码 TODO  手机号不需要加国家码
+        // 清除验证码
+        captchaService.removeCaptchaFromCache(CaptchaType.PASSWORD_REST, unionId);
+        // 重置用户密码，手机号不需要加国家码
         if (!StringUtils.isEmpty(bo.getCountryCode()) && unionId.startsWith(bo.getCountryCode())) {
             unionId = unionId.substring(bo.getCountryCode().length());
         }
