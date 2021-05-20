@@ -5,7 +5,7 @@
 资产管理：创建资产、修改资产、删除资产等
 设备管理：增加设备、移除设备、编辑设备、控制设备等
 ## 启动项目
-1. 将项目代码导入到IDE，在./iot-suite-starter/src/main/resources/application.properties文件中配置云开发平台应用的账号
+1. 将项目代码导入到IDE，在./iot-suite-server-web/src/main/resources/application.properties文件中配置云开发平台应用的账号
    //在云开发平台申请的Access ID/Client ID
    connector.ak=
    //在云开发平台申请的Access Secret/Client Secret
@@ -15,7 +15,7 @@
 
 2. 以Spring Boot Starter 方式启动项目，执行main方法，或者用Maven
    $ ./mvn package
-   $ java -jar iot-app-smart-office-starter/target/*.jar
+   $ java -jar iot-suite-server-web/target/*.jar
 
 ### 如何获得技术支持
 可以通过以下链接获得帮助

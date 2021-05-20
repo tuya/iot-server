@@ -5,7 +5,7 @@ Asset Management：Change Password、Reset Password.
 Asset Management：Create Devince、Delete Device、Edit Device and so on.
 Device Management：Create Devince、Remove Device、Edit Device、Control Device and so on.
 ## Run this project
-1.  Import the app source code into IDE，and initialized the settings about the account applied from Cloud Development Platform in the ./iot-suit-starter/src/main/resources/application.properties file
+1.  Import the app source code into IDE，and initialized the settings about the account applied from Cloud Development Platform in the ./iot-suit-server-web/src/main/resources/application.properties file
     //The Access ID/Client ID  applied from Cloud Development Platform
     connector.ak=
     //The Access Secret/Client Secret applied from Cloud Development Platform
@@ -15,7 +15,7 @@ Device Management：Create Devince、Remove Device、Edit Device、Control Devic
 
 2. Run this project as a Spring Boot app, run main method, or use Maven:
    $ ./mvn package
-   $ java -jar iot-app-smart-office-starter/target/*.jar
+   $ java -jar iot-suit-server-web/target/*.jar
 
 
 ## Documentation
