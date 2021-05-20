@@ -64,6 +64,14 @@ public class ContextUtil {
         getLocalMap().put(KEY_LANGUAGE, language);
     }
 
+    public static String getLanguage() {
+        Object o = getLocalMap().get(KEY_LANGUAGE);
+        if (Objects.nonNull(o)) {
+            return (String) o;
+        }
+        return null;
+    }
+
     public static void remove() {
         MAP.remove();
     }
