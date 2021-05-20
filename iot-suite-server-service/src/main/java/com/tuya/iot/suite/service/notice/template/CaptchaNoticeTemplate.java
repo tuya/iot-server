@@ -1,6 +1,7 @@
 package com.tuya.iot.suite.service.notice.template;
 
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
+import com.tuya.iot.suite.core.util.ApplicationUtil;
 import com.tuya.iot.suite.core.util.MixUtil;
 import org.springframework.util.StringUtils;
 
@@ -34,38 +35,38 @@ public class CaptchaNoticeTemplate extends NoticeTemplate {
     }
 
     static class CaptchaNoticeTemplateCn implements ICaptchaNoticeTemplate {
-        private static final String RESET_PASSWORD_SMS_TEMPLATE_ID = "SMS_683792742";
-        private static final String RESET_PASSWORD_SMS_TEMPLATE_PARAM = "{\"code\": \"%s\",\"timeLimit\": \"%d\"}";
+        private static final String RESET_PASSWORD_SMS_TEMPLATE_ID = ApplicationUtil.getProperty("captcha.notice.resetPassword.sms.templateId.cn");
 
-        private static final String RESET_PASSWORD_MAIL_TEMPLATE_ID = "MAIL_384597583";
-        private static final String RESET_PASSWORD_MAIL_TEMPLATE_PARAM = "{\"code\": \"%s\",\"timeLimit\": \"%d\"}";
+        private static final String RESET_PASSWORD_MAIL_TEMPLATE_ID = ApplicationUtil.getProperty("captcha.notice.resetPassword.mail.templateId.cn");
+
+        private static final String RESET_PASSWORD_TEMPLATE_PARAM = ApplicationUtil.getProperty("captcha.notice.resetPassword.templateParam");
 
         @Override
         public CaptchaNoticeTemplate restPasswordSms(Object... param) {
-            return new CaptchaNoticeTemplate(RESET_PASSWORD_SMS_TEMPLATE_ID, String.format(RESET_PASSWORD_SMS_TEMPLATE_PARAM, param));
+            return new CaptchaNoticeTemplate(RESET_PASSWORD_SMS_TEMPLATE_ID, String.format(RESET_PASSWORD_TEMPLATE_PARAM, param));
         }
 
         @Override
         public CaptchaNoticeTemplate restPasswordMail(Object... param) {
-            return new CaptchaNoticeTemplate(RESET_PASSWORD_MAIL_TEMPLATE_ID, String.format(RESET_PASSWORD_MAIL_TEMPLATE_PARAM, param));
+            return new CaptchaNoticeTemplate(RESET_PASSWORD_MAIL_TEMPLATE_ID, String.format(RESET_PASSWORD_TEMPLATE_PARAM, param));
         }
     }
 
     static class CaptchaNoticeTemplateEn implements ICaptchaNoticeTemplate {
-        private static final String RESET_PASSWORD_SMS_TEMPLATE_ID = "SMS_647256109";
-        private static final String RESET_PASSWORD_SMS_TEMPLATE_PARAM = "{\"code\": \"%s\",\"timeLimit\": \"%d\"}";
+        private static final String RESET_PASSWORD_SMS_TEMPLATE_ID = ApplicationUtil.getProperty("captcha.notice.resetPassword.sms.templateId.en");
 
-        private static final String RESET_PASSWORD_MAIL_TEMPLATE_ID = "MAIL_287988317";
-        private static final String RESET_PASSWORD_MAIL_TEMPLATE_PARAM = "{\"code\": \"%s\",\"timeLimit\": \"%d\"}";
+        private static final String RESET_PASSWORD_MAIL_TEMPLATE_ID = ApplicationUtil.getProperty("captcha.notice.resetPassword.mail.templateId.en");
+
+        private static final String RESET_PASSWORD_TEMPLATE_PARAM = ApplicationUtil.getProperty("captcha.notice.resetPassword.templateParam");
 
         @Override
         public CaptchaNoticeTemplate restPasswordSms(Object... param) {
-            return new CaptchaNoticeTemplate(RESET_PASSWORD_SMS_TEMPLATE_ID, String.format(RESET_PASSWORD_SMS_TEMPLATE_PARAM, param));
+            return new CaptchaNoticeTemplate(RESET_PASSWORD_SMS_TEMPLATE_ID, String.format(RESET_PASSWORD_TEMPLATE_PARAM, param));
         }
 
         @Override
         public CaptchaNoticeTemplate restPasswordMail(Object... param) {
-            return new CaptchaNoticeTemplate(RESET_PASSWORD_MAIL_TEMPLATE_ID, String.format(RESET_PASSWORD_MAIL_TEMPLATE_PARAM, param));
+            return new CaptchaNoticeTemplate(RESET_PASSWORD_MAIL_TEMPLATE_ID, String.format(RESET_PASSWORD_TEMPLATE_PARAM, param));
         }
     }
 
