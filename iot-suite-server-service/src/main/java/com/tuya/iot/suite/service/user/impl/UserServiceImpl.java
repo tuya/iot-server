@@ -121,7 +121,7 @@ public class UserServiceImpl implements UserService {
             throw new ServiceLogicException(CAPTCHA_ERROR);
         }
         // 重置用户密码 TODO  手机号不需要加国家码
-        if (unionId.startsWith(bo.getCountryCode())) {
+        if (!StringUtils.isEmpty(bo.getCountryCode()) && unionId.startsWith(bo.getCountryCode())) {
             unionId = unionId.substring(bo.getCountryCode().length());
         }
         result = userAbility.resetPassword(new ResetPasswordReq(unionId, bo.getPassword()));
