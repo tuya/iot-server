@@ -37,10 +37,6 @@ public enum ErrorCode {
      */
     USER_NOT_AUTH("1106", "用户未被授权"),
 
-    CAPTCHA_ERROR("1107", "验证码错误"),
-
-    CAPTCHA_ALREADY_EXITS("1108", "验证码已发送"),
-
     /**
      * WITHOUT_PERMISSION
      */
@@ -58,7 +54,11 @@ public enum ErrorCode {
     /**
      * PARAM_ERROR
      */
-    PARAM_ERROR("3003", "param_error")
+    PARAM_ERROR("3003", "param_error"),
+
+    CAPTCHA_ERROR("3004", "验证码错误"),
+
+    CAPTCHA_ALREADY_EXITS("3005", "验证码已发送"),
 
     ;
 

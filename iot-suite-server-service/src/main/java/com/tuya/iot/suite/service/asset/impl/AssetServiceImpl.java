@@ -3,6 +3,7 @@ package com.tuya.iot.suite.service.asset.impl;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.Lists;
+import com.tuya.connector.api.exceptions.ConnectorException;
 import com.tuya.connector.open.api.model.PageResult;
 import com.tuya.iot.suite.ability.asset.ability.AssetAbility;
 import com.tuya.iot.suite.ability.asset.model.*;
@@ -407,18 +408,25 @@ public class AssetServiceImpl implements AssetService {
                 AssetDTO::getAsset_id, Function.identity()
         ));
         if (!"-1".equals(targetAssetId) && !assetMap.containsKey(targetAssetId)) {
-            Asset asset = assetAbility.selectAsset(targetAssetId);
-            AssetDTO assetDTO = AssetDTO.builder()
-                    .asset_id(asset.getAsset_id())
-                    .parent_asset_id(asset.getParent_asset_id())
-                    .level(asset.getLevel())
-                    .asset_name(asset.getAsset_name())
-                    .asset_full_name(asset.getAsset_full_name())
-                    .is_authorized(false)
-                    .subAssets(new ArrayList<>())
-                    .build();
-            assetMap.put(targetAssetId, assetDTO);
-            assetList.add(assetDTO);
+            // TODO errorProcessor后续优化
+            try {
+                Asset asset = assetAbility.selectAsset(targetAssetId);
+                AssetDTO assetDTO = AssetDTO.builder()
+                        .asset_id(asset.getAsset_id())
+                        .parent_asset_id(asset.getParent_asset_id())
+                        .level(asset.getLevel())
+                        .asset_name(asset.getAsset_name())
+                        .asset_full_name(asset.getAsset_full_name())
+                        .is_authorized(false)
+                        .subAssets(new ArrayList<>())
+                        .build();
+                assetMap.put(targetAssetId, assetDTO);
+                assetList.add(assetDTO);
+            } catch (ConnectorException e) {
+                if (e.getMessage().contains("1106")) {
+                    return null;
+                }
+            }
         }
         // 从底层向上补全资产树
         Map<Integer, List<AssetDTO>> levelMap = assetList.stream().collect(Collectors.groupingBy(AssetDTO::getLevel)); // TODO 是否包含-1
