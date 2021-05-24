@@ -9,6 +9,7 @@ import com.tuya.iot.suite.core.exception.ServiceLogicException;
 import com.tuya.iot.suite.web.i18n.I18nMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.StringUtils;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -18,6 +19,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
+import java.util.regex.Pattern;
 
 /**
  * Description  TODO
@@ -28,6 +30,8 @@ import java.lang.reflect.UndeclaredThrowableException;
 @Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Pattern errMsgFixPattern = Pattern.compile(",traceId=[0-9a-zA-Z]+");
 
     @Autowired
     private I18nMessage i18NMessage;
@@ -73,7 +77,19 @@ public class GlobalExceptionHandler {
     public Response handleException(ConnectorResultException e) {
         log.error("全局拦截Exception异常:", e);
         ErrorInfo errorInfo = e.getErrorInfo();
-        return Response.buildFailure(errorInfo.getErrorCode(), getI18nMessageByCode(errorInfo.getErrorCode(), errorInfo.getErrorMsg()));
+        String errMsg = fixErrMsgIfNeed(errorInfo.getErrorMsg());
+        return Response.buildFailure(errorInfo.getErrorCode(), getI18nMessageByCode(errorInfo.getErrorCode(), errMsg));
+    }
+
+    /**
+     * 例如云端返回：旧密码不正确,traceId=Auto0594a1abb02041e6a749c0afdacf7755
+     * 我们返回的时候，要去掉后面的",traceId=xxxx
+     */
+    private String fixErrMsgIfNeed(String errorMsg) {
+        if(StringUtils.hasText(errorMsg)){
+            return errMsgFixPattern.matcher(errorMsg).replaceFirst("");
+        }
+        return errorMsg;
     }
 
     @ExceptionHandler(ConnectorException.class)
