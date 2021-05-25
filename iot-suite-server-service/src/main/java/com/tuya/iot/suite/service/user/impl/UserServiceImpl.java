@@ -97,7 +97,7 @@ public class UserServiceImpl implements UserService {
             return false;
         }
         bo.setType(type.getCode());
-        // 发送失败，删除缓存的captcha
+        // 发送失败，删除缓存的 captcha
         boolean result = false;
         try {
             result = captchaService.captchaPush(bo, template, code);
