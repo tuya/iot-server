@@ -1,5 +1,6 @@
 package com.tuya.iot.suite.service.user.impl;
 
+import com.tuya.connector.api.exceptions.ConnectorException;
 import com.tuya.iot.suite.ability.notice.model.ResetPasswordReq;
 import com.tuya.iot.suite.ability.user.ability.UserAbility;
 import com.tuya.iot.suite.ability.user.model.MobileCountries;
@@ -97,9 +98,13 @@ public class UserServiceImpl implements UserService {
         }
         bo.setType(type.getCode());
         // 发送失败，删除缓存的captcha
-        boolean result = captchaService.captchaPush(bo, template, code);
-        if (!result) {
-            captchaService.removeCaptchaFromCache(CaptchaType.PASSWORD_REST, unionId);
+        boolean result = false;
+        try {
+            result = captchaService.captchaPush(bo, template, code);
+        } finally {
+            if (!result) {
+                captchaService.removeCaptchaFromCache(CaptchaType.PASSWORD_REST, unionId);
+            }
         }
         return result;
     }
