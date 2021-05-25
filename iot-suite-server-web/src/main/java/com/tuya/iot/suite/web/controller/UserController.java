@@ -32,7 +32,7 @@ import static com.tuya.iot.suite.core.constant.ErrorCode.*;
  */
 @RestController
 @Slf4j
-@Api(description = "用户管理")
+@Api(value = "用户管理")
 public class UserController {
 
     @Autowired
