@@ -111,8 +111,7 @@ public class CaptchaServiceImpl implements CaptchaService {
             redisTemplate.opsForValue().increment(key, 1);
         }else {
             redisTemplate.opsForValue().increment(key, 1);
-//            redisTemplate.expire(key, 24, TimeUnit.HOURS);
-            redisTemplate.expire(key, 5, TimeUnit.MINUTES);
+            redisTemplate.expire(key, 24, TimeUnit.HOURS);
         }
     }
 
@@ -120,7 +119,7 @@ public class CaptchaServiceImpl implements CaptchaService {
     public boolean captchaValidateLimit(String unionId, int limit) {
         String key = CAPTCHA_LIMIT_PREFIX + unionId;
         if (redisTemplate.hasKey(key)) {
-            return (int)(redisTemplate.opsForValue().get(key)) < limit;
+            return (int) redisTemplate.opsForValue().get(key) < limit;
         }
         return true;
     }

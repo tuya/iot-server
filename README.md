@@ -19,6 +19,8 @@
 
 ### 如何获得技术支持
 可以通过以下链接获得帮助
+
 涂鸦智能帮助中心:[https://support.tuya.com/en/help](https://support.tuya.com/en/help "https://support.tuya.com/en/help")
+
 涂鸦智能全球化智能平台:[https://service.console.tuya.com ](https://service.console.tuya.com  "https://service.console.tuya.com ")
 
