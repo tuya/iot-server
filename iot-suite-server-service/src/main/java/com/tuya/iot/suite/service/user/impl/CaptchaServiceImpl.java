@@ -2,6 +2,7 @@ package com.tuya.iot.suite.service.user.impl;
 
 import com.tuya.iot.suite.core.constant.NoticeType;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
+import com.tuya.iot.suite.core.util.JacksonUtils;
 import com.tuya.iot.suite.core.util.LocalDateTimeUtil;
 import com.tuya.iot.suite.core.util.RandomUtil;
 import com.tuya.iot.suite.service.notice.NoticeService;
@@ -11,16 +12,17 @@ import com.tuya.iot.suite.service.notice.template.CaptchaNoticeTemplate;
 import com.tuya.iot.suite.service.user.CaptchaService;
 import com.tuya.iot.suite.service.user.model.CaptchaCache;
 import com.tuya.iot.suite.service.user.model.CaptchaPushBo;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-import static com.tuya.iot.suite.core.constant.ErrorCode.*;
+import static com.tuya.iot.suite.core.constant.ErrorCode.CAPTCHA_ALREADY_EXITS;
 
 /**
  * <p> TODO
@@ -42,21 +44,25 @@ public class CaptchaServiceImpl implements CaptchaService {
     private NoticeService noticeService;
 
     @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    private StringRedisTemplate redisTemplate;
 
     private String getCaptchaKey(String type, String unionId) {
         return CAPTCHA_PREFIX + ":" + type + ":" + unionId;
     }
 
+
+    @SneakyThrows
     @Override
     public String generateCaptcha(String type, String unionId, long timeout) {
         String key = getCaptchaKey(type, unionId);
         String code = RandomUtil.getStringWithNumber(CAPTCHA_NUMBER);
         CaptchaCache captchaCache = new CaptchaCache(code, type, LocalDateTime.now());
+        String captchCode = JacksonUtils.ObjectToJsonString(captchaCache);
+
         if (timeout > 0) {
-            redisTemplate.opsForValue().set(key, captchaCache, timeout, TimeUnit.SECONDS);
-        }else {
-            redisTemplate.opsForValue().set(key, captchaCache);
+            redisTemplate.opsForValue().set(key, captchCode, timeout, TimeUnit.SECONDS);
+        } else {
+            redisTemplate.opsForValue().set(key, captchCode);
         }
         return code;
     }
@@ -67,8 +73,7 @@ public class CaptchaServiceImpl implements CaptchaService {
         if (!Objects.isNull(cache)
                 && LocalDateTimeUtil.calculateSecondBetween(cache.getCreateTime(), LocalDateTime.now()) < permitTime) {
             throw new ServiceLogicException(CAPTCHA_ALREADY_EXITS);
-        }
-        else {
+        } else {
             return generateCaptcha(type, unionId, timeout);
         }
     }
@@ -78,15 +83,16 @@ public class CaptchaServiceImpl implements CaptchaService {
         CaptchaCache cache = getCaptcha(type, unionId);
         if (!Objects.isNull(cache)) {
             throw new ServiceLogicException(CAPTCHA_ALREADY_EXITS);
-        }else {
+        } else {
             return generateCaptcha(type, unionId, timeout);
         }
     }
 
+    @SneakyThrows
     @Override
     public CaptchaCache getCaptcha(String type, String unionId) {
-        Object object = redisTemplate.opsForValue().get(getCaptchaKey(type, unionId));
-        return Objects.isNull(object) ? null : (CaptchaCache) object;
+        String object = redisTemplate.opsForValue().get(getCaptchaKey(type, unionId));
+        return Objects.isNull(object) ? null :  JacksonUtils.readObjectValue(object, CaptchaCache.class);
     }
 
     @Override
@@ -109,7 +115,7 @@ public class CaptchaServiceImpl implements CaptchaService {
         String key = CAPTCHA_LIMIT_PREFIX + unionId;
         if (redisTemplate.hasKey(key)) {
             redisTemplate.opsForValue().increment(key, 1);
-        }else {
+        } else {
             redisTemplate.opsForValue().increment(key, 1);
 //            redisTemplate.expire(key, 24, TimeUnit.HOURS);
             redisTemplate.expire(key, 5, TimeUnit.MINUTES);
@@ -120,7 +126,7 @@ public class CaptchaServiceImpl implements CaptchaService {
     public boolean captchaValidateLimit(String unionId, int limit) {
         String key = CAPTCHA_LIMIT_PREFIX + unionId;
         if (redisTemplate.hasKey(key)) {
-            return (int)(redisTemplate.opsForValue().get(key)) < limit;
+            return Integer.valueOf(redisTemplate.opsForValue().get(key)) < limit;
         }
         return true;
     }
