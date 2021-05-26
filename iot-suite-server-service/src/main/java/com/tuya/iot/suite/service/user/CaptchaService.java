@@ -71,6 +71,29 @@ public interface CaptchaService {
     void removeCaptchaFromCache(String type, String unionId);
 
     /**
+     * 验证码校验错误计数
+     *
+     * @param unionId
+     */
+    void captchaValidateErrorIncr(String unionId);
+
+    /**
+     * 验证码校验次数校验
+     *
+     * @param unionId
+     * @param limit
+     * @return
+     */
+    boolean captchaValidateLimit(String unionId, int limit);
+
+    /**
+     * 验证码校验错误清除
+     *
+     * @param unionId
+     */
+    void captchaValidateErrorClear(String unionId);
+
+    /**
      * send captcha
      *
      * @param bo
