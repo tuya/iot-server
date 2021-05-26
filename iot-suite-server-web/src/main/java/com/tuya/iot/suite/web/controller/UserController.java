@@ -157,6 +157,8 @@ public class UserController {
                 log.info("telephone format error! =>{}{}", req.getCountryCode(), req.getPhone());
                 throw new ServiceLogicException(TELEPHONE_FORMAT_ERROR);
             }
+            // 国家码转换
+            req.setCountryCode(Integer.valueOf(req.getCountryCode()).toString());
         }
         // 验证邮箱格式
         if (!StringUtils.isEmpty(req.getMail()) && !MixUtil.mailFormatValidate(req.getMail())) {
