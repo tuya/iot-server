@@ -49,11 +49,11 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <!--<configuration>
+                <configuration>
                     <mainClass>com.tuya.iot.suite.web.IotSuiteServerApplication</mainClass>
                     <executable>true</executable>
                 </configuration>
-                <executions>
+                <!--<executions>
                     <execution>
                         <goals>
                             <goal>repackage</goal>
