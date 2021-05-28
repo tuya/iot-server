@@ -7,11 +7,17 @@ import com.tuya.iot.suite.core.model.UserToken;
 import com.tuya.iot.suite.core.util.ContextUtil;
 import com.tuya.iot.suite.core.util.LibPhoneNumberUtil;
 import com.tuya.iot.suite.core.util.MixUtil;
+import com.tuya.iot.suite.core.util.Todo;
+import com.tuya.iot.suite.service.model.PageDataVO;
 import com.tuya.iot.suite.service.user.UserService;
 import com.tuya.iot.suite.service.user.model.CaptchaPushBo;
 import com.tuya.iot.suite.service.user.model.ResetPasswordBo;
 import com.tuya.iot.suite.web.i18n.I18nMessage;
 import com.tuya.iot.suite.web.model.ResetPasswordReq;
+import com.tuya.iot.suite.web.model.UserCreateReq;
+import com.tuya.iot.suite.web.model.UserNameUpdateReq;
+import com.tuya.iot.suite.web.model.UserPermissionVO;
+import com.tuya.iot.suite.web.model.UserVO;
 import com.tuya.iot.suite.web.model.criteria.UserCriteria;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -23,6 +29,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+
+import java.util.List;
 
 import static com.tuya.iot.suite.core.constant.ErrorCode.*;
 
@@ -165,4 +173,34 @@ public class UserController {
         }
     }
 
+    @ApiOperation("创建用户")
+    @PutMapping("/users")
+    public Response<Boolean> createUser(@RequestBody UserCreateReq userCreateReq){
+        return Todo.todo("新增用户，重置密码");
+    }
+
+    @ApiOperation("修改用户名称")
+    @PutMapping("/users/{uid}/name")
+    public Response<Boolean> updateUserName(@PathVariable("uid") String uid,@RequestBody UserNameUpdateReq userNameUpdateReq){
+        return Todo.todo();
+    }
+
+    /**
+     * 批量操作，统一按"resources-batch"方式定义路径。（谁有好的建议可以提出来）
+     * */
+    @ApiOperation("批量删除用户")
+    @DeleteMapping("/batch-users")
+    public Response<Boolean> batchDeleteUser(@RequestParam("uid_list") String uidList){
+        return Todo.todo();
+    }
+    @ApiOperation("用户列表")
+    @GetMapping("/users")
+    public Response<PageDataVO<UserVO>> listUsers(@RequestParam("search_key") String searchKey,@RequestParam("role_code") String roleCode){
+        return Todo.todo();
+    }
+    @ApiOperation("用户权限列表")
+    @GetMapping("/users/{uid}/permissions")
+    public Response<List<UserPermissionVO>> listUserPermissions(@PathVariable("uid") String uid){
+        return Todo.todo();
+    }
 }
