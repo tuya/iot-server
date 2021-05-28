@@ -10,12 +10,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.core.env.Environment;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * 登陆拦截器
@@ -28,10 +32,25 @@ public class LoginInterceptor implements HandlerInterceptor {
     @Autowired
     private I18nMessage i18nMessage;
 
+    Environment env;
+
+    AntPathMatcher pathMatcher = new AntPathMatcher();
+
+    /**
+     * 支持swagger
+     * */
+    private List<String> swaggerPathPatterns = Arrays.asList(new String[]{
+            "/swagger-resources/**","/configuration/ui","/configuration/security","/v2/**"
+    });
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object o) throws Exception {
         log.info("preHandle {}...", request.getRequestURI());
         //获取session
+        String requestUri = request.getRequestURI();
+        if(swaggerPathPatterns.stream().anyMatch(it->pathMatcher.matchStart(it,requestUri))){
+            return true;
+        }
         HttpSession session = request.getSession(false);
         if (session != null) {
             Object token = session.getAttribute("token");
@@ -64,4 +83,5 @@ public class LoginInterceptor implements HandlerInterceptor {
     public LoginInterceptor(I18nMessage i18nMessage) {
         this.i18nMessage = i18nMessage;
     }
+
 }
