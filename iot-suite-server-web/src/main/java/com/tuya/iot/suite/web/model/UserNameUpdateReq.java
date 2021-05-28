@@ -15,6 +15,6 @@ import java.util.List;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserNameUpdateReq {
-    @ApiModelProperty("昵称")
-    String nick_name;
+    @ApiModelProperty(value="昵称",required = true)
+    String nickName;
 }

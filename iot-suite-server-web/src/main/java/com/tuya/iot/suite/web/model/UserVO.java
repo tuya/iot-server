@@ -16,13 +16,13 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserVO {
     @ApiModelProperty("昵称")
-    String nick_name;
+    String nickName;
     @ApiModelProperty("用户名")
-    String user_name;
+    String userName;
     @ApiModelProperty("创建时间")
-    String create_time;
+    String createTime;
     @ApiModelProperty("创建者用户名")
-    String creator_user_name;
+    String creatorUserName;
     @ApiModelProperty("角色名称列表")
-    List<String> role_names;
+    List<String> roleNames;
 }

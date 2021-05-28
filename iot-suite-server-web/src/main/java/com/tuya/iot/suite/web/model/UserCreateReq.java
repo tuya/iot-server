@@ -15,12 +15,12 @@ import java.util.List;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserCreateReq {
-    @ApiModelProperty("用户名")
-    String user_name;
-    @ApiModelProperty("密码")
+    @ApiModelProperty(value="用户名",required = true)
+    String userName;
+    @ApiModelProperty(value="密码",required = true)
     String password;
-    @ApiModelProperty("昵称")
-    String nick_name;
-    @ApiModelProperty("关联的角色列表")
-    List<String> role_code_list;
+    @ApiModelProperty(value="昵称",required = true)
+    String nickName;
+    @ApiModelProperty(value="关联的角色列表",required = true)
+    List<String> roleCodeList;
 }

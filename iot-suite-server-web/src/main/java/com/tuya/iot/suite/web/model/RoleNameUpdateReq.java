@@ -13,6 +13,6 @@ import lombok.experimental.FieldDefaults;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RoleNameUpdateReq {
-    @ApiModelProperty("名称")
+    @ApiModelProperty(value = "名称",required = true)
     String name;
 }

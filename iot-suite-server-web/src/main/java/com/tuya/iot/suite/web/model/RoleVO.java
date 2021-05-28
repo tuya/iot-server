@@ -18,5 +18,5 @@ public class RoleVO {
     @ApiModelProperty("角色名称")
     String name;
     @ApiModelProperty("角色类型编码")
-    String type_code;
+    String typeCode;
 }

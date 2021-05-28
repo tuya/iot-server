@@ -2,10 +2,12 @@ package com.tuya.iot.suite.web.controller;
 
 import com.tuya.iot.suite.core.constant.Response;
 import com.tuya.iot.suite.core.util.Todo;
+import com.tuya.iot.suite.web.model.RoleCreateReq;
 import com.tuya.iot.suite.web.model.RoleNameUpdateReq;
 import com.tuya.iot.suite.web.model.RoleVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,27 +30,31 @@ import java.util.List;
 public class RoleController {
     @ApiOperation("创建角色")
     @PutMapping("/roles")
-    public Response<Boolean> createRole(){
+    public Response<Boolean> createRole(@RequestBody RoleCreateReq req) {
         return Todo.todo();
     }
+
     @ApiOperation("角色列表")
     @GetMapping("/roles")
-    public Response<List<RoleVO>> listRoles(){
+    public Response<List<RoleVO>> listRoles() {
         return Todo.todo();
     }
+
     @ApiOperation("修改角色名称")
-    @PutMapping("/roles/{role_code}/name")
-    public Response<Boolean> updateRoleName(@PathVariable("role_code") String roleCode, @RequestBody RoleNameUpdateReq roleNameUpdateReq){
+    @PutMapping("/roles/{roleCode}/name")
+    public Response<Boolean> updateRoleName(@PathVariable String roleCode, @RequestBody RoleNameUpdateReq req) {
         return Todo.todo();
     }
+
     @ApiOperation("批量删除角色")
     @DeleteMapping("/batch-roles")
-    public Response<Boolean> batchDeleteRole(@RequestParam("role_codes") String roleCodes){
+    public Response<Boolean> batchDeleteRole(@ApiParam(value = "角色编码列表，逗号分隔") @RequestParam("roleCodeList") String roleCodeList) {
         return Todo.todo();
     }
+
     @ApiOperation("删除角色")
-    @DeleteMapping("/roles/{role_code}")
-    public Response<Boolean> deleteRole(@PathVariable("role_code") String roleCode){
+    @DeleteMapping("/roles/{roleCode}")
+    public Response<Boolean> deleteRole(@PathVariable String roleCode) {
         return Todo.todo();
     }
 }

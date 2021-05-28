@@ -17,6 +17,7 @@ import java.io.Serializable;
  */
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@ApiModel
 public class DeviceAlarmListCriteria implements Serializable {
 
     private static final long serialVersionUID = 1;
@@ -24,7 +25,7 @@ public class DeviceAlarmListCriteria implements Serializable {
     @ApiModelProperty(value = "告警等级。通知,轻微,严重")
     String alarm_level;
 
-    @ApiModelProperty(value = "告警时间类型。今天”、“昨天”、“近3天”、“近7天”、“近30天”和“近半年")
+    @ApiModelProperty(value = "告警时间类型。今天”、“昨天”、“近3天”、“近7天”、“近30天”和“近半年",required = true)
     String alarm_date_type;
 
     @ApiModelProperty(value = "告警状态。未处理、已处理")

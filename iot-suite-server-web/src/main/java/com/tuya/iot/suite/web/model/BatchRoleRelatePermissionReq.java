@@ -15,8 +15,11 @@ import java.util.List;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BatchRoleRelatePermissionReq {
-    @ApiModelProperty("角色code列表")
-    List<String> role_code_list;
-    @ApiModelProperty("权限code列表")
-    List<String> permission_code_list;
+
+    @ApiModelProperty(value = "角色code列表", required = true)
+    List<String> roleCodeList;
+
+    @ApiModelProperty(value = "权限code列表", required = true)
+    List<String> permissionCodeList;
+
 }
