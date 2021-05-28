@@ -15,8 +15,8 @@ import java.util.List;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserRelateAssetReq {
-    @ApiModelProperty("用户id")
+    @ApiModelProperty(value = "用户id",required = true)
     String uid;
-    @ApiModelProperty("资产id列表")
-    List<String> asset_id_list;
+    @ApiModelProperty(value = "资产id列表",required = true)
+    List<String> assetIdList;
 }

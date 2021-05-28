@@ -1,9 +1,11 @@
-package com.tuya.iot.suite.web.model.criteria;
+package com.tuya.iot.suite.web.model;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
+
+import java.util.List;
 
 /**
  * @description:
@@ -12,9 +14,12 @@ import lombok.experimental.FieldDefaults;
  */
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserListCriteria {
-    @ApiModelProperty("搜索关键词")
-    String searchKey;
-    @ApiModelProperty("角色编码")
-    String roleCode;
+public class RoleCreateReq {
+
+    @ApiModelProperty(value = "角色名称", required = true)
+    String roleName;
+
+    @ApiModelProperty(value = "角色类型", required = true)
+    String roleType;
+
 }

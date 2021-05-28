@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class RoleTypeController {
     @ApiOperation("创建角色")
     @GetMapping
-    public Response<RoleTypeVO> listRoleTypes(){
+    public Response<RoleTypeVO> listRoleTypes() {
         return Todo.todo();
     }
 

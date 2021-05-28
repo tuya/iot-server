@@ -21,6 +21,7 @@ import com.tuya.iot.suite.web.model.UserVO;
 import com.tuya.iot.suite.web.model.criteria.UserCriteria;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -177,32 +178,40 @@ public class UserController {
 
     @ApiOperation("创建用户")
     @PutMapping("/users")
-    public Response<Boolean> createUser(@RequestBody UserCreateReq userCreateReq){
+    public Response<Boolean> createUser(@RequestBody UserCreateReq userCreateReq) {
         return Todo.todo("新增用户，重置密码");
     }
 
     @ApiOperation("修改用户名称")
     @PutMapping("/users/{uid}/name")
-    public Response<Boolean> updateUserName(@PathVariable("uid") String uid,@RequestBody UserNameUpdateReq userNameUpdateReq){
+    public Response<Boolean> updateUserName(@ApiParam(value = "用户id") @PathVariable String uid,
+                                            @RequestBody UserNameUpdateReq req) {
         return Todo.todo();
     }
 
     /**
      * 批量操作，统一按"resources-batch"方式定义路径。（谁有好的建议可以提出来）
-     * */
+     */
     @ApiOperation("批量删除用户")
     @DeleteMapping("/batch-users")
-    public Response<Boolean> batchDeleteUser(@RequestParam("uid_list") String uidList){
+    public Response<Boolean> batchDeleteUser(@ApiParam(value = "uid列表，逗号分隔", required = true)
+                                             @RequestParam String uidList) {
         return Todo.todo();
     }
+
     @ApiOperation("用户列表")
     @GetMapping("/users")
-    public Response<PageDataVO<UserVO>> listUsers(@RequestParam("search_key") String searchKey,@RequestParam("role_code") String roleCode){
+    public Response<PageDataVO<UserVO>> listUsers(@ApiParam(value = "搜索关键字")
+                                                  @RequestParam String searchKey,
+                                                  @ApiParam(value = "角色编码")
+                                                  @RequestParam String roleCode) {
         return Todo.todo();
     }
+
     @ApiOperation("用户权限列表")
     @GetMapping("/users/{uid}/permissions")
-    public Response<List<UserPermissionVO>> listUserPermissions(@PathVariable("uid") String uid){
+    public Response<List<UserPermissionVO>> listUserPermissions(
+            @ApiParam(value = "用户id") @PathVariable String uid) {
         return Todo.todo();
     }
 }

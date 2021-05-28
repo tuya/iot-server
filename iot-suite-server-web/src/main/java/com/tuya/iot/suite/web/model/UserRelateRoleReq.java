@@ -15,8 +15,8 @@ import java.util.List;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserRelateRoleReq {
-    @ApiModelProperty("用户id")
+    @ApiModelProperty(value="用户id",required = true)
     String uid;
-    @ApiModelProperty("角色id列表")
-    List<String> role_code_list;
+    @ApiModelProperty(value = "角色id列表",required = true)
+    List<String> roleCodeList;
 }

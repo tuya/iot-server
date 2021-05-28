@@ -1,12 +1,8 @@
 package com.tuya.iot.suite.web.model;
 
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
 /**
@@ -18,17 +14,17 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DeviceAlarmVO {
     @ApiModelProperty("告警id")
-    String alarm_id;
+    String alarmId;
     @ApiModelProperty("告警名称")
-    String alarm_name;
+    String alarmName;
     @ApiModelProperty("告警内容")
-    String alarm_content;
+    String alarmContent;
     @ApiModelProperty("设备id")
-    String device_id;
+    String deviceId;
     @ApiModelProperty("告警时间")
-    String alarm_time;
+    String alarmTime;
     @ApiModelProperty("告警等级")
-    String alarm_level;
+    String alarmLevel;
     @ApiModelProperty("告警状态")
-    String alarm_status;
+    String alarmStatus;
 }
