@@ -8,7 +8,9 @@
         <artifactId>iot-suite-server</artifactId>
         <version>${revision}</version>
     </parent>
-
+    <properties>
+        <shiro.version>1.4.1</shiro.version>
+    </properties>
     <artifactId>iot-suite-server-web</artifactId>
 
     <dependencies>
@@ -32,7 +34,7 @@
             <artifactId>spring-session</artifactId>
         </dependency>
 
-        <dependency>
+       <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
             <scope>runtime</scope>
@@ -42,6 +44,21 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-spring-boot-web-starter</artifactId>
+            <version>${shiro.springboot.stater.version}</version>
+        </dependency>
+<!--        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-web</artifactId>
+            <version>${shiro.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.shiro</groupId>
+            <artifactId>shiro-core</artifactId>
+            <version>${shiro.version}</version>
+        </dependency>-->
     </dependencies>
 
     <build>

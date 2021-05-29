@@ -9,6 +9,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,6 +37,7 @@ public class RoleController {
 
     @ApiOperation("角色列表")
     @GetMapping("/roles")
+    @RequiresPermissions("roles")
     public Response<List<RoleVO>> listRoles() {
         return Todo.todo();
     }
@@ -48,7 +50,8 @@ public class RoleController {
 
     @ApiOperation("批量删除角色")
     @DeleteMapping("/batch-roles")
-    public Response<Boolean> batchDeleteRole(@ApiParam(value = "角色编码列表，逗号分隔") @RequestParam("roleCodeList") String roleCodeList) {
+    public Response<Boolean> batchDeleteRole(@ApiParam(value = "角色编码列表，逗号分隔",required = true)
+                                                 @RequestParam("roleCodeList") String roleCodeList) {
         return Todo.todo();
     }
 

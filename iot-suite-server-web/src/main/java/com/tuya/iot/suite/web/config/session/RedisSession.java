@@ -14,7 +14,7 @@ import java.util.UUID;
  * 所以这边实现的 ExpiringSession 方法可以不用管，用JsonIgnore 忽略防止反序列化失败
  */
 public class RedisSession implements ExpiringSession, Serializable {
-
+    private static final long serialVersionUID = 42L;
     private String id;
     private Map<String, Object> sessionAttrs = new HashMap<String, Object>();
 
