@@ -25,6 +25,7 @@
         <carrier.version>1.147</carrier.version>
         <prefixmapper.version>2.157</prefixmapper.version>
         <jackson.version>2.10.5</jackson.version>
+        <shiro.springboot.stater.version>1.4.2</shiro.springboot.stater.version>
     </properties>
 
     <modules>

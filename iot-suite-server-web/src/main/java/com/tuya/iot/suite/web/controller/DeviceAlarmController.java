@@ -31,13 +31,13 @@ public class DeviceAlarmController {
     @GetMapping
     public Response<PageDataVO<DeviceAlarmVO>> queryDeviceAlarms(
             @ApiParam(value = "告警等级。通知,轻微,严重")
-            @RequestParam String alarmLevel,
+            String alarmLevel,
             @ApiParam(value = "告警时间类型。今天”、“昨天”、“近3天”、“近7天”、“近30天”和“近半年",required = true)
             @RequestParam String alarmDateType,
             @ApiParam(value = "告警状态。未处理、已处理")
-            @RequestParam String alarmStatus,
+            String alarmStatus,
             @ApiParam(value = "搜索词。告警名称/设备id")
-            @RequestParam String searchKey
+            String searchKey
     ){
         return Todo.todo();
     }

@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.session.config.annotation.web.http.EnableSpringHttpSession;
 
@@ -43,7 +44,8 @@ public class HttpSessionConfig {
         jackson2JsonRedisSerializer.setObjectMapper(objectMapper);
 
         // 设置key和value的序列化规则
-        template.setValueSerializer(jackson2JsonRedisSerializer);
+        //template.setValueSerializer(jackson2JsonRedisSerializer);
+        template.setValueSerializer(new JdkSerializationRedisSerializer());
         template.setKeySerializer(new StringRedisSerializer());
         template.afterPropertiesSet();
 
