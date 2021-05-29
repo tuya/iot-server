@@ -60,6 +60,8 @@ public enum ErrorCode {
 
     CAPTCHA_ALREADY_EXITS("3005", "验证码已发送"),
 
+    CAPTCHA_LIMIT("3006", "验证码验证错误限制，请24小时后重试")
+
     ;
 
     private final String code;

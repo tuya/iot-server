@@ -32,7 +32,9 @@ import static com.tuya.iot.suite.core.constant.ErrorCode.*;
 @Service
 public class CaptchaServiceImpl implements CaptchaService {
 
-    public static final String CAPTCHA_PREFIX = "iot-suite-server:captcha:";
+    public static final String CAPTCHA_PREFIX = "iot-suite-server:captcha";
+
+    public static final String CAPTCHA_LIMIT_PREFIX = "iot-suite-server:captcha:limit:";
 
     public static final int CAPTCHA_NUMBER = 6;
 
@@ -92,7 +94,7 @@ public class CaptchaServiceImpl implements CaptchaService {
         CaptchaCache cache = getCaptcha(type, unionId);
         if (Objects.isNull(cache)) {
             log.error("captcha does not exist! type:[{}] - unionId:[{}]", type, unionId);
-            throw new ServiceLogicException(CAPTCHA_ERROR);
+            return false;
         }
         return code.equals(cache.getCode());
     }
@@ -100,6 +102,34 @@ public class CaptchaServiceImpl implements CaptchaService {
     @Override
     public void removeCaptchaFromCache(String type, String unionId) {
         redisTemplate.delete(getCaptchaKey(type, unionId));
+    }
+
+    @Override
+    public void captchaValidateErrorIncr(String unionId) {
+        String key = CAPTCHA_LIMIT_PREFIX + unionId;
+        if (redisTemplate.hasKey(key)) {
+            redisTemplate.opsForValue().increment(key, 1);
+        }else {
+            redisTemplate.opsForValue().increment(key, 1);
+            redisTemplate.expire(key, 24, TimeUnit.HOURS);
+        }
+    }
+
+    @Override
+    public boolean captchaValidateLimit(String unionId, int limit) {
+        String key = CAPTCHA_LIMIT_PREFIX + unionId;
+        if (redisTemplate.hasKey(key)) {
+            return (int) redisTemplate.opsForValue().get(key) < limit;
+        }
+        return true;
+    }
+
+    @Override
+    public void captchaValidateErrorClear(String unionId) {
+        String key = CAPTCHA_LIMIT_PREFIX + unionId;
+        if (redisTemplate.hasKey(key)) {
+            redisTemplate.delete(key);
+        }
     }
 
     @Override
