@@ -15,9 +15,11 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.redis.core.RedisTemplate;
+
 import javax.servlet.Filter;
 import java.util.HashMap;
 import java.util.Map;
+
 /**
  * @description:
  * @author: benguan.zhou@tuya.com
@@ -60,6 +62,7 @@ public class ShiroConfig {
     public ShiroFilterChainDefinition shiroFilterChainDefinition() {
         DefaultShiroFilterChainDefinition chainDefinition = new DefaultShiroFilterChainDefinition();
         chainDefinition.addPathDefinition("/", "authc");
+        chainDefinition.addPathDefinition("/my/**", "authc");
         //文件上传下载路径
         chainDefinition.addPathDefinition("/files/**", "anon");
         //静态资源都用这个做路径
@@ -67,6 +70,13 @@ public class ShiroConfig {
         //重定向都用这个forward路径
         chainDefinition.addPathDefinition("/forward/**", "anon");
         chainDefinition.addPathDefinition("/druid/**", "anon");
+        chainDefinition.addPathDefinition("/mobile/countries", "anon");
+        chainDefinition.addPathDefinition("/hc.do", "anon");
+        chainDefinition.addPathDefinition("/v2/api-docs", "anon");
+        chainDefinition.addPathDefinition("/swagger-resources/**", "anon");
+        chainDefinition.addPathDefinition("/configuration/ui", "anon");
+        chainDefinition.addPathDefinition("/configuration/security", "anon");
+        chainDefinition.addPathDefinition("/user/password/reset/captcha", "anon");
         chainDefinition.addPathDefinition("/**", "authc,perms");
         return chainDefinition;
     }

@@ -8,6 +8,7 @@ import com.tuya.iot.suite.core.constant.Response;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
 import com.tuya.iot.suite.web.i18n.I18nMessage;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.authz.UnauthorizedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -120,6 +121,13 @@ public class GlobalExceptionHandler {
     }
 
 
+    @ExceptionHandler(UnauthorizedException.class)
+    @ResponseBody
+    public Response handleException(UnauthorizedException e) {
+        log.error("全局拦截Exception异常:", e);
+        return Response.buildFailure(ErrorCode.USER_NOT_AUTH.getCode(),
+                getI18nMessageByCode(ErrorCode.USER_NOT_AUTH.getCode(), ErrorCode.USER_NOT_AUTH.getMsg()));
+    }
     /***
      *
      * @param errorCode

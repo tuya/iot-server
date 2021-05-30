@@ -8,10 +8,6 @@ import com.tuya.iot.suite.core.util.ContextUtil;
 import com.tuya.iot.suite.web.i18n.I18nMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.core.annotation.Order;
-import org.springframework.core.env.Environment;
-import org.springframework.util.AntPathMatcher;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -23,14 +19,10 @@ import javax.servlet.http.HttpSession;
  * 登陆拦截器
  */
 @Slf4j
-@Order(1)
-@Configuration
 public class LoginInterceptor implements HandlerInterceptor {
 
     @Autowired
     private I18nMessage i18nMessage;
-
-    AntPathMatcher pathMatcher = new AntPathMatcher();
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object o) throws Exception {
