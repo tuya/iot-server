@@ -5,6 +5,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.Locale;
 
 /**
@@ -20,6 +21,10 @@ public class HttpRequestUtils extends RequestContextHolder {
     public static HttpServletRequest getHttpServletRequest() {
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) getRequestAttributes();
         return requestAttributes.getRequest();
+    }
+
+    public static HttpSession getHttpSession(){
+        return getHttpServletRequest().getSession();
     }
 
 
