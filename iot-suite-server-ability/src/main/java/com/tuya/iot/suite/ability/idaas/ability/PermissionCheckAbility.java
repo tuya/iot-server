@@ -5,7 +5,7 @@ package com.tuya.iot.suite.ability.idaas.ability;
  * @description
  * @date 2021/05/31
  */
-public interface PermissionCheckerAbility {
+public interface PermissionCheckAbility {
 
     Boolean checkPermissionForRole(Long spaceId,String roleCode,String permissionCode);
 
