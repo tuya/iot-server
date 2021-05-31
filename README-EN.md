@@ -21,6 +21,7 @@ This portal is linked with `projectCode` of projects on the [Cloud Development P
     project.code=
 
 2. Start the project in the mode of Spring Boot Starter, execute the main method, or use Maven.
+   
     $ ./mvn package
     $ java -jar iot-suite-server-web/target/*.jar
 
@@ -29,4 +30,5 @@ This portal is linked with `projectCode` of projects on the [Cloud Development P
 You can get technical support from Tuya in the following services:
 
 Help Center: https://support.tuya.com/en/help
+
 Service & Support: https://service.console.tuya.com
