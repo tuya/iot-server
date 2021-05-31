@@ -27,7 +27,7 @@ import static com.tuya.iot.suite.core.constant.ErrorCode.*;
  * @Since 2021/3/15 8:46 下午
  */
 @Slf4j
-@Service
+@Service("userService")
 public class UserServiceImpl implements UserService {
 
     @Autowired

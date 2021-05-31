@@ -1,29 +1,31 @@
 package com.tuya.iot.suite.web.config.shiro;
 
 import com.tuya.iot.suite.web.i18n.I18nMessage;
-import org.apache.shiro.realm.Realm;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
-import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
+import org.apache.shiro.spring.web.config.DefaultShiroFilterChainDefinition;
+import org.apache.shiro.spring.web.config.ShiroFilterChainDefinition;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.session.mgt.ServletContainerSessionManager;
-import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.redis.core.RedisTemplate;
-
+import org.springframework.stereotype.Component;
 import javax.servlet.Filter;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * @description:
- * @author: benguan.zhou@tuya.com
- * @date: 2021/05/28
+ * @description
+ * @author benguan.zhou@tuya.com
+ * @date 2021/05/28
  */
 @Configuration
+@Component
 public class ShiroConfig {
 
     //Shiro生命周期处理器
@@ -32,43 +34,64 @@ public class ShiroConfig {
         return new LifecycleBeanPostProcessor();
     }
 
-    //开启注解权限验证
     @Bean
-    @DependsOn({"lifecycleBeanPostProcessor"})
-    @ConditionalOnMissingBean
-    public DefaultAdvisorAutoProxyCreator advisorAutoProxyCreator() {
-        DefaultAdvisorAutoProxyCreator advisorAutoProxyCreator = new DefaultAdvisorAutoProxyCreator();
-        advisorAutoProxyCreator.setProxyTargetClass(true);
-        return advisorAutoProxyCreator;
+    public FilterRegistrationBean loginFilterRegistration(LoginFilter filter) {
+        FilterRegistrationBean registration = new FilterRegistrationBean(filter);
+        registration.setEnabled(false);
+        return registration;
     }
-
-    //开启注解权限验证
     @Bean
-    public AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor(RedisTemplate redisTemplate) {
-        AuthorizationAttributeSourceAdvisor authorizationAttributeSourceAdvisor = new AuthorizationAttributeSourceAdvisor();
-        authorizationAttributeSourceAdvisor.setSecurityManager(securityManager(redisTemplate));
-        return authorizationAttributeSourceAdvisor;
+    public FilterRegistrationBean permissionFilterRegistration(PermissionFilter filter) {
+        FilterRegistrationBean registration = new FilterRegistrationBean(filter);
+        registration.setEnabled(false);
+        return registration;
     }
-
     @Bean
-    public Realm realm() {
-        TuyaCloudRealm customRealm = new TuyaCloudRealm();
-        return customRealm;
-    }
-
-    @Bean
-    public ShiroFilterFactoryBean shiroFilterFactoryBean(RedisTemplate redisTemplate
+    public ShiroFilterFactoryBean shiroFilterFactoryBean(ApplicationContext applicationContext
             , I18nMessage i18nMessage) {
         ShiroFilterFactoryBean fac = new ShiroFilterFactoryBean();
         fac.setLoginUrl("/login");
         fac.setSuccessUrl("/");
         fac.setUnauthorizedUrl("/unauthorized.html");
-        fac.setSecurityManager(securityManager(redisTemplate));
-        Map<String, Filter> filterMap = new HashMap<>();
+        fac.setSecurityManager(securityManager(applicationContext));
+        fac.setFilterChainDefinitionMap(getFilterChainDefinitionMap());
+        Map<String,Filter> filterMap = fac.getFilters();
         filterMap.put("authc", loginFilter(i18nMessage));
-        //filterMap.put("perms", permissionFilter);
+        filterMap.put("perms", permissionFilter(applicationContext));
         fac.setFilters(filterMap);
         return fac;
+    }
+
+    private Map<String, String> getFilterChainDefinitionMap() {
+        Map<String,String> map = new LinkedHashMap<>();
+
+        //静态资源
+        map.put("*.html", "anon");
+        map.put("*.css", "anon");
+        map.put("*.js", "anon");
+        map.put("*.jpg", "anon");
+        map.put("*.png", "anon");
+        map.put("*.gif", "anon");
+
+        //文件上传下载路径
+        map.put("/files/**", "anon");
+        //静态资源都用这个做路径
+        map.put("/static/**", "anon");
+        //重定向都用这个forward路径
+        map.put("/forward/**", "anon");
+        map.put("/druid/**", "anon");
+        map.put("/mobile/countries", "anon");
+        map.put("/hc.do", "anon");
+        map.put("/v2/api-docs", "anon");
+        map.put("/swagger-resources/**", "anon");
+        map.put("/configuration/ui", "anon");
+        map.put("/configuration/security", "anon");
+        map.put("/user/password/reset/captcha", "anon");
+
+        map.put("/", "authc");
+        map.put("/my/**", "authc");
+        map.put("/**", "authc,perms");
+        return map;
     }
 
     @Bean
@@ -79,19 +102,37 @@ public class ShiroConfig {
     }
 
     @Bean
-    public DefaultWebSecurityManager securityManager(RedisTemplate redisTemplate) {
+    @DependsOn({"i18nMessage"})
+    public PermissionFilter permissionFilter(ApplicationContext applicationContext){
+        I18nMessage i18nMessage = applicationContext.getBean(I18nMessage.class);
+        PermissionFilter filter = new PermissionFilter();
+        filter.setI18nMessage(i18nMessage);
+        return filter;
+    }
+
+    @Bean
+    @DependsOn({"tuyaCloudRealm"})
+    public DefaultWebSecurityManager securityManager(ApplicationContext applicationContext) {
         DefaultWebSecurityManager manager = new DefaultWebSecurityManager();
-        manager.setRealm(realm());
-        manager.setCacheManager(cacheManager(redisTemplate));
+        TuyaCloudRealm realm = applicationContext.getBean(TuyaCloudRealm.class);
+        //禁用shiro的认证和权限缓存，到时候在service层用spring-redis的缓存
+        realm.setCachingEnabled(false);
+        //realm.setAuthorizationCacheName("authorCache");
+        //realm.setAuthenticationCacheName("authenCache");
+        manager.setRealm(realm);
+        manager.setCacheManager(cacheManager(applicationContext));
         manager.setSessionManager(sessionManager());
         return manager;
     }
 
     @Bean
-    public ShiroRedisCacheManager cacheManager(RedisTemplate redisTemplate) {
+    @DependsOn({"redisTemplate"})
+    public ShiroRedisCacheManager cacheManager(ApplicationContext applicationContext) {
+        RedisTemplate redisTemplate = applicationContext.getBean("redisTemplate",RedisTemplate.class);
         ShiroRedisCacheManager cacheManager = new ShiroRedisCacheManager();
         Map<String, ShiroRedisCache> cacheMap = new HashMap<>();
         cacheMap.put("authenCache", new ShiroRedisCache("authenCache", redisTemplate));
+        cacheMap.put("authorCache", new ShiroRedisCache("authorCache", redisTemplate));
         cacheManager.setCacheMap(cacheMap);
         return cacheManager;
     }

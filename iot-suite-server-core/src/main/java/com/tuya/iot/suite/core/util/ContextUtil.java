@@ -14,7 +14,7 @@ import java.util.Objects;
  */
 public class ContextUtil {
 
-    private static final ThreadLocal<Map<String, Object>> MAP = new ThreadLocal<>();
+    private static final ThreadLocal<Map<String, Object>> MAP = new InheritableThreadLocal<>();
 
     private static final String KEY_TOKEN = "token";
 

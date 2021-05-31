@@ -32,14 +32,12 @@ import java.util.List;
 public class RoleController {
     @ApiOperation("创建角色")
     @PutMapping("/roles")
-    @RequiresRoles("sysadmin")
     public Response<Boolean> createRole(@RequestBody RoleCreateReq req) {
         return Todo.todo();
     }
 
     @ApiOperation("角色列表")
     @GetMapping("/roles")
-    @RequiresPermissions("roles")
     public Response<List<RoleVO>> listRoles() {
         return Todo.todo();
     }

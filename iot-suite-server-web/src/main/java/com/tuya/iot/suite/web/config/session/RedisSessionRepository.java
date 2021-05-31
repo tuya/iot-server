@@ -1,6 +1,7 @@
 package com.tuya.iot.suite.web.config.session;
 
 import com.tuya.iot.suite.core.model.UserToken;
+import com.tuya.iot.suite.web.util.SessionUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -44,8 +45,10 @@ public class RedisSessionRepository implements SessionRepository<RedisSession> {
         String key = prefix + session.getId();
         log.debug("save " + key);
         redisTemplate.opsForValue().set(key, session, defaultMaxInactiveInterval, TimeUnit.SECONDS);
-        UserToken token = session.getAttribute("token");
-        redisTemplate.opsForValue().set(token.getUserId(), session.getId(), defaultMaxInactiveInterval, TimeUnit.SECONDS);
+        UserToken token = session.getAttribute(SessionUtils.USER_TOKEN_ATTR_NAME);
+        if(token!=null){
+            redisTemplate.opsForValue().set(token.getUserId(), session.getId(), defaultMaxInactiveInterval, TimeUnit.SECONDS);
+        }
     }
 
     @Override
@@ -53,12 +56,12 @@ public class RedisSessionRepository implements SessionRepository<RedisSession> {
         RedisSession session = null;
         String key = prefix + id;
         log.debug("getSession " + key);
-        if (redisTemplate.hasKey(key)) {
-            RedisSession redisSession = (RedisSession) redisTemplate.opsForValue().get(key);
-            UserToken token = redisSession.getAttribute("token");
-            if (redisTemplate.hasKey(token.getUserId())) {
-                String str = (String) redisTemplate.opsForValue().get(token.getUserId());
-                if (id.equals(str)) {
+        RedisSession redisSession = (RedisSession) redisTemplate.opsForValue().get(key);
+        if(redisSession!=null){
+            UserToken token = redisSession.getAttribute(SessionUtils.USER_TOKEN_ATTR_NAME);
+            if(token!=null){
+                String savedSessionId = (String) redisTemplate.opsForValue().get(token.getUserId());
+                if (id.equals(savedSessionId)) {
                     session = redisSession;
                 }
             }
@@ -71,7 +74,7 @@ public class RedisSessionRepository implements SessionRepository<RedisSession> {
         String key = prefix + id;
         log.debug("delete " + key);
         RedisSession session = (RedisSession)redisTemplate.opsForValue().get(key);
-        UserToken token = session.getAttribute("token");
+        UserToken token = session.getAttribute(SessionUtils.USER_TOKEN_ATTR_NAME);
         redisTemplate.delete(key);
         redisTemplate.delete(token.getUserId());
     }

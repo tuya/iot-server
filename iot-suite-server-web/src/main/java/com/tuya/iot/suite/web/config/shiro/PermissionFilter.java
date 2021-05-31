@@ -1,10 +1,17 @@
 package com.tuya.iot.suite.web.config.shiro;
 
 import com.alibaba.fastjson.JSON;
+import com.tuya.iot.suite.ability.idaas.ability.PermissionAbility;
+import com.tuya.iot.suite.ability.idaas.ability.PermissionCheckAbility;
+import com.tuya.iot.suite.ability.idaas.model.IdaasPermission;
 import com.tuya.iot.suite.core.constant.ErrorCode;
 import com.tuya.iot.suite.core.constant.Response;
+import com.tuya.iot.suite.core.model.UserToken;
+import com.tuya.iot.suite.service.idaas.PermissionCheckService;
 import com.tuya.iot.suite.web.i18n.I18nMessage;
 import com.tuya.iot.suite.web.util.WebUtils;
+import lombok.Setter;
+import org.apache.shiro.authz.UnauthenticatedException;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authz.AuthorizationFilter;
 import org.springframework.data.redis.cache.RedisCache;
@@ -15,46 +22,43 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * @author benguan
+ */
+@Setter
 public class PermissionFilter extends AuthorizationFilter {
-
-    //private UriPermService uriPermService;
-
-    private RedisCache dataCache;
 
     private I18nMessage i18nMessage;
 
-    public void setI18nMessage(I18nMessage i18nMessage) {
-        this.i18nMessage = i18nMessage;
-    }
-
-    /*public void setUriPermService(UriPermService uriPermService) {
-        this.uriPermService = uriPermService;
-    }*/
-
-    /*private Map<String, Set<String>> getUriPermMap() {
-    	return uriPermService.query();
-        // 获取uri和权限的映射
-       *//* Map<String, Set<String>> cachedMap = (Map<String, Set<String>>) dataCache.get("uriPermMap");
-        if (cachedMap == null) {
-            Map<String, Set<String>> uriPermMap = uriPermService.query();
-            dataCache.put("uriPermMap", uriPermMap);
-            return uriPermMap;
-        }
-        return cachedMap;*//*
-    }*/
-
+    /**
+     * 权限校验
+     * 规则：例如  get /users/123 其中123为用户id
+     * 则权限字符串为 get:users:*
+     * */
     @Override
     protected boolean isAccessAllowed(ServletRequest req, ServletResponse resp, Object mappedValue) throws Exception {
         if(isLoginRequest(req, resp)){
             return true;
         }
-        HttpServletRequest request = (HttpServletRequest) req;
         Subject subject = this.getSubject(req, resp);
-        //TODO
-        return subject.isPermittedAll();
+        UserToken token = (UserToken) subject.getSession().getAttribute("token");
+        if(token == null){
+            throw new UnauthenticatedException("Unauthenticated at isAccessAllowed");
+        }
+        HttpServletRequest request = (HttpServletRequest) req;
+        String method = request.getMethod().toLowerCase();
+        //去掉contextPath
+        String relativeUri = request.getRequestURI().substring(request.getContextPath().length());
+        relativeUri = StringUtils.trimLeadingCharacter(relativeUri,'/');
+        relativeUri = StringUtils.trimTrailingCharacter(relativeUri,'/');
+        String uriCode = String.join(":",relativeUri.split("/"));
+        String permissionCode = method+":"+uriCode;
+        return subject.isPermitted(permissionCode);
     }
 
     @Override
@@ -71,23 +75,8 @@ public class PermissionFilter extends AuthorizationFilter {
             String body = JSON.toJSONString(Response.buildFailure(ErrorCode.USER_NOT_AUTH.getCode(),
                     i18nMessage.getMessage(ErrorCode.USER_NOT_AUTH.getCode(), ErrorCode.USER_NOT_AUTH.getMsg())));
             WebUtils.sendResponse(response, body);
-            /*if (WebUtils.isAjax(request)) {
-                R r = R.error(ReturnCode.UNAUTHORED, ReturnCode.UNAUTHORED_MSG);
-                response.getWriter().print(JSONObject.toJSON(r));
-            } else {
-                String unauthorizedUrl = getUnauthorizedUrl();
-                if (StringUtils.hasText(unauthorizedUrl)) {
-                    WebUtils.sendRedirect(request, response, unauthorizedUrl);
-                } else {
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-                }
-            }*/
         }
         return false;
-    }
-
-    public void setDataCache(RedisCache dataCache) {
-        this.dataCache = dataCache;
     }
 
 }
