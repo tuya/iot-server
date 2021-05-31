@@ -5,6 +5,7 @@ import com.tuya.iot.suite.core.util.LibPhoneNumberUtil;
 import com.tuya.iot.suite.service.user.UserService;
 import com.tuya.iot.suite.web.i18n.I18nMessage;
 import com.tuya.iot.suite.web.model.LoginReq;
+import com.tuya.iot.suite.web.util.SessionUtils;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
@@ -26,8 +27,6 @@ public class LoginController {
 
     @Autowired
     private UserService userService;
-    @Autowired
-    private HttpSession session;
     @Autowired
     private I18nMessage i18nMessage;
 
@@ -62,6 +61,6 @@ public class LoginController {
         UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken(username, password);
         Subject subject = SecurityUtils.getSubject();
         subject.login(usernamePasswordToken);
-        return new Response(session.getAttribute("token"));
+        return new Response(SessionUtils.getUserToken());
     }
 }

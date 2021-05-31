@@ -146,7 +146,6 @@ public class UserController {
 
     @ApiOperation("用户列表")
     @GetMapping("/users")
-    @RequiresPermissions("users")
     public Response<PageDataVO<UserVO>> listUsers(@ApiParam(value = "搜索关键字") String searchKey,
                                                   @ApiParam(value = "角色编码") String roleCode) {
         return Todo.todo();
