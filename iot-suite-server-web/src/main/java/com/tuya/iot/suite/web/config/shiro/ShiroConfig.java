@@ -5,8 +5,6 @@ import org.apache.shiro.realm.Realm;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
-import org.apache.shiro.spring.web.config.DefaultShiroFilterChainDefinition;
-import org.apache.shiro.spring.web.config.ShiroFilterChainDefinition;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.session.mgt.ServletContainerSessionManager;
 import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
@@ -59,36 +57,12 @@ public class ShiroConfig {
     }
 
     @Bean
-    public ShiroFilterChainDefinition shiroFilterChainDefinition() {
-        DefaultShiroFilterChainDefinition chainDefinition = new DefaultShiroFilterChainDefinition();
-        chainDefinition.addPathDefinition("/", "authc");
-        chainDefinition.addPathDefinition("/my/**", "authc");
-        //文件上传下载路径
-        chainDefinition.addPathDefinition("/files/**", "anon");
-        //静态资源都用这个做路径
-        chainDefinition.addPathDefinition("/static/**", "anon");
-        //重定向都用这个forward路径
-        chainDefinition.addPathDefinition("/forward/**", "anon");
-        chainDefinition.addPathDefinition("/druid/**", "anon");
-        chainDefinition.addPathDefinition("/mobile/countries", "anon");
-        chainDefinition.addPathDefinition("/hc.do", "anon");
-        chainDefinition.addPathDefinition("/v2/api-docs", "anon");
-        chainDefinition.addPathDefinition("/swagger-resources/**", "anon");
-        chainDefinition.addPathDefinition("/configuration/ui", "anon");
-        chainDefinition.addPathDefinition("/configuration/security", "anon");
-        chainDefinition.addPathDefinition("/user/password/reset/captcha", "anon");
-        chainDefinition.addPathDefinition("/**", "authc,perms");
-        return chainDefinition;
-    }
-
-    @Bean
     public ShiroFilterFactoryBean shiroFilterFactoryBean(RedisTemplate redisTemplate
             , I18nMessage i18nMessage) {
         ShiroFilterFactoryBean fac = new ShiroFilterFactoryBean();
         fac.setLoginUrl("/login");
         fac.setSuccessUrl("/");
         fac.setUnauthorizedUrl("/unauthorized.html");
-        fac.setFilterChainDefinitionMap(shiroFilterChainDefinition().getFilterChainMap());
         fac.setSecurityManager(securityManager(redisTemplate));
         Map<String, Filter> filterMap = new HashMap<>();
         filterMap.put("authc", loginFilter(i18nMessage));
