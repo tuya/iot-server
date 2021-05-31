@@ -1,7 +1,9 @@
 # General Management Portal
 ## Overview
 
-General Management Portal implements the industry capabilities of the cloud, flexibly integrates and extends the IoT applications. This portal is linked with `projectCode` of projects on the [Cloud Development Platform](https://iot.tuya.com/cloud/). You need to log in with the user information corresponding to the `projectCode`, including the following items:
+General Management Portal implements the industry capabilities of the cloud, flexibly integrates and extends the IoT applications. 
+
+This portal is linked with `projectCode` of projects on the [Cloud Development Platform](https://iot.tuya.com/cloud/). You need to log in with the user information corresponding to the `projectCode`, including the following items:
 
 - Account management: Modify and reset passwords.
 - Asset management: Create, modify, and delete assets.
