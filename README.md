@@ -11,7 +11,9 @@
 设备管理：增加设备、移除设备、编辑设备、控制设备
 ## 启动项目
 1. 将项目代码导入到IDE，在./iot-suite-server-web/src/main/resources/application.properties文件中配置云开发平台应用的账号
+   
    //在云开发平台申请的Access ID/Client ID
+   
    connector.ak=
    
    \# 在云开发平台申请的Access Secret/Client Secret
