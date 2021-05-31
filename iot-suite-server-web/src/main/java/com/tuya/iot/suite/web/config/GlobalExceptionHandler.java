@@ -8,6 +8,7 @@ import com.tuya.iot.suite.core.constant.Response;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
 import com.tuya.iot.suite.web.i18n.I18nMessage;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.authz.UnauthenticatedException;
 import org.apache.shiro.authz.UnauthorizedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
@@ -25,7 +26,7 @@ import java.util.regex.Pattern;
 /**
  * Description  TODO
  *
- * @author Chyern
+ * @author Chyern,benguan
  * @since 2021/3/17
  */
 @Slf4j
@@ -40,8 +41,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseBody
     public Response MethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        log.error("全局拦截Exception异常:", e);
-        log.error(e.getBindingResult().getFieldError().getDefaultMessage());
+        log.info("全局拦截MethodArgumentNotValidException异常:{}", e.getMessage());
+        //log.error(e.getBindingResult().getFieldError().getDefaultMessage());
         return Response
                 .buildFailure(ErrorCode.PARAM_ERROR.getCode(),
                         getI18nMessageByCode(ErrorCode.PARAM_ERROR.getCode(), ErrorCode.PARAM_ERROR.getMsg()));
@@ -50,7 +51,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NoHandlerFoundException.class)
     @ResponseBody
     public Response handleException(NoHandlerFoundException e) {
-        log.error("全局拦截Exception异常:", e);
+        log.info("全局拦截NoHandlerFoundException异常:{}", e.getMessage());
         return Response
                 .buildFailure(ErrorCode.NOT_FOUND.getCode(),
                         getI18nMessageByCode(ErrorCode.NOT_FOUND.getCode(), ErrorCode.NOT_FOUND.getMsg()));
@@ -59,7 +60,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     @ResponseBody
     public Response handleException(HttpRequestMethodNotSupportedException e) {
-        log.error("全局拦截Exception异常:", e);
+        log.info("全局拦截HttpRequestMethodNotSupportedException异常:{}", e.getMessage());
         return Response.buildFailure(ErrorCode.NOT_FOUND.getCode(),
                 getI18nMessageByCode(ErrorCode.NOT_FOUND.getCode(), ErrorCode.NOT_FOUND.getMsg()));
     }
@@ -76,7 +77,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConnectorResultException.class)
     @ResponseBody
     public Response handleException(ConnectorResultException e) {
-        log.error("全局拦截Exception异常:", e);
+        log.error("全局拦截ConnectorResultException异常:", e);
         ErrorInfo errorInfo = e.getErrorInfo();
         String errMsg = fixErrMsgIfNeed(errorInfo.getErrorMsg());
         return Response.buildFailure(errorInfo.getErrorCode(), getI18nMessageByCode(errorInfo.getErrorCode(), errMsg));
@@ -96,7 +97,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConnectorException.class)
     @ResponseBody
     public Response handleException(ConnectorException e) {
-        log.error("全局拦截Exception异常:", e);
+        log.error("全局拦截ConnectorException异常:", e);
         Throwable cause = e.getCause();
         if (cause instanceof UndeclaredThrowableException) {
             UndeclaredThrowableException undeclaredThrowableException = (UndeclaredThrowableException) cause;
@@ -120,11 +121,24 @@ public class GlobalExceptionHandler {
                 getI18nMessageByCode(ErrorCode.SYSTEM_ERROR.getCode(), ErrorCode.SYSTEM_ERROR.getMsg()));
     }
 
+    /**
+     * 未登陆
+     * */
+    @ExceptionHandler(UnauthenticatedException.class)
+    @ResponseBody
+    public Response handleException(UnauthenticatedException e) {
+        log.info("全局拦截UnauthenticatedException异常:{}", e.getMessage());
+        return Response.buildFailure(ErrorCode.NO_LOGIN.getCode(),
+                getI18nMessageByCode(ErrorCode.NO_LOGIN.getCode(), ErrorCode.NO_LOGIN.getMsg()));
+    }
 
+    /**
+     * 未授权
+     * */
     @ExceptionHandler(UnauthorizedException.class)
     @ResponseBody
     public Response handleException(UnauthorizedException e) {
-        log.error("全局拦截Exception异常:", e);
+        log.info("全局拦截UnauthorizedException异常:{}", e.getMessage());
         return Response.buildFailure(ErrorCode.USER_NOT_AUTH.getCode(),
                 getI18nMessageByCode(ErrorCode.USER_NOT_AUTH.getCode(), ErrorCode.USER_NOT_AUTH.getMsg()));
     }
