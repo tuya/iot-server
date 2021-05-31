@@ -61,16 +61,13 @@
             <artifactId>shiro-spring-boot-web-starter</artifactId>
             <version>${shiro.springboot.stater.version}</version>
         </dependency>
-<!--        <dependency>
-            <groupId>org.apache.shiro</groupId>
-            <artifactId>shiro-web</artifactId>
-            <version>${shiro.version}</version>
-        </dependency>
+        <!-- 支持代码块，方便测试 -->
         <dependency>
-            <groupId>org.apache.shiro</groupId>
-            <artifactId>shiro-core</artifactId>
-            <version>${shiro.version}</version>
-        </dependency>-->
+            <groupId>com.mageddo.lombok</groupId>
+            <artifactId>lombok-ext</artifactId>
+            <version>2.3.4</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 </project>
