@@ -1,4 +1,4 @@
-package com.tuya.iot.suite.web.model;
+package com.tuya.iot.suite.web.model.response.alarm;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;

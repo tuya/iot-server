@@ -1,5 +1,6 @@
-package com.tuya.iot.suite.web.model;
+package com.tuya.iot.suite.web.model.response.user;
 
+import com.tuya.iot.suite.web.model.response.role.RoleDto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -14,15 +15,16 @@ import java.util.List;
  */
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserVO {
+public class UserDto {
+
     @ApiModelProperty("昵称")
     String nickName;
+     @ApiModelProperty("用户Id")
+    String userId;
     @ApiModelProperty("用户名")
     String userName;
     @ApiModelProperty("创建时间")
     String createTime;
-    @ApiModelProperty("创建者用户名")
-    String creatorUserName;
     @ApiModelProperty("角色名称列表")
-    List<String> roleNames;
+    List<RoleDto> roles;
 }
