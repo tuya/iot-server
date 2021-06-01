@@ -24,7 +24,7 @@ public interface RoleAbility {
 
     IdaasRole getRole(Long spaceId, String roleCode);
 
-    List<IdaasRole> queryRolesByCodes(RoleQueryReq request);
+    //List<IdaasRole> queryRolesByCodes(RoleQueryReq request);
 
     List<IdaasRole> queryRolesByUser(Long spaceId,String uid);
 
