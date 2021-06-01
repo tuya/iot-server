@@ -3,14 +3,16 @@ package com.tuya.iot.suite.web.controller;
 
 import com.tuya.iot.suite.core.constant.Response;
 import com.tuya.iot.suite.core.util.ContextUtil;
+import com.tuya.iot.suite.core.util.Todo;
 import com.tuya.iot.suite.service.asset.AssetService;
 import com.tuya.iot.suite.service.dto.AssetConvertor;
 import com.tuya.iot.suite.service.dto.AssetVO;
 import com.tuya.iot.suite.service.dto.DeviceDTO;
 import com.tuya.iot.suite.service.model.PageDataVO;
-import com.tuya.iot.suite.web.model.DeviceInfoVO;
+import com.tuya.iot.suite.web.model.response.device.DeviceInfoVO;
 import com.tuya.iot.suite.web.model.convert.DeviceInfoConvert;
 import com.tuya.iot.suite.web.model.criteria.AssetCriteria;
+import com.tuya.iot.suite.web.model.request.asset.AssetAuths;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -95,5 +97,12 @@ public class AssetController {
         vo.setTotal(resultPage.getTotal());
         vo.setData(DeviceInfoConvert.INSTANCE.deviceDTO2VO(resultPage.getData()));
         return Response.buildSuccess(vo);
+    }
+
+
+    @ApiOperation(value = "批量给用户授权资产")
+    @PutMapping(value = "/auths")
+    public Response<Boolean> authAssetToUser(@RequestBody AssetAuths req) {
+        return Todo.todo();
     }
 }

@@ -1,4 +1,4 @@
-package com.tuya.iot.suite.web.model;
+package com.tuya.iot.suite.web.model.response.device;
 
 import lombok.Data;
 

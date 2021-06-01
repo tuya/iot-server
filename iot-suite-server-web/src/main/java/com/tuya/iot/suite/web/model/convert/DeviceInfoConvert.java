@@ -1,7 +1,7 @@
 package com.tuya.iot.suite.web.model.convert;
 
 import com.tuya.iot.suite.service.dto.DeviceDTO;
-import com.tuya.iot.suite.web.model.DeviceInfoVO;
+import com.tuya.iot.suite.web.model.response.device.DeviceInfoVO;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
