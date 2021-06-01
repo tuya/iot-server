@@ -10,8 +10,6 @@ import java.util.UUID;
 
 /**
  * @description 由于没有云端没有 角色类型，所以我们通过角色编码来实现。
- * 云端角色编码 = 管控台角色类型:管控台角色编码
- * 例如 admin:adminX
  * @author benguan.zhou@tuya.com
  * @date 2021/06/01
  */

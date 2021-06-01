@@ -7,7 +7,7 @@ import com.tuya.iot.suite.core.exception.ServiceLogicException;
 import com.tuya.iot.suite.core.util.LibPhoneNumberUtil;
 import com.tuya.iot.suite.core.util.MixUtil;
 import com.tuya.iot.suite.core.util.Todo;
-import com.tuya.iot.suite.service.model.PageDataVO;
+import com.tuya.iot.suite.service.model.PageVO;
 import com.tuya.iot.suite.service.user.UserService;
 import com.tuya.iot.suite.service.user.model.ResetPasswordBo;
 import com.tuya.iot.suite.web.config.ProjectProperties;
@@ -19,7 +19,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -144,8 +143,8 @@ public class UserController {
 
     @ApiOperation("用户列表")
     @GetMapping("/users")
-    public Response<PageDataVO<UserVO>> listUsers(@ApiParam(value = "搜索关键字") String searchKey,
-                                                  @ApiParam(value = "角色编码") String roleCode) {
+    public Response<PageVO<UserVO>> listUsers(@ApiParam(value = "搜索关键字") String searchKey,
+                                              @ApiParam(value = "角色编码") String roleCode) {
         return Todo.todo();
     }
 
