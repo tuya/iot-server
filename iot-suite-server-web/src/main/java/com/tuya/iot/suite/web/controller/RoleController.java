@@ -4,7 +4,9 @@ import com.tuya.iot.suite.ability.idaas.model.IdaasRole;
 import com.tuya.iot.suite.ability.idaas.model.IdaasRoleCreateReq;
 import com.tuya.iot.suite.ability.idaas.model.RoleUpdateReq;
 import com.tuya.iot.suite.ability.idaas.model.RolesPaginationQueryReq;
+import com.tuya.iot.suite.ability.idaas.model.SuiteRoleCode;
 import com.tuya.iot.suite.core.constant.Response;
+import com.tuya.iot.suite.core.util.Todo;
 import com.tuya.iot.suite.service.dto.RoleCreateReqDTO;
 import com.tuya.iot.suite.service.idaas.RoleService;
 import com.tuya.iot.suite.service.model.PageVO;
@@ -14,6 +16,9 @@ import com.tuya.iot.suite.web.config.ProjectProperties;
 import com.tuya.iot.suite.web.model.RoleCreateReq;
 import com.tuya.iot.suite.web.model.RoleNameUpdateReq;
 import com.tuya.iot.suite.web.model.RoleVO;
+import com.tuya.iot.suite.web.model.request.role.RoleEditReq;
+import com.tuya.iot.suite.web.model.request.role.RolePermissionReq;
+import com.tuya.iot.suite.web.model.response.permission.PermissionDto;
 import com.tuya.iot.suite.web.util.SessionContext;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -21,7 +26,7 @@ import io.swagger.annotations.ApiParam;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -53,7 +58,7 @@ public class RoleController {
     ProjectProperties projectProperties;
 
     @ApiOperation("创建角色")
-    @PutMapping("/roles")
+    @PostMapping("/roles")
     public Response<Boolean> createRole(@RequestBody RoleCreateReq req) {
         String uid = SessionContext.getUserToken().getUserId();
         Boolean res = roleService.createRole(projectProperties.getSpaceId(), RoleCreateReqDTO.builder()
@@ -80,15 +85,15 @@ public class RoleController {
                 .data((List)pageVO.getData().stream().map(
                         it->
                                 RoleVO.builder().typeCode(RoleTypeEnum.fromRoleCode(it.getRoleCode()).name())
-                        .code(it.getRoleCode())
-                        .name(it.getRoleName())
-                        .build()
+                                        .code(it.getRoleCode())
+                                        .name(it.getRoleName())
+                                        .build()
                 ).collect(Collectors.toList())).build());
     }
 
-    @ApiOperation("修改角色名称")
-    @PutMapping("/roles/{roleCode}/name")
-    public Response<Boolean> updateRoleName(@PathVariable String roleCode, @RequestBody RoleNameUpdateReq req) {
+    @ApiOperation("修改角色")
+    @PutMapping("/roles")
+    public Response<Boolean> updateRoleName(@RequestBody RoleEditReq req) {
         Boolean res = roleService.updateRole(projectProperties.getSpaceId(), roleCode,
                 RoleUpdateReq.builder().roleName(req.getName()).build());
         return Response.buildSuccess(res);
@@ -111,5 +116,19 @@ public class RoleController {
     public Response<Boolean> deleteRole(@PathVariable String roleCode) {
         Boolean success = roleService.deleteRole(projectProperties.getSpaceId(),roleCode);
         return Response.buildSuccess(success);
+    }
+
+    @ApiOperation("给角色授权")
+    @PutMapping("/roles/permissions")
+    @RequiresPermissions("roles")
+    public Response<Boolean> rolePermissions(@RequestBody RolePermissionReq req) {
+        return Todo.todo();
+    }
+
+    @ApiOperation("查角色拥有的授权")
+    @GetMapping("/roles/permissions")
+    @RequiresPermissions("roles")
+    public Response<List<PermissionDto>> getRolePermissions(@RequestParam String roleCode) {
+        return Todo.todo();
     }
 }
