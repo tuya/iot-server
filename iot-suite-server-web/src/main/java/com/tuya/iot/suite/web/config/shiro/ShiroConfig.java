@@ -35,18 +35,6 @@ public class ShiroConfig {
     }
 
     @Bean
-    public FilterRegistrationBean loginFilterRegistration(LoginFilter filter) {
-        FilterRegistrationBean registration = new FilterRegistrationBean(filter);
-        registration.setEnabled(false);
-        return registration;
-    }
-    @Bean
-    public FilterRegistrationBean permissionFilterRegistration(PermissionFilter filter) {
-        FilterRegistrationBean registration = new FilterRegistrationBean(filter);
-        registration.setEnabled(false);
-        return registration;
-    }
-    @Bean
     public ShiroFilterFactoryBean shiroFilterFactoryBean(ApplicationContext applicationContext
             , I18nMessage i18nMessage) {
         ShiroFilterFactoryBean fac = new ShiroFilterFactoryBean();
@@ -57,7 +45,7 @@ public class ShiroConfig {
         fac.setFilterChainDefinitionMap(getFilterChainDefinitionMap());
         Map<String,Filter> filterMap = fac.getFilters();
         filterMap.put("authc", loginFilter(i18nMessage));
-        filterMap.put("perms", permissionFilter(applicationContext));
+        //filterMap.put("perms", permissionFilter(applicationContext));
         fac.setFilters(filterMap);
         return fac;
     }
