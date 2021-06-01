@@ -3,10 +3,12 @@ package com.tuya.iot.suite.web.controller;
 import com.tuya.iot.suite.core.constant.Response;
 import com.tuya.iot.suite.core.util.Todo;
 import com.tuya.iot.suite.service.model.PageDataVO;
+import com.tuya.iot.suite.service.model.PageVO;
 import com.tuya.iot.suite.web.model.response.alarm.DeviceAlarmVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,7 +26,8 @@ public class DeviceAlarmController {
 
     @ApiOperation("查询设备告警")
     @GetMapping
-    public Response<PageDataVO<DeviceAlarmVO>> queryDeviceAlarms(
+    @RequiresPermissions("5001")
+    public Response<PageVO<DeviceAlarmVO>> queryDeviceAlarms(
             @ApiParam(value = "告警等级。通知,轻微,严重")
             String alarmLevel,
             @ApiParam(value = "告警时间类型。今天”、“昨天”、“近3天”、“近7天”、“近30天”和“近半年",required = true)

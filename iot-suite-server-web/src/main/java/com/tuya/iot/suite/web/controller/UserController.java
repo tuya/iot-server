@@ -62,12 +62,14 @@ public class UserController {
     @ApiOperation(value = "修改密码")
     @SneakyThrows
     @PutMapping(value = "/user/password")
+    @RequiresPermissions("4005")
     public Response<Boolean> modifyLoginPassword(@RequestBody UserPasswordModifyReq req) {
         Boolean modifyLoginPassword = userService.modifyLoginPassword(req.getUid(), req.getOldPassword(), req.getNewPassword());
         return modifyLoginPassword ? Response.buildSuccess(true) :
                 Responses.buildFailure(USER_NOT_EXIST);
     }
 
+    /** 这个还需要吗？要验证码的 */
     @ApiOperation(value = "用户密码重置")
     @PostMapping(value = "/user/password/reset")
     public Response<Boolean> resetPassword(@RequestBody @Valid ResetPasswordReq req) {
@@ -120,6 +122,7 @@ public class UserController {
 
     @ApiOperation("创建用户")
     @PostMapping("/users")
+    @RequiresPermissions("4002")
     public Response<Boolean> createUser(@RequestBody UserAddReq req) {
         Boolean success = userService.createUser(projectProperties.getSpaceId(),
                 IdaasUserCreateReq.builder()
@@ -133,18 +136,21 @@ public class UserController {
 
     @ApiOperation("修改用户")
     @PutMapping("/users")
+    @RequiresPermissions("4003")
     public Response<Boolean> updateUserName(@RequestBody UserEditReq req) {
         return Todo.todo();
     }
 
     @ApiOperation("修改用户密码")
     @PutMapping("/users/pwd")
+    @RequiresPermissions("4005")
     public Response<Boolean> updateUserPwd(@RequestBody UserPwdReq req) {
         return Todo.todo();
     }
 
     @ApiOperation("删除用户")
     @DeleteMapping("/users/{userId}")
+    @RequiresPermissions("4004")
     public Response<Boolean> updateUserPwd(@PathVariable("userId") String userId) {
         return Todo.todo();
     }
@@ -154,6 +160,7 @@ public class UserController {
      */
     @ApiOperation("批量删除用户")
     @DeleteMapping("/users")
+    @RequiresPermissions("4003")
     public Response<Boolean> batchDeleteUser(@ApiParam(value = "uid列表，逗号分隔", required = true)
                                              @RequestParam String uidList) {
         return Todo.todo();
@@ -161,7 +168,7 @@ public class UserController {
 
     @ApiOperation("用户列表")
     @GetMapping("/users")
-    @RequiresPermissions("10087")
+    @RequiresPermissions("4001")
     public Response<PageVO<UserDto>> listUsers(@ApiParam(value = "搜索关键字")@RequestParam String searchKey,
                                                @ApiParam(value = "角色编码")@RequestParam String roleCode) {
         return Todo.todo();
@@ -169,9 +176,11 @@ public class UserController {
 
     @ApiOperation("用户权限列表")
     @GetMapping("/users/{uid}/permissions")
+    @RequiresPermissions("4001")
     public Response<List<PermissionDto>> listUserPermissions(
             @ApiParam(value = "用户id") @PathVariable String uid) {
         return Todo.todo();
     }
 
+    //TODO 分配角色 4006
 }
