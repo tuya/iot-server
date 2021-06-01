@@ -37,4 +37,7 @@ public class ApplicationUtil implements ApplicationContextAware, EnvironmentAwar
     public static <T> T getProperty(String key, Class<T> t) {
         return ApplicationUtil.environment.getProperty(key, t);
     }
+    public static <T> T getBean(Class<T> clazz){
+        return context.getBean(clazz);
+    }
 }

@@ -66,12 +66,12 @@ public class ShiroConfig {
         Map<String,String> map = new LinkedHashMap<>();
 
         //静态资源
-        map.put("*.html", "anon");
-        map.put("*.css", "anon");
-        map.put("*.js", "anon");
-        map.put("*.jpg", "anon");
-        map.put("*.png", "anon");
-        map.put("*.gif", "anon");
+        map.put("/**/*.html", "anon");
+        map.put("/**/*.css", "anon");
+        map.put("/**/*.js", "anon");
+        map.put("/**/*.jpg", "anon");
+        map.put("/**/*.png", "anon");
+        map.put("/**/*.gif", "anon");
 
         //文件上传下载路径
         map.put("/files/**", "anon");
@@ -86,8 +86,10 @@ public class ShiroConfig {
         map.put("/swagger-resources/**", "anon");
         map.put("/configuration/ui", "anon");
         map.put("/configuration/security", "anon");
-        map.put("/user/password/reset/captcha", "anon");
+        //不需要过滤的业务接口
+        map.put("/my/password/reset/captcha", "anon");
 
+        //需要过滤的业务接口
         map.put("/", "authc");
         map.put("/my/**", "authc");
         map.put("/**", "authc,perms");

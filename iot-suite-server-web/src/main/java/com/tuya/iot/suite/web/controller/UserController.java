@@ -1,5 +1,6 @@
 package com.tuya.iot.suite.web.controller;
 
+import com.tuya.iot.suite.ability.idaas.model.IdaasUserCreateReq;
 import com.tuya.iot.suite.ability.user.model.MobileCountries;
 import com.tuya.iot.suite.core.constant.Response;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
@@ -9,14 +10,16 @@ import com.tuya.iot.suite.core.util.Todo;
 import com.tuya.iot.suite.service.model.PageDataVO;
 import com.tuya.iot.suite.service.user.UserService;
 import com.tuya.iot.suite.service.user.model.ResetPasswordBo;
+import com.tuya.iot.suite.web.config.ProjectProperties;
 import com.tuya.iot.suite.web.i18n.I18nMessage;
 import com.tuya.iot.suite.web.model.*;
+import com.tuya.iot.suite.web.util.Responses;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -30,7 +33,7 @@ import static com.tuya.iot.suite.core.constant.ErrorCode.*;
 
 
 /**
- * @author bade,benguan
+ * @author bade, benguan
  */
 @RestController
 @Slf4j
@@ -44,32 +47,20 @@ public class UserController {
     @Autowired
     private I18nMessage i18nMessage;
 
+    @Autowired
+    private ProjectProperties projectProperties;
+
     /**
      * @return
      */
     @ApiOperation(value = "修改密码")
     @SneakyThrows
     @PutMapping(value = "/user/password")
-    public Response modifyLoginPassword(@RequestBody UserPasswordModifyReq req) {
+    public Response<Boolean> modifyLoginPassword(@RequestBody UserPasswordModifyReq req) {
         Boolean modifyLoginPassword = userService.modifyLoginPassword(req.getUid(), req.getOldPassword(), req.getNewPassword());
         return modifyLoginPassword ? Response.buildSuccess(true) :
-                Response.buildFailure(USER_NOT_EXIST.getCode(), i18nMessage.getMessage(USER_NOT_EXIST.getCode(), USER_NOT_EXIST.getMsg()));
+                Responses.buildFailure(USER_NOT_EXIST);
     }
-
-/*    *//**
-     * @see MyController#restPasswordCaptcha
-     * *//*
-    @ApiOperation(value = "获取密码重置验证码")
-    @PostMapping(value = "/user/password/reset/captcha")
-    public Response<Boolean> restPasswordCaptcha(@RequestBody ResetPasswordReq req) {
-        resetPasswordCheck(req);
-        CaptchaPushBo captchaPushBo = new CaptchaPushBo();
-        captchaPushBo.setLanguage(req.getLanguage());
-        captchaPushBo.setCountryCode(req.getCountryCode());
-        captchaPushBo.setPhone(req.getPhone());
-        captchaPushBo.setMail(req.getMail());
-        return Response.buildSuccess(userService.sendRestPasswordCaptcha(captchaPushBo));
-    }*/
 
     @ApiOperation(value = "用户密码重置")
     @PostMapping(value = "/user/password/reset")
@@ -123,8 +114,15 @@ public class UserController {
 
     @ApiOperation("创建用户")
     @PutMapping("/users")
-    public Response<Boolean> createUser(@RequestBody UserCreateReq userCreateReq) {
-        return Todo.todo("新增用户，重置密码");
+    public Response<Boolean> createUser(@RequestBody UserCreateReq req) {
+        Boolean success = userService.createUser(projectProperties.getSpaceId(),
+                IdaasUserCreateReq.builder()
+                        .uid("TODO")
+                        .username(req.getUserName())
+                        .remark(req.getNickName()).build());
+        return Response.buildSuccess(success);
+        //TODO
+        //return Todo.todo("新增用户，重置密码");
     }
 
     @ApiOperation("修改用户名称")

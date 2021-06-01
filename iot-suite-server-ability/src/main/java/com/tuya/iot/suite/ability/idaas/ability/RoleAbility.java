@@ -1,7 +1,7 @@
 package com.tuya.iot.suite.ability.idaas.ability;
 
 import com.tuya.iot.suite.ability.idaas.model.IdaasRole;
-import com.tuya.iot.suite.ability.idaas.model.RoleCreateReq;
+import com.tuya.iot.suite.ability.idaas.model.IdaasRoleCreateReq;
 import com.tuya.iot.suite.ability.idaas.model.RoleQueryReq;
 import com.tuya.iot.suite.ability.idaas.model.RoleUpdateReq;
 
@@ -14,7 +14,7 @@ import java.util.List;
  */
 public interface RoleAbility {
 
-    Boolean createRole(Long spaceId, RoleCreateReq request);
+    Boolean createRole(Long spaceId, IdaasRoleCreateReq request);
 
     Boolean updateRole(Long spaceId, String roleCode, RoleUpdateReq request);
 

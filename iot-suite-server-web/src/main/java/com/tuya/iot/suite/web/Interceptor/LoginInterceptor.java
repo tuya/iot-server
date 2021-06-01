@@ -6,7 +6,7 @@ import com.tuya.iot.suite.core.constant.Response;
 import com.tuya.iot.suite.core.model.UserToken;
 import com.tuya.iot.suite.core.util.ContextUtil;
 import com.tuya.iot.suite.web.i18n.I18nMessage;
-import com.tuya.iot.suite.web.util.SessionUtils;
+import com.tuya.iot.suite.web.util.SessionContext;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -31,7 +31,7 @@ public class LoginInterceptor implements HandlerInterceptor {
         //获取session
         HttpSession session = request.getSession(false);
         if (session != null) {
-            UserToken token = SessionUtils.getUserToken();
+            UserToken token = SessionContext.getUserToken();
             //判断session中是否有用户数据，如果有，则返回true，继续向下执行
             if (token != null) {
                 ContextUtil.setUserToken(token);

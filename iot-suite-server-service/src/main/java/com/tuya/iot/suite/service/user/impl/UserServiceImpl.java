@@ -1,6 +1,9 @@
 package com.tuya.iot.suite.service.user.impl;
 
 import com.tuya.connector.api.exceptions.ConnectorException;
+import com.tuya.iot.suite.ability.idaas.model.IdaasUser;
+import com.tuya.iot.suite.ability.idaas.model.IdaasUserCreateReq;
+import com.tuya.iot.suite.ability.idaas.model.IdaasUserUpdateReq;
 import com.tuya.iot.suite.ability.notice.model.ResetPasswordReq;
 import com.tuya.iot.suite.ability.user.ability.UserAbility;
 import com.tuya.iot.suite.ability.user.model.MobileCountries;
@@ -133,6 +136,26 @@ public class UserServiceImpl implements UserService {
         }
         result = userAbility.resetPassword(new ResetPasswordReq(unionId, bo.getPassword()));
         return result;
+    }
+
+    @Override
+    public Boolean createUser(Long spaceId, IdaasUserCreateReq request) {
+        return null;
+    }
+
+    @Override
+    public Boolean updateUser(Long spaceId, String uid, IdaasUserUpdateReq req) {
+        return null;
+    }
+
+    @Override
+    public Boolean deleteUser(Long spaceId, String uid) {
+        return null;
+    }
+
+    @Override
+    public IdaasUser getUserByUid(Long spaceId, String uid) {
+        return null;
     }
 }
 

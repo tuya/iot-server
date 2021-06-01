@@ -2,6 +2,7 @@ package com.tuya.iot.suite.web.model;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
@@ -13,6 +14,7 @@ import java.util.List;
  * @date: 2021/05/28
  */
 @Data
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PermissionVO {
     @ApiModelProperty("权限id")
@@ -21,8 +23,12 @@ public class PermissionVO {
     String name;
     @ApiModelProperty("权限编码")
     String code;
+    @ApiModelProperty("权限说明")
+    String remark;
     @ApiModelProperty("权限类型，菜单/api/按钮/数据")
     String type;
+    @ApiModelProperty("顺序")
+    Integer order;
     @ApiModelProperty("权限的依赖，权限编码列表")
     List<String> dependencies;
 }

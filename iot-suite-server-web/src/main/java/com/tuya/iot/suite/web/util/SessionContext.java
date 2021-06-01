@@ -8,7 +8,7 @@ import com.tuya.iot.suite.web.config.HttpRequestUtils;
  * @description
  * @date 2021/05/31
  */
-public abstract class SessionUtils {
+public abstract class SessionContext {
     public static final String USER_TOKEN_ATTR_NAME = "token";
     public static UserToken getUserToken(){
         return (UserToken) HttpRequestUtils.getHttpSession().getAttribute(USER_TOKEN_ATTR_NAME);

@@ -4,7 +4,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
-import org.springframework.util.StringUtils;
 
 /**
  * @author benguan.zhou@tuya.com
@@ -14,7 +13,7 @@ import org.springframework.util.StringUtils;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
-public class IdaasRole {
+public class IdaasRoleCreateReq {
 
     /**
      * 角色code
@@ -25,11 +24,6 @@ public class IdaasRole {
      * 角色名字
      */
     String roleName;
-
-    /**
-     * 隔离空间id
-     */
-    Long spaceId;
 
     /**
      * 备注
