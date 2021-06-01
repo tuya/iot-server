@@ -6,6 +6,7 @@ import com.tuya.iot.suite.ability.idaas.model.IdaasRoleCreateReq;
 import com.tuya.iot.suite.ability.idaas.model.RoleQueryReq;
 import com.tuya.iot.suite.ability.idaas.model.RoleUpdateReq;
 import com.tuya.iot.suite.ability.idaas.model.RolesPaginationQueryReq;
+import com.tuya.iot.suite.service.dto.RoleCreateReqDTO;
 import com.tuya.iot.suite.service.model.PageVO;
 
 import java.util.List;
@@ -16,7 +17,7 @@ import java.util.List;
  * @date 2021/05/31
  */
 public interface RoleService {
-    Boolean createRole(Long spaceId, IdaasRoleCreateReq request);
+    Boolean createRole(Long spaceId, RoleCreateReqDTO request);
 
     Boolean updateRole(Long spaceId, String roleCode, RoleUpdateReq request);
 
