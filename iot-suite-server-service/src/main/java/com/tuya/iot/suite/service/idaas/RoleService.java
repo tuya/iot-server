@@ -1,6 +1,9 @@
 package com.tuya.iot.suite.service.idaas;
 
 import com.tuya.iot.suite.ability.idaas.model.IdaasRole;
+import com.tuya.iot.suite.ability.idaas.model.IdaasRoleCreateReq;
+import com.tuya.iot.suite.ability.idaas.model.RoleQueryReq;
+import com.tuya.iot.suite.ability.idaas.model.RoleUpdateReq;
 
 import java.util.List;
 
@@ -10,5 +13,15 @@ import java.util.List;
  * @date 2021/05/31
  */
 public interface RoleService {
-    List<IdaasRole> queryRolesByUser(Long spaceId, String userId);
+    Boolean createRole(Long spaceId, IdaasRoleCreateReq request);
+
+    Boolean updateRole(Long spaceId, String roleCode, RoleUpdateReq request);
+
+    Boolean deleteRole(Long spaceId, String roleCode);
+
+    IdaasRole getRole(Long spaceId, String roleCode);
+
+    List<IdaasRole> queryRolesByCodes(RoleQueryReq request);
+
+    List<IdaasRole> queryRolesByUser(Long spaceId,String uid);
 }

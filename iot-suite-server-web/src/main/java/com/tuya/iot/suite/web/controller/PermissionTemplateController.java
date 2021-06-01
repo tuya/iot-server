@@ -25,6 +25,12 @@ import java.util.List;
 @Api(value = "权限模板")
 public class PermissionTemplateController {
 
+    /**
+     * 是否需要权限模板？
+     * 可以创建几个角色，当作权限模板。
+     * 创建其他角色，可以选择另一个角色当作源，创建其副本。
+     * 这样不仅可以实现需求，而且更灵活。管控台也不需要保存模板文件了。
+     * */
     @ApiOperation("查询权限模版列表")
     @GetMapping
     public Response<List<PermissionTemplate>> listPermTemplates(){

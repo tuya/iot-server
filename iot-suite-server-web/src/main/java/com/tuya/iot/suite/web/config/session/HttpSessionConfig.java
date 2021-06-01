@@ -3,7 +3,7 @@ package com.tuya.iot.suite.web.config.session;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tuya.iot.suite.web.util.SessionUtils;
+import com.tuya.iot.suite.web.util.SessionContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,7 +29,7 @@ public class HttpSessionConfig {
      */
     @Bean
     public HttpSessionStrategy httpSessionStrategy() {
-        return new HttpSessionStrategy(SessionUtils.USER_TOKEN_ATTR_NAME);
+        return new HttpSessionStrategy(SessionContext.USER_TOKEN_ATTR_NAME);
     }
 
     @Bean

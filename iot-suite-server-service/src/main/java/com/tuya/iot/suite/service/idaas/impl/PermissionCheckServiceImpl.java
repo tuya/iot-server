@@ -15,7 +15,17 @@ public class PermissionCheckServiceImpl implements PermissionCheckService {
 
 
     @Override
-    public boolean checkPermissionForUser(Long spaceId, String userId, String permissionCode) {
+    public Boolean checkPermissionForRole(Long spaceId, String roleCode, String permissionCode) {
+        return null;
+    }
+
+    @Override
+    public Boolean checkRoleForUser(Long spaceId, String uid, String roleCode) {
+        return null;
+    }
+
+    @Override
+    public Boolean checkPermissionForUser(Long spaceId, String userId, String permissionCode) {
         if(permissionCode.contains("users")){
             return true;
         }

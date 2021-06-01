@@ -2,6 +2,7 @@ package com.tuya.iot.suite.web.model;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
@@ -11,6 +12,7 @@ import lombok.experimental.FieldDefaults;
  * @date: 2021/05/28
  */
 @Data
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RoleVO {
     @ApiModelProperty("角色编码")

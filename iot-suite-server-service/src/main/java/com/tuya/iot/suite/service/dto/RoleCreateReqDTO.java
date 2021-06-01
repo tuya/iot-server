@@ -1,4 +1,4 @@
-package com.tuya.iot.suite.ability.idaas.model;
+package com.tuya.iot.suite.service.dto;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -13,8 +13,9 @@ import lombok.experimental.FieldDefaults;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
-public class RoleCreateReq {
+public class RoleCreateReqDTO {
 
+    String uid;
     /**
      * 角色code
      */

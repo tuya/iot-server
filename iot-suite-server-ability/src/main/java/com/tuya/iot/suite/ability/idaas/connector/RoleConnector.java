@@ -8,7 +8,7 @@ import com.tuya.connector.api.annotations.PUT;
 import com.tuya.connector.api.annotations.Path;
 import com.tuya.iot.suite.ability.idaas.ability.RoleAbility;
 import com.tuya.iot.suite.ability.idaas.model.IdaasRole;
-import com.tuya.iot.suite.ability.idaas.model.RoleCreateReq;
+import com.tuya.iot.suite.ability.idaas.model.IdaasRoleCreateReq;
 import com.tuya.iot.suite.ability.idaas.model.RoleQueryReq;
 import com.tuya.iot.suite.ability.idaas.model.RoleUpdateReq;
 
@@ -23,7 +23,7 @@ public interface RoleConnector extends RoleAbility {
 
     @POST("/v1.0/iot-03/idaas/spaces/{space_id}/roles")
     @Override
-    Boolean createRole(@Path("space_id") Long spaceId, @Body RoleCreateReq request);
+    Boolean createRole(@Path("space_id") Long spaceId, @Body IdaasRoleCreateReq request);
 
     @PUT("/v1.0/iot-03/idaas/spaces/{space_id}/roles/{role_code}")
     @Override

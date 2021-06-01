@@ -1,6 +1,9 @@
 package com.tuya.iot.suite.service.user;
 
 
+import com.tuya.iot.suite.ability.idaas.model.IdaasUser;
+import com.tuya.iot.suite.ability.idaas.model.IdaasUserCreateReq;
+import com.tuya.iot.suite.ability.idaas.model.IdaasUserUpdateReq;
 import com.tuya.iot.suite.ability.user.model.MobileCountries;
 import com.tuya.iot.suite.ability.user.model.UserToken;
 import com.tuya.iot.suite.service.user.model.CaptchaPushBo;
@@ -52,4 +55,12 @@ public interface UserService {
      * @return
      */
     boolean resetPassword(ResetPasswordBo resetPasswordBo);
+
+    Boolean createUser(Long spaceId, IdaasUserCreateReq request);
+
+    Boolean updateUser(Long spaceId, String uid, IdaasUserUpdateReq req);
+
+    Boolean deleteUser(Long spaceId, String uid);
+
+    IdaasUser getUserByUid(Long spaceId, String uid);
 }
