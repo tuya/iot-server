@@ -1,11 +1,14 @@
 package com.tuya.iot.suite.service.idaas.impl;
 
 import com.tuya.iot.suite.ability.idaas.ability.RoleAbility;
+import com.tuya.iot.suite.ability.idaas.model.IdaasPageResult;
 import com.tuya.iot.suite.ability.idaas.model.IdaasRole;
 import com.tuya.iot.suite.ability.idaas.model.IdaasRoleCreateReq;
 import com.tuya.iot.suite.ability.idaas.model.RoleQueryReq;
 import com.tuya.iot.suite.ability.idaas.model.RoleUpdateReq;
+import com.tuya.iot.suite.ability.idaas.model.RolesPaginationQueryReq;
 import com.tuya.iot.suite.service.idaas.RoleService;
+import com.tuya.iot.suite.service.model.PageVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -50,5 +53,15 @@ public class RoleServiceImpl implements RoleService {
     public List<IdaasRole> queryRolesByUser(Long spaceId, String userId) {
         //return Lists.newArrayList(IdaasRole.builder().roleCode("sysadmin").build());
         return roleAbility.queryRolesByUser(spaceId,userId);
+    }
+
+    @Override
+    public PageVO<IdaasRole> queryRolesPagination(Long spaceId, RolesPaginationQueryReq req) {
+        IdaasPageResult<IdaasRole> pageResult = roleAbility.queryRolesPagination(spaceId,req);
+        List<IdaasRole> list = pageResult.getResults();
+        return PageVO.builder().pageNo(pageResult.getPageNumber())
+                .pageSize(pageResult.getPageSize())
+                .total(pageResult.getTotalCount())
+                .data((List)list).build();
     }
 }

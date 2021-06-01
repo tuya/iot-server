@@ -1,11 +1,15 @@
 package com.tuya.iot.suite.web.controller;
 
+import com.tuya.iot.suite.ability.idaas.model.IdaasRole;
 import com.tuya.iot.suite.ability.idaas.model.IdaasRoleCreateReq;
 import com.tuya.iot.suite.ability.idaas.model.RoleUpdateReq;
+import com.tuya.iot.suite.ability.idaas.model.RolesPaginationQueryReq;
 import com.tuya.iot.suite.ability.idaas.model.SuiteRoleCode;
 import com.tuya.iot.suite.core.constant.Response;
 import com.tuya.iot.suite.core.util.Todo;
 import com.tuya.iot.suite.service.idaas.RoleService;
+import com.tuya.iot.suite.service.model.PageVO;
+import com.tuya.iot.suite.service.model.RoleTypeEnum;
 import com.tuya.iot.suite.web.config.ProjectProperties;
 import com.tuya.iot.suite.web.model.RoleCreateReq;
 import com.tuya.iot.suite.web.model.RoleNameUpdateReq;
@@ -29,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 
 /**
@@ -66,11 +71,24 @@ public class RoleController {
 
     @ApiOperation("角色列表")
     @GetMapping("/roles")
-    public Response<List<RoleVO>> listRoles() {
-        //TODO
-        //需要iot平台提供一个查询所有角色的接口
-        //roleService.queryRolesByUser(projectProperties.getSpaceId(),)
-        return Todo.todo();
+    public Response<PageVO<RoleVO>> listRoles(Integer pageNo,Integer pageSize,String roleCode,String roleName) {
+        PageVO<IdaasRole> pageVO = roleService.queryRolesPagination(projectProperties.getSpaceId(),
+                RolesPaginationQueryReq.builder()
+                        .pageNum(pageNo)
+                        .pageSize(pageSize)
+                        .roleCode(roleCode)
+                        .roleName(roleName)
+                        .build());
+        return Response.buildSuccess(PageVO.builder().pageNo(pageVO.getPageNo())
+                .pageSize(pageVO.getPageSize())
+                .total(pageVO.getTotal())
+                .data((List)pageVO.getData().stream().map(
+                        it->
+                                RoleVO.builder().typeCode(RoleTypeEnum.fromRoleCode(it.getRoleCode()).name())
+                        .code(it.getRoleCode())
+                        .name(it.getRoleName())
+                        .build()
+                ).collect(Collectors.toList())).build());
     }
 
     @ApiOperation("修改角色名称")

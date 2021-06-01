@@ -1,9 +1,12 @@
 package com.tuya.iot.suite.service.idaas;
 
+import com.tuya.iot.suite.ability.idaas.model.IdaasPageResult;
 import com.tuya.iot.suite.ability.idaas.model.IdaasRole;
 import com.tuya.iot.suite.ability.idaas.model.IdaasRoleCreateReq;
 import com.tuya.iot.suite.ability.idaas.model.RoleQueryReq;
 import com.tuya.iot.suite.ability.idaas.model.RoleUpdateReq;
+import com.tuya.iot.suite.ability.idaas.model.RolesPaginationQueryReq;
+import com.tuya.iot.suite.service.model.PageVO;
 
 import java.util.List;
 
@@ -24,4 +27,7 @@ public interface RoleService {
     List<IdaasRole> queryRolesByCodes(RoleQueryReq request);
 
     List<IdaasRole> queryRolesByUser(Long spaceId,String uid);
+
+    PageVO<IdaasRole> queryRolesPagination(Long spaceId, RolesPaginationQueryReq req);
+
 }

@@ -14,5 +14,7 @@ public interface SpaceAbility {
      * @param spaceApplyRequest 权限空间申请参数
      * @return 申请是否成功
      * */
-    SpaceApplyResp applySpace(SpaceApplyReq spaceApplyRequest);
+    Long applySpace(SpaceApplyReq spaceApplyRequest);
+
+    Long querySpace(String spaceGroup,String spaceCode);
 }
