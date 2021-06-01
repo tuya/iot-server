@@ -13,6 +13,12 @@ import com.tuya.iot.suite.service.user.model.ResetPasswordBo;
 import com.tuya.iot.suite.web.config.ProjectProperties;
 import com.tuya.iot.suite.web.i18n.I18nMessage;
 import com.tuya.iot.suite.web.model.*;
+import com.tuya.iot.suite.web.model.request.user.UserAddReq;
+import com.tuya.iot.suite.web.model.request.user.UserEditReq;
+import com.tuya.iot.suite.web.model.request.user.UserPasswordModifyReq;
+import com.tuya.iot.suite.web.model.request.user.UserPwdReq;
+import com.tuya.iot.suite.web.model.response.permission.PermissionDto;
+import com.tuya.iot.suite.web.model.response.user.UserDto;
 import com.tuya.iot.suite.web.util.Responses;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -114,8 +120,8 @@ public class UserController {
     }
 
     @ApiOperation("创建用户")
-    @PutMapping("/users")
-    public Response<Boolean> createUser(@RequestBody UserCreateReq req) {
+    @PostMapping("/user")
+    public Response<Boolean> createUser(@RequestBody UserAddReq req) {
         Boolean success = userService.createUser(projectProperties.getSpaceId(),
                 IdaasUserCreateReq.builder()
                         .uid("TODO")
@@ -126,10 +132,20 @@ public class UserController {
         //return Todo.todo("新增用户，重置密码");
     }
 
-    @ApiOperation("修改用户名称")
-    @PutMapping("/users/{uid}/name")
-    public Response<Boolean> updateUserName(@ApiParam(value = "用户id") @PathVariable String uid,
-                                            @RequestBody UserNameUpdateReq req) {
+    @ApiOperation("修改用户")
+    @PutMapping("/user")
+    public Response<Boolean> updateUserName(@RequestBody UserEditReq req) {
+        return Todo.todo();
+    }
+
+    @ApiOperation("修改用户密码")
+    @PutMapping("/user/pwd")
+    public Response<Boolean> updateUserPwd(@RequestBody UserPwdReq req) {
+        return Todo.todo();
+    }
+    @ApiOperation("删除用户")
+    @DeleteMapping("/user/{userId}")
+    public Response<Boolean> updateUserPwd(@PathVariable("userId") String userId) {
         return Todo.todo();
     }
 
@@ -137,7 +153,7 @@ public class UserController {
      * 批量操作，统一按"resources-batch"方式定义路径。（谁有好的建议可以提出来）
      */
     @ApiOperation("批量删除用户")
-    @DeleteMapping("/batch-users")
+    @DeleteMapping("/user")
     public Response<Boolean> batchDeleteUser(@ApiParam(value = "uid列表，逗号分隔", required = true)
                                              @RequestParam String uidList) {
         return Todo.todo();
@@ -145,14 +161,14 @@ public class UserController {
 
     @ApiOperation("用户列表")
     @GetMapping("/users")
-    public Response<PageVO<UserVO>> listUsers(@ApiParam(value = "搜索关键字") String searchKey,
-                                              @ApiParam(value = "角色编码") String roleCode) {
+    public Response<PageVO<UserDto>> listUsers(@ApiParam(value = "搜索关键字")@RequestParam String searchKey,
+                                               @ApiParam(value = "角色编码")@RequestParam String roleCode) {
         return Todo.todo();
     }
 
     @ApiOperation("用户权限列表")
-    @GetMapping("/users/{uid}/permissions")
-    public Response<List<UserPermissionVO>> listUserPermissions(
+    @GetMapping("/user/{uid}/permissions")
+    public Response<List<PermissionDto>> listUserPermissions(
             @ApiParam(value = "用户id") @PathVariable String uid) {
         return Todo.todo();
     }

@@ -3,7 +3,7 @@ package com.tuya.iot.suite.web.controller;
 import com.tuya.iot.suite.core.constant.ErrorCode;
 import com.tuya.iot.suite.core.constant.Response;
 import com.tuya.iot.suite.core.util.LibPhoneNumberUtil;
-import com.tuya.iot.suite.web.model.LoginReq;
+import com.tuya.iot.suite.web.model.request.login.LoginReq;
 import com.tuya.iot.suite.web.util.Responses;
 import com.tuya.iot.suite.web.util.SessionContext;
 import io.swagger.annotations.ApiOperation;
