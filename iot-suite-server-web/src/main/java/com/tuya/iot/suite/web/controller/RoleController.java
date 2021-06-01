@@ -1,10 +1,8 @@
 package com.tuya.iot.suite.web.controller;
 
 import com.tuya.iot.suite.ability.idaas.model.IdaasRole;
-import com.tuya.iot.suite.ability.idaas.model.IdaasRoleCreateReq;
 import com.tuya.iot.suite.ability.idaas.model.RoleUpdateReq;
 import com.tuya.iot.suite.ability.idaas.model.RolesPaginationQueryReq;
-import com.tuya.iot.suite.ability.idaas.model.SuiteRoleCode;
 import com.tuya.iot.suite.core.constant.Response;
 import com.tuya.iot.suite.core.util.Todo;
 import com.tuya.iot.suite.service.dto.RoleCreateReqDTO;
@@ -13,9 +11,8 @@ import com.tuya.iot.suite.service.model.PageVO;
 import com.tuya.iot.suite.service.model.RoleCodeGenerator;
 import com.tuya.iot.suite.service.model.RoleTypeEnum;
 import com.tuya.iot.suite.web.config.ProjectProperties;
-import com.tuya.iot.suite.web.model.RoleCreateReq;
-import com.tuya.iot.suite.web.model.RoleNameUpdateReq;
 import com.tuya.iot.suite.web.model.RoleVO;
+import com.tuya.iot.suite.web.model.request.role.RoleAddReq;
 import com.tuya.iot.suite.web.model.request.role.RoleEditReq;
 import com.tuya.iot.suite.web.model.request.role.RolePermissionReq;
 import com.tuya.iot.suite.web.model.response.permission.PermissionDto;
@@ -32,6 +29,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -59,7 +57,7 @@ public class RoleController {
 
     @ApiOperation("创建角色")
     @PostMapping("/roles")
-    public Response<Boolean> createRole(@RequestBody RoleCreateReq req) {
+    public Response<Boolean> createRole(@RequestBody RoleAddReq req) {
         String uid = SessionContext.getUserToken().getUserId();
         Boolean res = roleService.createRole(projectProperties.getSpaceId(), RoleCreateReqDTO.builder()
                 .roleCode(RoleCodeGenerator.generate(req.getRoleType()))
@@ -94,8 +92,8 @@ public class RoleController {
     @ApiOperation("修改角色")
     @PutMapping("/roles")
     public Response<Boolean> updateRoleName(@RequestBody RoleEditReq req) {
-        Boolean res = roleService.updateRole(projectProperties.getSpaceId(), roleCode,
-                RoleUpdateReq.builder().roleName(req.getName()).build());
+        Boolean res = roleService.updateRole(projectProperties.getSpaceId(), req.getRoleCode(),
+                RoleUpdateReq.builder().roleName(req.getRoleName()).build());
         return Response.buildSuccess(res);
     }
 
