@@ -77,6 +77,7 @@ public class RoleController {
 
     @ApiOperation("角色列表")
     @GetMapping("/roles")
+    @RequiresPermissions("10086")
     public Response<PageVO<RoleVO>> listRoles(Integer pageNo, Integer pageSize, String roleCode, String roleName) {
         PageVO<IdaasRole> pageVO = roleService.queryRolesPagination(projectProperties.getSpaceId(),
                 RolesPaginationQueryReq.builder()

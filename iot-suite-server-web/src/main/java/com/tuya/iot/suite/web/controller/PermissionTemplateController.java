@@ -23,8 +23,7 @@ public class PermissionTemplateController {
 
 
     @ApiOperation("查询权限模版列表")
-    @RequestMapping("/permission-template/role")
-    @GetMapping
+    @GetMapping("/permission-template/role")
     public Response<List<PermissionTemplate>> listPermTemplates(@RequestParam  String roleCode){
         return Todo.todo();
     }

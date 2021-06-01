@@ -25,6 +25,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -160,6 +161,7 @@ public class UserController {
 
     @ApiOperation("用户列表")
     @GetMapping("/users")
+    @RequiresPermissions("10087")
     public Response<PageVO<UserDto>> listUsers(@ApiParam(value = "搜索关键字")@RequestParam String searchKey,
                                                @ApiParam(value = "角色编码")@RequestParam String roleCode) {
         return Todo.todo();
