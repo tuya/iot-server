@@ -1,10 +1,15 @@
 package com.tuya.iot.suite.web.controller;
 
+import com.google.common.collect.Lists;
 import com.tuya.iot.suite.ability.idaas.model.IdaasRole;
+import com.tuya.iot.suite.ability.idaas.model.PermissionQueryByRolesReq;
+import com.tuya.iot.suite.ability.idaas.model.RoleGrantPermissionsReq;
 import com.tuya.iot.suite.ability.idaas.model.RoleUpdateReq;
 import com.tuya.iot.suite.ability.idaas.model.RolesPaginationQueryReq;
 import com.tuya.iot.suite.core.constant.Response;
 import com.tuya.iot.suite.service.dto.RoleCreateReqDTO;
+import com.tuya.iot.suite.service.idaas.GrantService;
+import com.tuya.iot.suite.service.idaas.PermissionService;
 import com.tuya.iot.suite.service.idaas.RoleService;
 import com.tuya.iot.suite.service.model.PageVO;
 import com.tuya.iot.suite.service.model.RoleCodeGenerator;
@@ -23,6 +28,7 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -53,6 +59,10 @@ public class RoleController {
     RoleService roleService;
     @Autowired
     ProjectProperties projectProperties;
+    @Autowired
+    GrantService grantService;
+    @Autowired
+    PermissionService permissionService;
 
     @ApiOperation("创建角色")
     @PostMapping("/roles")
@@ -68,7 +78,7 @@ public class RoleController {
 
     @ApiOperation("角色列表")
     @GetMapping("/roles")
-    public Response<PageVO<RoleVO>> listRoles(Integer pageNo,Integer pageSize,String roleCode,String roleName) {
+    public Response<PageVO<RoleVO>> listRoles(Integer pageNo, Integer pageSize, String roleCode, String roleName) {
         PageVO<IdaasRole> pageVO = roleService.queryRolesPagination(projectProperties.getSpaceId(),
                 RolesPaginationQueryReq.builder()
                         .pageNum(pageNo)
@@ -79,8 +89,8 @@ public class RoleController {
         return Response.buildSuccess(PageVO.builder().pageNo(pageVO.getPageNo())
                 .pageSize(pageVO.getPageSize())
                 .total(pageVO.getTotal())
-                .data((List)pageVO.getData().stream().map(
-                        it->
+                .data((List) pageVO.getData().stream().map(
+                        it ->
                                 RoleVO.builder().typeCode(RoleTypeEnum.fromRoleCode(it.getRoleCode()).name())
                         .code(it.getRoleCode())
                         .name(it.getRoleName())
@@ -103,7 +113,7 @@ public class RoleController {
         Set<String> roleCodes = StringUtils.commaDelimitedListToSet(roleCodeList);
         boolean success = true;
         for (String roleCode : roleCodes) {
-            success &= roleService.deleteRole(projectProperties.getSpaceId(),roleCode);
+            success &= roleService.deleteRole(projectProperties.getSpaceId(), roleCode);
         }
         return Response.buildSuccess(success);
     }
@@ -111,7 +121,43 @@ public class RoleController {
     @ApiOperation("删除角色")
     @DeleteMapping("/roles/{roleCode}")
     public Response<Boolean> deleteRole(@PathVariable String roleCode) {
-        Boolean success = roleService.deleteRole(projectProperties.getSpaceId(),roleCode);
+        Boolean success = roleService.deleteRole(projectProperties.getSpaceId(), roleCode);
         return Response.buildSuccess(success);
+    }
+
+    @ApiOperation("给角色授权")
+    @PutMapping("/roles/permissions")
+    @RequiresPermissions("roles")
+    public Response<Boolean> rolePermissions(@RequestBody RolePermissionReq req) {
+        Boolean success = grantService.grantPermissionsToRole(RoleGrantPermissionsReq.builder()
+                .spaceId(projectProperties.getSpaceId())
+                .roleCode(req.getRoleCode())
+                .permissionCodes(req.getPermissionCodes())
+                .build());
+        return Response.buildSuccess(success);
+    }
+
+    @ApiOperation("查角色拥有的授权")
+    @GetMapping("/roles/permissions")
+    @RequiresPermissions("roles")
+    public Response<List<PermissionDto>> getRolePermissions(@RequestParam String roleCode) {
+        List<PermissionDto> list = permissionService.queryPermissionsByRoleCodes(
+                PermissionQueryByRolesReq.builder()
+                        .spaceId(projectProperties.getSpaceId())
+                        .roleCodes(Lists.newArrayList(roleCode))
+                        .build())
+                .stream().flatMap(it ->
+                        it.getPermissionList().stream()
+                                .map(p ->
+                                        PermissionDto.builder()
+                                                .permissionCode(p.getPermissionCode())
+                                                .permissionName(p.getName())
+                                                .permissionType(p.getType().name())
+                                                .order(p.getOrder())
+                                                .remark(p.getRemark())
+                                                //.parentCode(p.getParentId())
+                                                .build())
+                ).collect(Collectors.toList());
+        return Response.buildSuccess(list);
     }
 }

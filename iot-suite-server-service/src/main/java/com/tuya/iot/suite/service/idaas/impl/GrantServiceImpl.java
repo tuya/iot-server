@@ -1,5 +1,6 @@
 package com.tuya.iot.suite.service.idaas.impl;
 
+import com.tuya.iot.suite.ability.idaas.ability.GrantAbility;
 import com.tuya.iot.suite.ability.idaas.model.RoleGrantPermissionReq;
 import com.tuya.iot.suite.ability.idaas.model.RoleGrantPermissionsReq;
 import com.tuya.iot.suite.ability.idaas.model.RoleRevokePermissionsReq;
@@ -7,6 +8,10 @@ import com.tuya.iot.suite.ability.idaas.model.UserGrantRoleReq;
 import com.tuya.iot.suite.ability.idaas.model.UserGrantRolesReq;
 import com.tuya.iot.suite.ability.idaas.model.UserRevokeRolesReq;
 import com.tuya.iot.suite.service.idaas.GrantService;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -15,7 +20,11 @@ import org.springframework.stereotype.Service;
  * @date 2021/05/31
  */
 @Service
+@Slf4j
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class GrantServiceImpl implements GrantService {
+    @Autowired
+    GrantAbility grantAbility;
     @Override
     public Boolean grantPermissionToRole(RoleGrantPermissionReq request) {
         return null;
@@ -23,7 +32,7 @@ public class GrantServiceImpl implements GrantService {
 
     @Override
     public Boolean grantPermissionsToRole(RoleGrantPermissionsReq request) {
-        return null;
+        return grantAbility.grantPermissionsToRole(request);
     }
 
     @Override

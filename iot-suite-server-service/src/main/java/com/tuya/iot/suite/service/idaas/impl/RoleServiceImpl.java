@@ -31,6 +31,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Boolean createRole(Long spaceId, RoleCreateReqDTO req) {
         //TODO 用一个自定义的错误码
+        //数据权限校验，校验操作者自己是否为更高的角色。
         roleAbility.queryRolesByUser(spaceId,req.getUid()).stream().filter(
                 it-> RoleTypeEnum.fromRoleCode(req.getRoleCode()).isOffspringOrSelf(RoleTypeEnum.fromRoleCode(it.getRoleCode()))
         ).findAny().orElseThrow(()->new ServiceLogicException(ErrorCode.USER_NOT_AUTH));
@@ -41,13 +42,14 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public Boolean updateRole(Long spaceId, String roleCode, RoleUpdateReq request) {
-        return null;
+    public Boolean updateRole(Long spaceId, String roleCode, RoleUpdateReq req) {
+        return roleAbility.updateRole(spaceId,roleCode,RoleUpdateReq.builder()
+                .roleName(req.getRoleName()).build());
     }
 
     @Override
     public Boolean deleteRole(Long spaceId, String roleCode) {
-        return null;
+        return roleAbility.deleteRole(spaceId,roleCode);
     }
 
     @Override
