@@ -7,11 +7,13 @@ package com.tuya.iot.suite.service.model;
  */
 public enum RoleTypeEnum {
     /**系统管理员*/
-    sysadmin(null),
+    admin(null),
     /**管理员*/
-    admin(sysadmin),
+    manage(admin),
     /**普通用户*/
-    normal(admin);
+    normal(manage);
+
+    private static final String SEPARATOR = "-";
 
     /**上级角色*/
     RoleTypeEnum parent;
@@ -23,6 +25,20 @@ public enum RoleTypeEnum {
         return parent;
     }
 
+    public static RoleTypeEnum fromRoleCode(String roleCode){
+        if(isAdmin(roleCode)){
+            return admin;
+        }
+        int pos = roleCode.indexOf(SEPARATOR);
+        if(pos<0){
+            return null;
+        }
+        String name = roleCode.substring(0,pos);
+        if(admin.name().equals(name)){
+            return null;
+        }
+        return RoleTypeEnum.valueOf(name);
+    }
     /**
      * 是否为target的子级角色 或 当前角色
      * */
@@ -36,8 +52,26 @@ public enum RoleTypeEnum {
         }
         return false;
     }
-    public boolean isSysadmin(RoleTypeEnum roleTypeEnum){
-        return sysadmin.equals(roleTypeEnum);
+    public static boolean isAdmin(RoleTypeEnum roleTypeEnum){
+        return admin.equals(roleTypeEnum);
+    }
+    public static boolean isManage(RoleTypeEnum roleTypeEnum){
+        return manage.equals(roleTypeEnum);
+    }
+    public static boolean isNormal(RoleTypeEnum roleTypeEnum){
+        return normal.equals(roleTypeEnum);
+    }
+    public static boolean isAdmin(String roleCode){
+        return admin.name().equals(roleCode);
+    }
+    public static boolean isManage(String roleCode){
+        return roleCode.startsWith(manage.name()+SEPARATOR);
+    }
+    public static boolean isNormal(String roleCode){
+        return roleCode.startsWith(normal.name()+SEPARATOR);
     }
 
+    public static boolean isValidRoleCode(String roleCode){
+        return isAdmin(roleCode) || isManage(roleCode) || isNormal(roleCode);
+    }
 }

@@ -1,6 +1,5 @@
 package com.tuya.iot.suite.web.controller;
 
-import com.tuya.iot.suite.ability.idaas.model.SuiteRoleCode;
 import com.tuya.iot.suite.core.constant.Response;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
 import com.tuya.iot.suite.core.util.*;
@@ -8,6 +7,7 @@ import com.tuya.iot.suite.service.asset.AssetService;
 import com.tuya.iot.suite.service.dto.AssetVO;
 import com.tuya.iot.suite.service.idaas.PermissionService;
 import com.tuya.iot.suite.service.idaas.RoleService;
+import com.tuya.iot.suite.service.model.RoleTypeEnum;
 import com.tuya.iot.suite.service.user.UserService;
 import com.tuya.iot.suite.service.user.model.CaptchaPushBo;
 import com.tuya.iot.suite.service.user.model.ResetPasswordBo;
@@ -88,13 +88,10 @@ public class MyController {
     public Response<List<RoleVO>> myRoles() {
         String uid = SessionContext.getUserToken().getUserId();
         List<RoleVO> list =  roleService.queryRolesByUser(projectProperties.getSpaceId(),uid)
-        .stream().map(it-> {
-            SuiteRoleCode roleCode = SuiteRoleCode.fromCloudRoleCode(it.getRoleCode());
-            return RoleVO.builder()
-                    .code(roleCode.getCode())
-                    .name(it.getRoleName())
-                    .typeCode(roleCode.getType()).build();
-        }).collect(Collectors.toList());
+        .stream().map(it-> RoleVO.builder()
+                .code(it.getRoleCode())
+                .name(it.getRoleName())
+                .typeCode(RoleTypeEnum.fromRoleCode(it.getRoleCode()).name()).build()).collect(Collectors.toList());
         return Response.buildSuccess(list);
     }
 

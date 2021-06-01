@@ -7,10 +7,12 @@ import com.tuya.connector.api.annotations.POST;
 import com.tuya.connector.api.annotations.PUT;
 import com.tuya.connector.api.annotations.Path;
 import com.tuya.iot.suite.ability.idaas.ability.RoleAbility;
+import com.tuya.iot.suite.ability.idaas.model.IdaasPageResult;
 import com.tuya.iot.suite.ability.idaas.model.IdaasRole;
 import com.tuya.iot.suite.ability.idaas.model.IdaasRoleCreateReq;
 import com.tuya.iot.suite.ability.idaas.model.RoleQueryReq;
 import com.tuya.iot.suite.ability.idaas.model.RoleUpdateReq;
+import com.tuya.iot.suite.ability.idaas.model.RolesPaginationQueryReq;
 
 import java.util.List;
 
@@ -48,4 +50,9 @@ public interface RoleConnector extends RoleAbility {
     @Override
     List<IdaasRole> queryRolesByUser(@Path("space_id")Long spaceId,
                                      @Path("uid")String uid);
+
+    @POST("/v1.0/iot-03/idaas/spaces/{space_id}/page-role")
+    @Override
+    IdaasPageResult<IdaasRole> queryRolesPagination(@Path("space_id")Long spaceId,
+                                                    @Body RolesPaginationQueryReq req);
 }
