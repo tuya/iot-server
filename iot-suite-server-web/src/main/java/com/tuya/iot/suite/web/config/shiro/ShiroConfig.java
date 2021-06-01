@@ -122,12 +122,12 @@ public class ShiroConfig {
         //realm.setAuthorizationCacheName("authorCache");
         //realm.setAuthenticationCacheName("authenCache");
         manager.setRealm(realm);
-        manager.setCacheManager(cacheManager(applicationContext));
+        //manager.setCacheManager(cacheManager(applicationContext));
         manager.setSessionManager(sessionManager());
         return manager;
     }
 
-    @Bean
+    /*@Bean
     @DependsOn({"redisTemplate"})
     public ShiroRedisCacheManager cacheManager(ApplicationContext applicationContext) {
         RedisTemplate redisTemplate = applicationContext.getBean("redisTemplate",RedisTemplate.class);
@@ -137,7 +137,7 @@ public class ShiroConfig {
         cacheMap.put("authorCache", new ShiroRedisCache("authorCache", redisTemplate));
         cacheManager.setCacheMap(cacheMap);
         return cacheManager;
-    }
+    }*/
 
     /**
      * 我们已经用spring整合redis实现了分布式会话，shiro的会话直接交给容器管理。

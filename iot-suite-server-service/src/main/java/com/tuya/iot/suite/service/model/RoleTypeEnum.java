@@ -13,7 +13,7 @@ public enum RoleTypeEnum {
     /**普通用户*/
     normal(manage);
 
-    private static final String SEPARATOR = "-";
+    public static final String SEPARATOR = "-";
 
     /**上级角色*/
     RoleTypeEnum parent;
@@ -26,7 +26,7 @@ public enum RoleTypeEnum {
     }
 
     public static RoleTypeEnum fromRoleCode(String roleCode){
-        if(isAdmin(roleCode)){
+        if(isAdminRoleCode(roleCode)){
             return admin;
         }
         int pos = roleCode.indexOf(SEPARATOR);
@@ -61,17 +61,28 @@ public enum RoleTypeEnum {
     public static boolean isNormal(RoleTypeEnum roleTypeEnum){
         return normal.equals(roleTypeEnum);
     }
-    public static boolean isAdmin(String roleCode){
+
+    public static boolean isAdminRoleType(String roleType){
+        return admin.name().equals(roleType);
+    }
+    public static boolean isManageRoleType(String roleType){
+        return manage.name().equals(roleType);
+    }
+    public static boolean isNormalRoleType(String roleType){
+        return normal.name().equals(roleType);
+    }
+
+    public static boolean isAdminRoleCode(String roleCode){
         return admin.name().equals(roleCode);
     }
-    public static boolean isManage(String roleCode){
+    public static boolean isManageRoleCode(String roleCode){
         return roleCode.startsWith(manage.name()+SEPARATOR);
     }
-    public static boolean isNormal(String roleCode){
+    public static boolean isNormalRoleCode(String roleCode){
         return roleCode.startsWith(normal.name()+SEPARATOR);
     }
 
     public static boolean isValidRoleCode(String roleCode){
-        return isAdmin(roleCode) || isManage(roleCode) || isNormal(roleCode);
+        return isAdminRoleCode(roleCode) || isManageRoleCode(roleCode) || isNormalRoleCode(roleCode);
     }
 }

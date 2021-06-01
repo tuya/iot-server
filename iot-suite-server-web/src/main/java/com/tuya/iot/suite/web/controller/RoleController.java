@@ -4,11 +4,11 @@ import com.tuya.iot.suite.ability.idaas.model.IdaasRole;
 import com.tuya.iot.suite.ability.idaas.model.IdaasRoleCreateReq;
 import com.tuya.iot.suite.ability.idaas.model.RoleUpdateReq;
 import com.tuya.iot.suite.ability.idaas.model.RolesPaginationQueryReq;
-import com.tuya.iot.suite.ability.idaas.model.SuiteRoleCode;
 import com.tuya.iot.suite.core.constant.Response;
-import com.tuya.iot.suite.core.util.Todo;
+import com.tuya.iot.suite.service.dto.RoleCreateReqDTO;
 import com.tuya.iot.suite.service.idaas.RoleService;
 import com.tuya.iot.suite.service.model.PageVO;
+import com.tuya.iot.suite.service.model.RoleCodeGenerator;
 import com.tuya.iot.suite.service.model.RoleTypeEnum;
 import com.tuya.iot.suite.web.config.ProjectProperties;
 import com.tuya.iot.suite.web.model.RoleCreateReq;
@@ -21,6 +21,7 @@ import io.swagger.annotations.ApiParam;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -55,16 +56,10 @@ public class RoleController {
     @PutMapping("/roles")
     public Response<Boolean> createRole(@RequestBody RoleCreateReq req) {
         String uid = SessionContext.getUserToken().getUserId();
-        //TODO 校验角色类型，不能创建超级管理员类型的角色
-        Boolean res = roleService.createRole(projectProperties.getSpaceId(), IdaasRoleCreateReq.builder()
-                .roleCode(
-                        SuiteRoleCode.builder()
-                                .code(SuiteRoleCode.randomCode())
-                                .type(req.getRoleType())
-                                .build()
-                                .toCloudRoleCode()
-                )
+        Boolean res = roleService.createRole(projectProperties.getSpaceId(), RoleCreateReqDTO.builder()
+                .roleCode(RoleCodeGenerator.generate(req.getRoleType()))
                 .roleName(req.getRoleName())
+                .uid(uid)
                 .build());
         return Response.buildSuccess(res);
     }
