@@ -7,8 +7,12 @@ import com.tuya.iot.suite.ability.idaas.model.IdaasRoleCreateReq;
 import com.tuya.iot.suite.ability.idaas.model.RoleQueryReq;
 import com.tuya.iot.suite.ability.idaas.model.RoleUpdateReq;
 import com.tuya.iot.suite.ability.idaas.model.RolesPaginationQueryReq;
+import com.tuya.iot.suite.core.constant.ErrorCode;
+import com.tuya.iot.suite.core.exception.ServiceLogicException;
+import com.tuya.iot.suite.service.dto.RoleCreateReqDTO;
 import com.tuya.iot.suite.service.idaas.RoleService;
 import com.tuya.iot.suite.service.model.PageVO;
+import com.tuya.iot.suite.service.model.RoleTypeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,8 +29,15 @@ public class RoleServiceImpl implements RoleService {
     private RoleAbility roleAbility;
 
     @Override
-    public Boolean createRole(Long spaceId, IdaasRoleCreateReq request) {
-        return null;
+    public Boolean createRole(Long spaceId, RoleCreateReqDTO req) {
+        //TODO 用一个自定义的错误码
+        roleAbility.queryRolesByUser(spaceId,req.getUid()).stream().filter(
+                it-> RoleTypeEnum.fromRoleCode(req.getRoleCode()).isOffspringOrSelf(RoleTypeEnum.fromRoleCode(it.getRoleCode()))
+        ).findAny().orElseThrow(()->new ServiceLogicException(ErrorCode.USER_NOT_AUTH));
+        return roleAbility.createRole(spaceId, IdaasRoleCreateReq.builder()
+                .roleCode(req.getRoleCode())
+                .roleName(req.getRoleName())
+                .remark(req.getRemark()).build());
     }
 
     @Override
