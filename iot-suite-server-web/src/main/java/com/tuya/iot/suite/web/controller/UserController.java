@@ -118,7 +118,7 @@ public class UserController {
     }
 
     @ApiOperation("创建用户")
-    @PostMapping("/user")
+    @PostMapping("/users")
     public Response<Boolean> createUser(@RequestBody UserAddReq req) {
         Boolean success = userService.createUser(projectProperties.getSpaceId(),
                 IdaasUserCreateReq.builder()
@@ -131,18 +131,19 @@ public class UserController {
     }
 
     @ApiOperation("修改用户")
-    @PutMapping("/user")
+    @PutMapping("/users")
     public Response<Boolean> updateUserName(@RequestBody UserEditReq req) {
         return Todo.todo();
     }
 
     @ApiOperation("修改用户密码")
-    @PutMapping("/user/pwd")
+    @PutMapping("/users/pwd")
     public Response<Boolean> updateUserPwd(@RequestBody UserPwdReq req) {
         return Todo.todo();
     }
+
     @ApiOperation("删除用户")
-    @DeleteMapping("/user/{userId}")
+    @DeleteMapping("/users/{userId}")
     public Response<Boolean> updateUserPwd(@PathVariable("userId") String userId) {
         return Todo.todo();
     }
@@ -151,7 +152,7 @@ public class UserController {
      * 批量操作，统一按"resources-batch"方式定义路径。（谁有好的建议可以提出来）
      */
     @ApiOperation("批量删除用户")
-    @DeleteMapping("/user")
+    @DeleteMapping("/users")
     public Response<Boolean> batchDeleteUser(@ApiParam(value = "uid列表，逗号分隔", required = true)
                                              @RequestParam String uidList) {
         return Todo.todo();
@@ -165,7 +166,7 @@ public class UserController {
     }
 
     @ApiOperation("用户权限列表")
-    @GetMapping("/user/{uid}/permissions")
+    @GetMapping("/users/{uid}/permissions")
     public Response<List<PermissionDto>> listUserPermissions(
             @ApiParam(value = "用户id") @PathVariable String uid) {
         return Todo.todo();
