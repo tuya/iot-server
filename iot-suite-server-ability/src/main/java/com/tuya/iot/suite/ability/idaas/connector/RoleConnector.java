@@ -10,7 +10,6 @@ import com.tuya.iot.suite.ability.idaas.ability.RoleAbility;
 import com.tuya.iot.suite.ability.idaas.model.IdaasPageResult;
 import com.tuya.iot.suite.ability.idaas.model.IdaasRole;
 import com.tuya.iot.suite.ability.idaas.model.IdaasRoleCreateReq;
-import com.tuya.iot.suite.ability.idaas.model.RoleQueryReq;
 import com.tuya.iot.suite.ability.idaas.model.RoleUpdateReq;
 import com.tuya.iot.suite.ability.idaas.model.RolesPaginationQueryReq;
 
@@ -42,9 +41,9 @@ public interface RoleConnector extends RoleAbility {
     @Override
     IdaasRole getRole(Long spaceId, String roleCode);
 
-    @POST("/v1.0/iot-03/idaas/get-batch-role")
+/*    @POST("/v1.0/iot-03/idaas/get-batch-role")
     @Override
-    List<IdaasRole> queryRolesByCodes(@Body RoleQueryReq request);
+    List<IdaasRole> queryRolesByCodes(@Body RoleQueryReq request);*/
 
     @GET("/v1.0/iot-03/idaas/spaces/{space_id}/users/{uid}/roles")
     @Override
