@@ -26,7 +26,7 @@ public class SpaceConnectorTest extends BaseTest {
 
     @Test
     public void testApplySpace() {
-        SpaceApplyResp res = spaceConnector.applySpace(SpaceApplyReq.builder()
+        Long res = spaceConnector.applySpace(SpaceApplyReq.builder()
                 .spaceCode(projectCode)
                 .spaceGroup("tuya")
                 .remark("none")
