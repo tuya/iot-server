@@ -17,6 +17,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -38,30 +39,35 @@ public class AssetController {
 
     @ApiOperation(value = "添加资产")
     @PostMapping
+    @RequiresPermissions("1002")
     public Response addAsset(@RequestBody AssetCriteria criteria) {
         return assetService.addAsset(criteria.getAsset_name(), criteria.getParent_asset_id(), ContextUtil.getUserId());
     }
 
     @ApiOperation(value = "更新资产信息")
     @PutMapping(value = "/{asset_id}")
+    @RequiresPermissions("1003")
     public Response updateAsset(@PathVariable("asset_id") String assetId, @RequestBody AssetCriteria criteria) {
         return assetService.updateAsset(ContextUtil.getUserId(), assetId, criteria.getAsset_name());
     }
 
     @ApiOperation("删除资产")
     @DeleteMapping(value = "/{asset_id}")
+    @RequiresPermissions("1004")
     public Response deleteAsset(@PathVariable("asset_id") String assetId) {
         return assetService.deleteAsset(ContextUtil.getUserId(), assetId);
     }
 
     @ApiOperation(value = "获取树形资产结构")
     @GetMapping(value = "/tree/{asset_id}")
+    @RequiresPermissions("1001")
     public Response<AssetVO> getTreeBy(@PathVariable("asset_id") String assetId) {
         return Response.buildSuccess(AssetConvertor.$.toAssetVO(assetService.getTreeByV2(assetId, ContextUtil.getUserId())));
     }
 
     @ApiOperation(value = "资产树接口")
     @GetMapping(value = "/tree-fast/{asset_id}")
+    @RequiresPermissions("1001")
     public Response<List<AssetVO>> getTreeFastBy(@PathVariable("asset_id") String assetId) {
         return Response.buildSuccess(AssetConvertor.$.toAssetVOList(assetService.getTreeFast(assetId, ContextUtil.getUserId())));
     }
@@ -71,12 +77,14 @@ public class AssetController {
             @ApiImplicitParam(name = "asset_name", value = "资产名称", required = true, paramType = "string")
     })
     @GetMapping
+    @RequiresPermissions("1001")
     public Response<List<AssetVO>> getAssetByName(@RequestParam("asset_name") String assetName) {
         return Response.buildSuccess(AssetConvertor.$.toAssetVOList(assetService.getAssetByNameV2(assetName, ContextUtil.getUserId())));
     }
 
     @ApiOperation(value = "通过资产ID获取子资产")
     @GetMapping(value = "/{asset_id}")
+    @RequiresPermissions("1001")
     public Response<List<AssetVO>> getChildAssetListBy(@PathVariable("asset_id") String assetId) {
         return Response.buildSuccess(AssetConvertor.$.toAssetVOList(assetService.getTreeFast(assetId, ContextUtil.getUserId())));
     }
@@ -87,6 +95,7 @@ public class AssetController {
             @ApiImplicitParam(name = "page_size", value = "页面大小", defaultValue = "10", paramType = "string")
     })
     @GetMapping(value = "/{asset_id}/deviceInfos")
+    @RequiresPermissions("1001")
     public Response<PageDataVO<DeviceInfoVO>> getDeviceInfoBy(@PathVariable("asset_id") String assetId,
                                                 @RequestParam(value = "page_no", required = false, defaultValue = "1") Integer pageNo,
                                                 @RequestParam(value = "page_size", required = false, defaultValue = "10") Integer pageSize) {
@@ -102,6 +111,7 @@ public class AssetController {
 
     @ApiOperation(value = "批量给用户授权资产")
     @PutMapping(value = "/auths")
+    @RequiresPermissions("1005")
     public Response<Boolean> authAssetToUser(@RequestBody AssetAuths req) {
         return Todo.todo();
     }

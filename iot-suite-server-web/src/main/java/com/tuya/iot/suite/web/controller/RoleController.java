@@ -66,6 +66,7 @@ public class RoleController {
 
     @ApiOperation("创建角色")
     @PostMapping("/roles")
+    @RequiresPermissions("3002")
     public Response<Boolean> createRole(@RequestBody RoleAddReq req) {
         String uid = SessionContext.getUserToken().getUserId();
         Boolean res = roleService.createRole(projectProperties.getSpaceId(), RoleCreateReqDTO.builder()
@@ -78,7 +79,7 @@ public class RoleController {
 
     @ApiOperation("角色列表")
     @GetMapping("/roles")
-    @RequiresPermissions("10086")
+    @RequiresPermissions("3001")
     public Response<PageVO<RoleVO>> listRoles(Integer pageNo, Integer pageSize, String roleCode, String roleName) {
         PageVO<IdaasRole> pageVO = roleService.queryRolesPagination(projectProperties.getSpaceId(),
                 RolesPaginationQueryReq.builder()
@@ -101,6 +102,7 @@ public class RoleController {
 
     @ApiOperation("修改角色")
     @PutMapping("/roles")
+    @RequiresPermissions("3003")
     public Response<Boolean> updateRoleName(@RequestBody RoleEditReq req) {
         Boolean res = roleService.updateRole(projectProperties.getSpaceId(), req.getRoleCode(),
                 RoleUpdateReq.builder().roleName(req.getRoleName()).build());
@@ -109,6 +111,7 @@ public class RoleController {
 
     @ApiOperation("批量删除角色")
     @DeleteMapping("/batch-roles")
+    @RequiresPermissions("3003")
     public Response<Boolean> batchDeleteRole(@ApiParam(value = "角色编码列表，逗号分隔", required = true)
                                              @RequestParam("roleCodeList") String roleCodeList) {
         Set<String> roleCodes = StringUtils.commaDelimitedListToSet(roleCodeList);
@@ -121,6 +124,7 @@ public class RoleController {
 
     @ApiOperation("删除角色")
     @DeleteMapping("/roles/{roleCode}")
+    @RequiresPermissions("3004")
     public Response<Boolean> deleteRole(@PathVariable String roleCode) {
         Boolean success = roleService.deleteRole(projectProperties.getSpaceId(), roleCode);
         return Response.buildSuccess(success);
@@ -128,7 +132,7 @@ public class RoleController {
 
     @ApiOperation("给角色授权")
     @PutMapping("/roles/permissions")
-    @RequiresPermissions("roles")
+    @RequiresPermissions("3005")
     public Response<Boolean> rolePermissions(@RequestBody RolePermissionReq req) {
         Boolean success = grantService.grantPermissionsToRole(RoleGrantPermissionsReq.builder()
                 .spaceId(projectProperties.getSpaceId())
@@ -140,7 +144,7 @@ public class RoleController {
 
     @ApiOperation("查角色拥有的授权")
     @GetMapping("/roles/permissions")
-    @RequiresPermissions("roles")
+    @RequiresPermissions("3006")
     public Response<List<PermissionDto>> getRolePermissions(@RequestParam String roleCode) {
         List<PermissionDto> list = permissionService.queryPermissionsByRoleCodes(
                 PermissionQueryByRolesReq.builder()
