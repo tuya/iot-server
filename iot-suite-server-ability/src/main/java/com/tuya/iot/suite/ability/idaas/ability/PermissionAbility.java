@@ -7,6 +7,7 @@ import com.tuya.iot.suite.ability.idaas.model.PermissionQueryByRolesRespItem;
 import com.tuya.iot.suite.ability.idaas.model.PermissionQueryReq;
 import com.tuya.iot.suite.ability.idaas.model.PermissionUpdateReq;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -20,7 +21,7 @@ public interface PermissionAbility {
      * */
     Boolean createPermission(Long spaceId, PermissionCreateReq permissionCreateRequest);
 
-    Boolean batchCreatePermission(Long spaceId,List<PermissionCreateReq> permissionCreateRequestList);
+    Boolean batchCreatePermission(Long spaceId, Collection<PermissionCreateReq> permissionCreateRequestList);
 
     Boolean updatePermission(Long spaceId, String permissionCode, PermissionUpdateReq permissionUpdateRequest);
 
