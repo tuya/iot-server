@@ -4,6 +4,7 @@ import com.tuya.iot.suite.core.constant.Response;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
 import com.tuya.iot.suite.core.util.*;
 import com.tuya.iot.suite.service.asset.AssetService;
+import com.tuya.iot.suite.service.dto.PermissionNodeDTO;
 import com.tuya.iot.suite.service.idaas.PermissionService;
 import com.tuya.iot.suite.service.idaas.RoleService;
 import com.tuya.iot.suite.service.model.RoleTypeEnum;
@@ -12,7 +13,6 @@ import com.tuya.iot.suite.service.user.model.CaptchaPushBo;
 import com.tuya.iot.suite.service.user.model.ResetPasswordBo;
 import com.tuya.iot.suite.web.config.ProjectProperties;
 import com.tuya.iot.suite.web.i18n.I18nMessage;
-import com.tuya.iot.suite.web.model.PermissionNodeVO;
 import com.tuya.iot.suite.web.model.PermissionVO;
 import com.tuya.iot.suite.web.model.ResetPasswordReq;
 import com.tuya.iot.suite.web.model.RoleVO;
@@ -85,28 +85,9 @@ public class MyController {
 
     @ApiOperation("我的权限森林")
     @GetMapping("/permissions-trees")
-    public Response<List<PermissionNodeVO>> myPermissionsTrees() {
+    public Response<List<PermissionNodeDTO>> myPermissionsTrees() {
         String uid = ContextUtil.getUserId();
-        List<PermissionNodeVO> perms = permissionService.queryPermissionsByUser(projectProperties.getPermissionSpaceId(),uid)
-                .stream()
-                .map(it->
-                        PermissionNodeVO.builder()
-                                .code(it.getPermissionCode())
-                                .name(it.getName())
-                                .type(it.getType().name())
-                                .remark(it.getRemark())
-                                .order(it.getOrder())
-                                .parentCode(it.getParentCode())
-                                .build())
-                .collect(Collectors.toList());
-        //permissionCode=>PermissionNodeVO
-        Map<String,PermissionNodeVO> map = perms.stream().collect(Collectors.toMap(it->it.getCode(), it->it));
-        //permissionCode=>children
-        Map<String,List<PermissionNodeVO>> childrenMap = perms.stream().collect(Collectors.groupingBy(it->it.getParentCode()));
-        //find roots, which parentCode not in map
-        List<PermissionNodeVO> trees = perms.stream().filter(it->!map.containsKey(it.getParentCode())).collect(Collectors.toList());
-        //set children
-        perms.forEach(it->it.setChildren(childrenMap.get(it.getCode())));
+        List<PermissionNodeDTO> trees = permissionService.queryPermissionTrees(projectProperties.getPermissionSpaceId(),uid);
         return Response.buildSuccess(trees);
     }
 

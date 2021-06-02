@@ -115,10 +115,7 @@ public class RoleController {
     public Response<Boolean> batchDeleteRole(@ApiParam(value = "角色编码列表，逗号分隔", required = true)
                                              @RequestParam("roleCodeList") String roleCodeList) {
         Set<String> roleCodes = StringUtils.commaDelimitedListToSet(roleCodeList);
-        boolean success = true;
-        for (String roleCode : roleCodes) {
-            success &= roleService.deleteRole(projectProperties.getPermissionSpaceId(), roleCode);
-        }
+        boolean success = roleService.deleteRoles(projectProperties.getPermissionSpaceId(), roleCodes);
         return Response.buildSuccess(success);
     }
 

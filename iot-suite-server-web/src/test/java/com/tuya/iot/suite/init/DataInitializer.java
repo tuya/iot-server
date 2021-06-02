@@ -119,11 +119,14 @@ public class DataInitializer extends BaseTest {
         JSONArray menuPerms = root.getJSONArray("permissionList");
         return menuPerms.stream().flatMap(menuPermObj->{
             JSONObject menuPerm = (JSONObject) menuPermObj;
-            return menuPerm.getJSONArray("permissionList").stream();
+            JSONArray arr = menuPerm.getJSONArray("permissionList");
+            arr.add(menuPerm);
+            return arr.stream();
         }).map(perm-> {
             JSONObject it = (JSONObject) perm;
             return PermissionCreateReq.builder()
                     .permissionCode(it.getString("permissionCode"))
+                    .parentCode(it.getString("parentCode"))
                     .name(it.getString("permissionName"))
                     .type(PermissionTypeEnum.valueOf(it.getString("type")))
                     .order(it.getInteger("order"))

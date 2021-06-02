@@ -7,11 +7,15 @@ import com.tuya.iot.suite.ability.idaas.model.PermissionQueryByRolesReq;
 import com.tuya.iot.suite.ability.idaas.model.PermissionQueryByRolesRespItem;
 import com.tuya.iot.suite.ability.idaas.model.PermissionQueryReq;
 import com.tuya.iot.suite.ability.idaas.model.PermissionUpdateReq;
+import com.tuya.iot.suite.core.constant.Response;
+import com.tuya.iot.suite.service.dto.PermissionNodeDTO;
 import com.tuya.iot.suite.service.idaas.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @author benguan.zhou@tuya.com
@@ -62,5 +66,30 @@ public class PermissionServiceImpl implements PermissionService {
     public List<IdaasPermission> queryPermissionsByUser(Long spaceId, String uid) {
         //return Lists.newArrayList(IdaasPermission.builder().permissionCode("get:users").build());
         return permissionAbility.queryPermissionsByUser(spaceId,uid);
+    }
+
+    @Override
+    public List<PermissionNodeDTO> queryPermissionTrees(Long permissionSpaceId, String uid) {
+        List<PermissionNodeDTO> perms = permissionAbility.queryPermissionsByUser(permissionSpaceId,uid)
+                .stream()
+                .map(it->
+                        PermissionNodeDTO.builder()
+                                .code(it.getPermissionCode())
+                                .name(it.getName())
+                                .type(it.getType().name())
+                                .remark(it.getRemark())
+                                .order(it.getOrder())
+                                .parentCode(it.getParentCode())
+                                .build())
+                .collect(Collectors.toList());
+        //permissionCode=>PermissionNodeDTO
+        Map<String,PermissionNodeDTO> map = perms.stream().collect(Collectors.toMap(it->it.getCode(), it->it));
+        //permissionCode=>children
+        Map<String,List<PermissionNodeDTO>> childrenMap = perms.stream().collect(Collectors.groupingBy(it->it.getParentCode()));
+        //find roots, which parentCode not in map
+        List<PermissionNodeDTO> trees = perms.stream().filter(it->!map.containsKey(it.getParentCode())).collect(Collectors.toList());
+        //set children
+        perms.forEach(it->it.setChildren(childrenMap.get(it.getCode())));
+        return trees;
     }
 }

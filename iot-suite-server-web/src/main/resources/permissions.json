@@ -156,7 +156,7 @@
     },{
       "permissionName": "用户",
       "type": "menu",
-      "permissionCode": "3000",
+      "permissionCode": "4000",
       "parentCode": "0",
       "order": "4",
       "remark": "用户能力",
