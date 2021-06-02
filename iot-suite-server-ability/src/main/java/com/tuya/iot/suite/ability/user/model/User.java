@@ -16,4 +16,5 @@ public class User implements Serializable {
     private String country_code;
     private String user_id;
     private String user_name;
+    private String nickName;
 }

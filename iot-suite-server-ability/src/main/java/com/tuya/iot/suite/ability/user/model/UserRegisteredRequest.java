@@ -1,6 +1,6 @@
 package com.tuya.iot.suite.ability.user.model;
 
-import lombok.Data;
+import lombok.*;
 
 import java.io.Serializable;
 
@@ -10,12 +10,16 @@ import java.io.Serializable;
  * @author Chyern
  * @date 2021/3/26
  */
-@Data
+@Getter
+@Setter
+@ToString
+@Builder
 public class UserRegisteredRequest implements Serializable {
 
     private static final long serialVersionUID = 7026392351794858299L;
     private String username;
-    private String user_name;
     private String password;
+    private String nicke_name;
     private String country_code;
+
 }

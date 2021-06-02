@@ -1,16 +1,17 @@
 package com.tuya.iot.suite.service.user.impl;
 
 import com.tuya.connector.api.exceptions.ConnectorException;
+import com.tuya.iot.suite.ability.idaas.ability.GrantAbility;
+import com.tuya.iot.suite.ability.idaas.ability.IdaasUserAbility;
 import com.tuya.iot.suite.ability.idaas.model.IdaasUser;
 import com.tuya.iot.suite.ability.idaas.model.IdaasUserCreateReq;
 import com.tuya.iot.suite.ability.idaas.model.IdaasUserUpdateReq;
+import com.tuya.iot.suite.ability.idaas.model.UserRevokeRolesReq;
 import com.tuya.iot.suite.ability.notice.model.ResetPasswordReq;
 import com.tuya.iot.suite.ability.user.ability.UserAbility;
-import com.tuya.iot.suite.ability.user.model.MobileCountries;
-import com.tuya.iot.suite.ability.user.model.UserModifyRequest;
-import com.tuya.iot.suite.ability.user.model.UserRegisteredRequest;
-import com.tuya.iot.suite.ability.user.model.UserToken;
+import com.tuya.iot.suite.ability.user.model.*;
 import com.tuya.iot.suite.core.constant.CaptchaType;
+import com.tuya.iot.suite.core.constant.ErrorCode;
 import com.tuya.iot.suite.core.constant.NoticeType;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
 import com.tuya.iot.suite.service.notice.template.CaptchaNoticeTemplate;
@@ -22,6 +23,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
+import java.util.List;
 
 import static com.tuya.iot.suite.core.constant.ErrorCode.*;
 
@@ -36,6 +39,10 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserAbility userAbility;
+    @Autowired
+    private IdaasUserAbility idaasUserAbility;
+@Autowired
+    private GrantAbility grantAbility;
 
     @Autowired
     private CaptchaService captchaService;
@@ -66,11 +73,10 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserToken login(String userName, String password) {
-        UserRegisteredRequest request = new UserRegisteredRequest();
-        request.setUsername(userName);
-        request.setUser_name(userName);
-        request.setPassword(password);
-        return userAbility.loginUser(request);
+        return userAbility.loginUser(UserRegisteredRequest.builder()
+                .username(userName)
+                .password(password)
+                .nicke_name(userName).build());
     }
 
     @Override
@@ -148,8 +154,26 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Boolean createUser(Long spaceId, IdaasUserCreateReq request) {
-        return null;
+    public Boolean createUser(Long spaceId, UserRegisteredRequest req, List<String> roleCodes) {
+        //1、向云端注册用户得到用户id
+        User user = userAbility.registeredUser(req);
+        //2、向基础服务注册用户
+        Boolean res = idaasUserAbility.createUser(spaceId, IdaasUserCreateReq.builder()
+                .uid(user.getUser_id())
+                .username(req.getUsername())
+                .remark("").build());
+        if (!res) {
+            throw new ServiceLogicException(USER_CREATE_FAIL);
+        }
+        //3、给用户授权
+        Boolean auth = grantAbility.revokeRolesFromUser(UserRevokeRolesReq.builder()
+                .spaceId(spaceId)
+                .roleCodes(roleCodes)
+                .uid(user.getUser_id()).build());
+        if (!auth) {
+            throw new ServiceLogicException(USER_CREATE_FAIL);
+        }
+        return res && auth;
     }
 
     @Override

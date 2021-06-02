@@ -28,6 +28,11 @@ public enum ErrorCode {
      * WITHOUT_PERMISSION
      */
     USER_NOT_EXIST("2006", "用户不存在"),
+
+    USER_CREATE_FAIL("2100", "创建用户失败"),
+
+    USER_AUTH_ROLE_FAIL("2200", "用户授权角色失败"),
+
     /**
      * TELEPHONE_FORMAT_ERROR
      */
@@ -61,7 +66,9 @@ public enum ErrorCode {
 
     CAPTCHA_ALREADY_EXITS("3005", "验证码已发送"),
 
-    CAPTCHA_LIMIT("3006", "验证码验证错误限制，请24小时后重试")
+    CAPTCHA_LIMIT("3006", "验证码验证错误限制，请24小时后重试"),
+
+    PARAM_LOST("9998","参数缺失"),
 
     ;
 

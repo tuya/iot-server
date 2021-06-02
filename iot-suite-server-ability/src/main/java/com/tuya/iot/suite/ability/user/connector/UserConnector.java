@@ -45,4 +45,6 @@ public interface UserConnector extends UserAbility {
     @Override
     @PUT("/v1.0/iot-02/users/reset-password")
     Boolean resetPassword(@Body ResetPasswordReq resetPasswordReq);
+
+
 }

@@ -1,7 +1,7 @@
 package com.tuya.iot.suite.web.controller;
 
-import com.tuya.iot.suite.ability.idaas.model.IdaasUserCreateReq;
 import com.tuya.iot.suite.ability.user.model.MobileCountries;
+import com.tuya.iot.suite.ability.user.model.UserRegisteredRequest;
 import com.tuya.iot.suite.core.constant.Response;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
 import com.tuya.iot.suite.core.util.LibPhoneNumberUtil;
@@ -12,7 +12,7 @@ import com.tuya.iot.suite.service.user.UserService;
 import com.tuya.iot.suite.service.user.model.ResetPasswordBo;
 import com.tuya.iot.suite.web.config.ProjectProperties;
 import com.tuya.iot.suite.web.i18n.I18nMessage;
-import com.tuya.iot.suite.web.model.*;
+import com.tuya.iot.suite.web.model.ResetPasswordReq;
 import com.tuya.iot.suite.web.model.request.user.UserAddReq;
 import com.tuya.iot.suite.web.model.request.user.UserEditReq;
 import com.tuya.iot.suite.web.model.request.user.UserPasswordModifyReq;
@@ -27,12 +27,12 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-
 import java.util.List;
 
 import static com.tuya.iot.suite.core.constant.ErrorCode.*;
@@ -126,14 +126,16 @@ public class UserController {
     @PostMapping("/users")
     @RequiresPermissions("4002")
     public Response<Boolean> createUser(@RequestBody UserAddReq req) {
-        Boolean success = userService.createUser(projectProperties.getPermissionSpaceId(),
-                IdaasUserCreateReq.builder()
-                        .uid("TODO")
-                        .username(req.getUserName())
-                        .remark(req.getNickName()).build());
-        return Response.buildSuccess(success);
-        //TODO
-        //return Todo.todo("新增用户，重置密码");
+        Long spaceId = 0L;
+        if (CollectionUtils.isEmpty(req.getRoleCodes())) {
+            throw new ServiceLogicException(PARAM_LOST);
+        }
+        return Response.buildSuccess(userService.createUser(spaceId, UserRegisteredRequest.builder()
+                .username(req.getUserName())
+                .password(req.getPassword())
+                .country_code(req.getCountryCode())
+                .nicke_name(req.getNickName())
+                .build(), req.getRoleCodes()));
     }
 
     @ApiOperation("修改用户")
