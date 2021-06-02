@@ -96,38 +96,6 @@
           "dependency": [],
           "remark": "角色列表"
         },{
-          "permissionName": "创建角色",
-          "type": "api",
-          "permissionCode": "3002",
-          "parentCode": "3000",
-          "order": "3",
-          "dependency": ["3001"],
-          "remark": "新增角色"
-        },{
-          "permissionName": "编辑角色",
-          "type": "api",
-          "permissionCode": "3003",
-          "parentCode": "3000",
-          "order": "3",
-          "dependency": ["3001"],
-          "remark": "修改角色"
-        },{
-          "permissionName": "删除角色",
-          "type": "api",
-          "permissionCode": "3003",
-          "parentCode": "3000",
-          "order": "4",
-          "dependency": ["3001"],
-          "remark": "删除角色"
-        },{
-          "permissionName": "角色授权",
-          "type": "api",
-          "permissionCode": "3004",
-          "parentCode": "3000",
-          "order": "4",
-          "dependency": ["3001"],
-          "remark": "给角色授权"
-        },{
           "permissionName": "查看角色权限",
           "type": "api",
           "permissionCode": "3005",

@@ -83,7 +83,7 @@ public class MyController {
         return Response.buildSuccess(perms);
     }
 
-    @ApiOperation("我的权限森林")
+    @ApiOperation("我的权限树")
     @GetMapping("/permissions-trees")
     public Response<List<PermissionNodeVO>> myPermissionsTrees() {
         String uid = ContextUtil.getUserId();
