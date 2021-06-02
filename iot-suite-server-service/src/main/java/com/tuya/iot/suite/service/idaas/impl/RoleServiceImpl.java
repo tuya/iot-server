@@ -28,6 +28,7 @@ import java.util.List;
 @Service
 @Setter
 public class RoleServiceImpl implements RoleService {
+
     @Autowired
     private RoleAbility roleAbility;
 

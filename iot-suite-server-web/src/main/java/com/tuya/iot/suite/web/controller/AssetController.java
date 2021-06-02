@@ -115,4 +115,20 @@ public class AssetController {
     public Response<Boolean> authAssetToUser(@RequestBody AssetAuths req) {
         return Todo.todo();
     }
+
+    @ApiOperation(value = "用户被授权的资产")
+    @GetMapping(value = "/auths")
+    @RequiresPermissions("1005")
+    public Response<List<AssetVO>> authAssetOfUser() {
+        return Todo.todo();
+    }
+
+    @ApiOperation(value = "系统所有资产")
+    @GetMapping(value = "/all")
+    @RequiresPermissions("1005")
+    public Response<List<AssetVO>> sysAssetAll() {
+        return Todo.todo();
+    }
+
+
 }

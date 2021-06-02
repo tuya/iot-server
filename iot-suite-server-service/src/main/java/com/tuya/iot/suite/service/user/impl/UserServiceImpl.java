@@ -31,7 +31,7 @@ import static com.tuya.iot.suite.core.constant.ErrorCode.*;
  * @Since 2021/3/15 8:46 下午
  */
 @Slf4j
-@Service("userService")
+@Service
 public class UserServiceImpl implements UserService {
 
     @Autowired
@@ -123,13 +123,22 @@ public class UserServiceImpl implements UserService {
             log.info("resetPassword error! param:{}", bo.toString());
             throw new ServiceLogicException(PARAM_ERROR);
         }
+        // 判断是否错误验证次数上限
+        if (!captchaService.captchaValidateLimit(unionId, 10)) {
+            throw new ServiceLogicException(CAPTCHA_LIMIT);
+        }
         boolean result = captchaService.captchaValidate(CaptchaType.PASSWORD_REST, unionId, bo.getCode());
         if (!result) {
             log.error("captcha validate failed! unionId:[{}] code:[{}]", unionId, bo.getCode());
+            // 错误次数+1
+            captchaService.captchaValidateErrorIncr(unionId);
             throw new ServiceLogicException(CAPTCHA_ERROR);
         }
         // 清除验证码
         captchaService.removeCaptchaFromCache(CaptchaType.PASSWORD_REST, unionId);
+        // 清除错误次数限制
+        captchaService.captchaValidateErrorClear(unionId);
+
         // 重置用户密码，手机号不需要加国家码
         if (!StringUtils.isEmpty(bo.getCountryCode()) && unionId.startsWith(bo.getCountryCode())) {
             unionId = unionId.substring(bo.getCountryCode().length());
