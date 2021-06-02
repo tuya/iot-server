@@ -4,7 +4,6 @@ import com.tuya.iot.suite.core.constant.Response;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
 import com.tuya.iot.suite.core.util.*;
 import com.tuya.iot.suite.service.asset.AssetService;
-import com.tuya.iot.suite.service.dto.AssetVO;
 import com.tuya.iot.suite.service.idaas.PermissionService;
 import com.tuya.iot.suite.service.idaas.RoleService;
 import com.tuya.iot.suite.service.model.RoleTypeEnum;
@@ -13,12 +12,12 @@ import com.tuya.iot.suite.service.user.model.CaptchaPushBo;
 import com.tuya.iot.suite.service.user.model.ResetPasswordBo;
 import com.tuya.iot.suite.web.config.ProjectProperties;
 import com.tuya.iot.suite.web.i18n.I18nMessage;
+import com.tuya.iot.suite.web.model.PermissionNodeVO;
 import com.tuya.iot.suite.web.model.PermissionVO;
 import com.tuya.iot.suite.web.model.ResetPasswordReq;
 import com.tuya.iot.suite.web.model.RoleVO;
 import com.tuya.iot.suite.web.model.criteria.UserCriteria;
 import com.tuya.iot.suite.web.util.Responses;
-import com.tuya.iot.suite.web.util.SessionContext;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AccessLevel;
@@ -31,6 +30,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import static com.tuya.iot.suite.core.constant.ErrorCode.*;
 import static com.tuya.iot.suite.core.constant.ErrorCode.USER_NOT_EXIST;
@@ -68,7 +68,7 @@ public class MyController {
     @ApiOperation("我的权限列表")
     @GetMapping("/permissions")
     public Response<List<PermissionVO>> myPermissions() {
-        String uid = SessionContext.getUserToken().getUserId();
+        String uid = ContextUtil.getUserId();
         List<PermissionVO> perms = permissionService.queryPermissionsByUser(projectProperties.getSpaceId(),uid)
                 .stream()
                 .map(it->
@@ -83,10 +83,37 @@ public class MyController {
         return Response.buildSuccess(perms);
     }
 
+    @ApiOperation("我的权限森林")
+    @GetMapping("/permissions-trees")
+    public Response<List<PermissionNodeVO>> myPermissionsTrees() {
+        String uid = ContextUtil.getUserId();
+        List<PermissionNodeVO> perms = permissionService.queryPermissionsByUser(projectProperties.getSpaceId(),uid)
+                .stream()
+                .map(it->
+                        PermissionNodeVO.builder()
+                                .code(it.getPermissionCode())
+                                .name(it.getName())
+                                .type(it.getType().name())
+                                .remark(it.getRemark())
+                                .order(it.getOrder())
+                                .parentCode(it.getParentCode())
+                                .build())
+                .collect(Collectors.toList());
+        //permissionCode=>PermissionNodeVO
+        Map<String,PermissionNodeVO> map = perms.stream().collect(Collectors.toMap(it->it.getCode(), it->it));
+        //permissionCode=>children
+        Map<String,List<PermissionNodeVO>> childrenMap = perms.stream().collect(Collectors.groupingBy(it->it.getParentCode()));
+        //find roots, which parentCode not in map
+        List<PermissionNodeVO> trees = perms.stream().filter(it->!map.containsKey(it.getParentCode())).collect(Collectors.toList());
+        //set children
+        perms.forEach(it->it.setChildren(childrenMap.get(it.getCode())));
+        return Response.buildSuccess(trees);
+    }
+
     @ApiOperation("我的角色列表")
     @GetMapping("/roles")
     public Response<List<RoleVO>> myRoles() {
-        String uid = SessionContext.getUserToken().getUserId();
+        String uid = ContextUtil.getUserId();
         List<RoleVO> list =  roleService.queryRolesByUser(projectProperties.getSpaceId(),uid)
         .stream().map(it-> RoleVO.builder()
                 .code(it.getRoleCode())
@@ -94,13 +121,6 @@ public class MyController {
                 .typeCode(RoleTypeEnum.fromRoleCode(it.getRoleCode()).name()).build()).collect(Collectors.toList());
         return Response.buildSuccess(list);
     }
-
-    @ApiOperation("我的资产树")
-    @GetMapping("/assets-tree")
-    public Response<AssetVO> myAssetsTree() {
-        return Todo.todo();
-    }
-
 
     /**
      * @return

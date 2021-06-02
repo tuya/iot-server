@@ -21,9 +21,9 @@ public class PermissionUpdateReq {
     String name;
 
     /**
-     * 父级权限id
+     * 父级权限code
      */
-    Long parentId;
+    String parentCode;
 
     /**
      * 展示顺序
