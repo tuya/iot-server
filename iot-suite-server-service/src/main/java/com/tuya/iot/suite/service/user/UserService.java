@@ -5,9 +5,12 @@ import com.tuya.iot.suite.ability.idaas.model.IdaasUser;
 import com.tuya.iot.suite.ability.idaas.model.IdaasUserCreateReq;
 import com.tuya.iot.suite.ability.idaas.model.IdaasUserUpdateReq;
 import com.tuya.iot.suite.ability.user.model.MobileCountries;
+import com.tuya.iot.suite.ability.user.model.UserRegisteredRequest;
 import com.tuya.iot.suite.ability.user.model.UserToken;
 import com.tuya.iot.suite.service.user.model.CaptchaPushBo;
 import com.tuya.iot.suite.service.user.model.ResetPasswordBo;
+
+import java.util.List;
 
 /**
  * @Description 用户service$
@@ -56,7 +59,7 @@ public interface UserService {
      */
     boolean resetPassword(ResetPasswordBo resetPasswordBo);
 
-    Boolean createUser(Long spaceId, IdaasUserCreateReq request);
+    Boolean createUser(Long spaceId, UserRegisteredRequest req, List<String> roleCodes);
 
     Boolean updateUser(Long spaceId, String uid, IdaasUserUpdateReq req);
 

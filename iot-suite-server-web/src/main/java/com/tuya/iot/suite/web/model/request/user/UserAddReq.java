@@ -1,5 +1,6 @@
 package com.tuya.iot.suite.web.model.request.user;
 
+import com.tuya.iot.suite.ability.user.model.UserRegisteredRequest;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -31,4 +32,5 @@ public class UserAddReq implements Serializable {
 
     @ApiModelProperty(value="关联的角色列表",required = true)
     List<String> roleCodes;
+
 }
