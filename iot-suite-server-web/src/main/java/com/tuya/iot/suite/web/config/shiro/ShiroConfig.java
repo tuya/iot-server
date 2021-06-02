@@ -14,6 +14,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.web.filter.DelegatingFilterProxy;
+
 import javax.servlet.Filter;
 import java.util.HashMap;
 import java.util.LinkedHashMap;

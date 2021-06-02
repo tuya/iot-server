@@ -6,6 +6,7 @@ import com.tuya.iot.suite.ability.idaas.model.PermissionQueryByRolesReq;
 import com.tuya.iot.suite.ability.idaas.model.PermissionQueryByRolesRespItem;
 import com.tuya.iot.suite.ability.idaas.model.PermissionQueryReq;
 import com.tuya.iot.suite.ability.idaas.model.PermissionUpdateReq;
+import com.tuya.iot.suite.service.dto.PermissionNodeDTO;
 
 import java.util.List;
 
@@ -33,4 +34,6 @@ public interface PermissionService {
     List<PermissionQueryByRolesRespItem> queryPermissionsByRoleCodes(PermissionQueryByRolesReq request);
 
     List<IdaasPermission> queryPermissionsByUser(Long spaceId, String uid);
+
+    List<PermissionNodeDTO> queryPermissionTrees(Long permissionSpaceId, String uid);
 }

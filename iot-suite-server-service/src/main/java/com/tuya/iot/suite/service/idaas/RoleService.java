@@ -9,7 +9,9 @@ import com.tuya.iot.suite.ability.idaas.model.RolesPaginationQueryReq;
 import com.tuya.iot.suite.service.dto.RoleCreateReqDTO;
 import com.tuya.iot.suite.service.model.PageVO;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author benguan.zhou@tuya.com
@@ -31,4 +33,5 @@ public interface RoleService {
 
     PageVO<IdaasRole> queryRolesPagination(Long spaceId, RolesPaginationQueryReq req);
 
+    boolean deleteRoles(Long permissionSpaceId, Collection<String> roleCodes);
 }

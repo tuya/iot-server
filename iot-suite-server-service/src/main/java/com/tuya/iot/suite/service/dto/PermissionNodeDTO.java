@@ -1,4 +1,4 @@
-package com.tuya.iot.suite.web.model;
+package com.tuya.iot.suite.service.dto;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
@@ -16,7 +16,7 @@ import java.util.List;
 @Data
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class PermissionNodeVO {
+public class PermissionNodeDTO {
     @ApiModelProperty("权限名称")
     String name;
     @ApiModelProperty("权限编码")
@@ -32,5 +32,5 @@ public class PermissionNodeVO {
     @ApiModelProperty("上级权限编码")
     String parentCode;
     @ApiModelProperty("下级权限")
-    List<PermissionNodeVO> children;
+    List<PermissionNodeDTO> children;
 }

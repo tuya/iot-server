@@ -13,9 +13,11 @@ import com.tuya.iot.suite.service.dto.RoleCreateReqDTO;
 import com.tuya.iot.suite.service.idaas.RoleService;
 import com.tuya.iot.suite.service.model.PageVO;
 import com.tuya.iot.suite.service.model.RoleTypeEnum;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -24,6 +26,7 @@ import java.util.List;
  * @date 2021/05/31
  */
 @Service
+@Setter
 public class RoleServiceImpl implements RoleService {
     @Autowired
     private RoleAbility roleAbility;
@@ -76,5 +79,11 @@ public class RoleServiceImpl implements RoleService {
                 .pageSize(pageResult.getPageSize())
                 .total(pageResult.getTotalCount())
                 .data((List)list).build();
+    }
+
+    @Override
+    public boolean deleteRoles(Long permissionSpaceId, Collection<String> roleCodes) {
+        long count = roleCodes.stream().map(roleCode->roleAbility.deleteRole(permissionSpaceId,roleCode)).count();
+        return count == roleCodes.size();
     }
 }
