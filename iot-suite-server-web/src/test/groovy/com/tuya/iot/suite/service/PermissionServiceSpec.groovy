@@ -35,7 +35,7 @@ class PermissionServiceSpec extends BaseSpec{
         trees.size() == 5
     }
     private List<IdaasPermission> loadAllPerms() {
-        File file = ResourceUtils.getFile("classpath:permissions.json");
+        File file = ResourceUtils.getFile("classpath:permissions-admin.json");
         String json = StreamUtils.copyToString(new FileInputStream(file), StandardCharsets.UTF_8);
         JSONObject root = JSONObject.parseObject(json);
         JSONArray menuPerms = root.getJSONArray("permissionList");

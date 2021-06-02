@@ -14,6 +14,7 @@ import com.tuya.iot.suite.ability.idaas.model.PermissionQueryByRolesRespItem;
 import com.tuya.iot.suite.ability.idaas.model.PermissionQueryReq;
 import com.tuya.iot.suite.ability.idaas.model.PermissionUpdateReq;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -28,7 +29,7 @@ public interface PermissionConnector extends PermissionAbility {
 
     @POST("/v1.0/iot-03/idaas/spaces/{space_id}/add-batch-permission")
     @Override
-    Boolean batchCreatePermission(@Path("space_id")Long spaceId,@Body List<PermissionCreateReq> permissionCreateRequestList);
+    Boolean batchCreatePermission(@Path("space_id")Long spaceId,@Body Collection<PermissionCreateReq> permissionCreateRequestList);
 
     @PUT("/v1.0/iot-03/idaas/spaces/{space_id}/permissions/{permission_code}")
     @Override
