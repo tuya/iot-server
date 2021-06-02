@@ -50,10 +50,10 @@ public class TuyaCloudRealm extends AuthorizingRealm {
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
         UserToken userToken = SessionContext.getUserToken();
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
-        List<IdaasRole> roles = roleService.queryRolesByUser(projectProperties.getSpaceId(),userToken.getUserId());
+        List<IdaasRole> roles = roleService.queryRolesByUser(projectProperties.getPermissionSpaceId(),userToken.getUserId());
         info.addRoles(roles.stream().map(it->it.getRoleCode()).collect(Collectors.toSet()));
 
-        List<IdaasPermission> perms = permissionService.queryPermissionsByUser(projectProperties.getSpaceId(),userToken.getUserId());
+        List<IdaasPermission> perms = permissionService.queryPermissionsByUser(projectProperties.getPermissionSpaceId(),userToken.getUserId());
 
         info.addStringPermissions(perms.stream().map(it->it.getPermissionCode()).collect(Collectors.toSet()));
         return info;

@@ -124,7 +124,7 @@ public class UserController {
     @PostMapping("/users")
     @RequiresPermissions("4002")
     public Response<Boolean> createUser(@RequestBody UserAddReq req) {
-        Boolean success = userService.createUser(projectProperties.getSpaceId(),
+        Boolean success = userService.createUser(projectProperties.getPermissionSpaceId(),
                 IdaasUserCreateReq.builder()
                         .uid("TODO")
                         .username(req.getUserName())
