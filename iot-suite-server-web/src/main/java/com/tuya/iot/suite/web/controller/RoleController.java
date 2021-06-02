@@ -103,7 +103,9 @@ public class RoleController {
     @PutMapping("/roles")
     @RequiresPermissions("3003")
     public Response<Boolean> updateRoleName(@RequestBody RoleEditReq req) {
-        Boolean res = roleService.updateRole(projectProperties.getPermissionSpaceId(), req.getRoleCode(),
+        Boolean res = roleService.updateRole(projectProperties.getPermissionSpaceId(),
+                ContextUtil.getUserId(),
+                req.getRoleCode(),
                 RoleUpdateReq.builder().roleName(req.getRoleName()).build());
         return Response.buildSuccess(res);
     }
@@ -114,7 +116,7 @@ public class RoleController {
     public Response<Boolean> batchDeleteRole(@ApiParam(value = "角色编码列表，逗号分隔", required = true)
                                              @RequestParam("roleCodeList") String roleCodeList) {
         Set<String> roleCodes = StringUtils.commaDelimitedListToSet(roleCodeList);
-        boolean success = roleService.deleteRoles(projectProperties.getPermissionSpaceId(), roleCodes);
+        boolean success = roleService.deleteRoles(projectProperties.getPermissionSpaceId(), ContextUtil.getUserId(), roleCodes);
         return Response.buildSuccess(success);
     }
 
@@ -122,7 +124,9 @@ public class RoleController {
     @DeleteMapping("/roles/{roleCode}")
     @RequiresPermissions("3004")
     public Response<Boolean> deleteRole(@PathVariable String roleCode) {
-        Boolean success = roleService.deleteRole(projectProperties.getPermissionSpaceId(), roleCode);
+        Boolean success = roleService.deleteRole(projectProperties.getPermissionSpaceId(),
+                ContextUtil.getUserId(),
+                roleCode);
         return Response.buildSuccess(success);
     }
 

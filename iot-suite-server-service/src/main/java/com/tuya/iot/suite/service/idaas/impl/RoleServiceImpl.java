@@ -4,7 +4,6 @@ import com.tuya.iot.suite.ability.idaas.ability.RoleAbility;
 import com.tuya.iot.suite.ability.idaas.model.IdaasPageResult;
 import com.tuya.iot.suite.ability.idaas.model.IdaasRole;
 import com.tuya.iot.suite.ability.idaas.model.IdaasRoleCreateReq;
-import com.tuya.iot.suite.ability.idaas.model.RoleQueryReq;
 import com.tuya.iot.suite.ability.idaas.model.RoleUpdateReq;
 import com.tuya.iot.suite.ability.idaas.model.RolesPaginationQueryReq;
 import com.tuya.iot.suite.core.constant.ErrorCode;
@@ -16,6 +15,7 @@ import com.tuya.iot.suite.service.model.RoleTypeEnum;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.util.Collection;
 import java.util.List;
@@ -34,42 +34,67 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public Boolean createRole(Long spaceId, RoleCreateReqDTO req) {
-        //TODO 用一个自定义的错误码
-        //数据权限校验，校验操作者自己是否为更高的角色。
-        roleAbility.queryRolesByUser(spaceId,req.getUid()).stream().filter(
-                it-> RoleTypeEnum.fromRoleCode(req.getRoleCode()).isOffspringOrSelf(RoleTypeEnum.fromRoleCode(it.getRoleCode()))
-        ).findAny().orElseThrow(()->new ServiceLogicException(ErrorCode.USER_NOT_AUTH));
+        checkRoleWritePermission(spaceId,req.getUid(),req.getRoleCode());
         return roleAbility.createRole(spaceId, IdaasRoleCreateReq.builder()
                 .roleCode(req.getRoleCode())
                 .roleName(req.getRoleName())
                 .remark(req.getRemark()).build());
     }
 
+    private void checkRoleWritePermission(Long spaceId, String operatorUid, String targetRoleCode){
+        Assert.isTrue(!RoleTypeEnum.fromRoleCode(targetRoleCode).isAdmin(),"can not write a 'admin' role!");
+        //数据权限校验，校验操作者自己是否为更高的角色。
+        roleAbility.queryRolesByUser(spaceId,operatorUid).stream().filter(
+                it-> RoleTypeEnum.fromRoleCode(targetRoleCode).isOffspringOrSelf(RoleTypeEnum.fromRoleCode(it.getRoleCode()))
+        ).findAny().orElseThrow(()->new ServiceLogicException(ErrorCode.NO_DATA_PERM));
+    }
+
+    private void checkRoleWritePermission(Long spaceId, String operatorUid, Collection<String> targetRoleCodes){
+        targetRoleCodes.forEach(targetRoleCode->
+                Assert.isTrue(!RoleTypeEnum.fromRoleCode(targetRoleCode).isAdmin(),"can not write a 'admin' role!"));
+        //数据权限校验，校验操作者自己是否为更高的角色。
+        List<IdaasRole> roles = roleAbility.queryRolesByUser(spaceId,operatorUid);
+        for(String targetRoleCode : targetRoleCodes){
+            for(IdaasRole myRole : roles){
+                boolean enabled = RoleTypeEnum.fromRoleCode(targetRoleCode).isOffspringOrSelf(RoleTypeEnum.fromRoleCode(myRole.getRoleCode()));
+                if(!enabled){
+                    throw new ServiceLogicException(ErrorCode.NO_DATA_PERM);
+                }
+            }
+        }
+    }
+
+    private void checkRoleReadPermission(Long spaceId, String operatorUid,String targetRoleCode){
+        //数据权限校验，校验操作者自己是否为更高的角色。
+        roleAbility.queryRolesByUser(spaceId,operatorUid).stream().filter(
+                it-> RoleTypeEnum.fromRoleCode(targetRoleCode).isOffspringOrSelf(RoleTypeEnum.fromRoleCode(it.getRoleCode()))
+        ).findAny().orElseThrow(()->new ServiceLogicException(ErrorCode.NO_DATA_PERM));
+    }
     @Override
-    public Boolean updateRole(Long spaceId, String roleCode, RoleUpdateReq req) {
+    public Boolean updateRole(Long spaceId, String operatorUid, String roleCode, RoleUpdateReq req) {
+        checkRoleWritePermission(spaceId,operatorUid,roleCode);
         return roleAbility.updateRole(spaceId,roleCode,RoleUpdateReq.builder()
                 .roleName(req.getRoleName()).build());
     }
 
     @Override
-    public Boolean deleteRole(Long spaceId, String roleCode) {
+    public Boolean deleteRole(Long spaceId, String operatorUid, String roleCode) {
+        checkRoleWritePermission(spaceId,operatorUid,roleCode);
         return roleAbility.deleteRole(spaceId,roleCode);
     }
 
-    @Override
-    public IdaasRole getRole(Long spaceId, String roleCode) {
-        return null;
-    }
 
     @Override
-    public List<IdaasRole> queryRolesByCodes(RoleQueryReq request) {
-        return null;
+    public IdaasRole getRole(Long spaceId, String operatorUid, String roleCode) {
+        //checkRoleReadPermission(spaceId,operatorUid,roleCode);
+        return roleAbility.getRole(spaceId,roleCode);
     }
 
+
     @Override
-    public List<IdaasRole> queryRolesByUser(Long spaceId, String userId) {
-        //return Lists.newArrayList(IdaasRole.builder().roleCode("sysadmin").build());
-        return roleAbility.queryRolesByUser(spaceId,userId);
+    public List<IdaasRole> queryRolesByUser(Long spaceId, String uid) {
+        //need check read permission?
+        return roleAbility.queryRolesByUser(spaceId,uid);
     }
 
     @Override
@@ -83,7 +108,8 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public boolean deleteRoles(Long permissionSpaceId, Collection<String> roleCodes) {
+    public boolean deleteRoles(Long permissionSpaceId,String uid, Collection<String> roleCodes) {
+        checkRoleWritePermission(permissionSpaceId, uid, roleCodes);
         long count = roleCodes.stream().map(roleCode->roleAbility.deleteRole(permissionSpaceId,roleCode)).count();
         return count == roleCodes.size();
     }

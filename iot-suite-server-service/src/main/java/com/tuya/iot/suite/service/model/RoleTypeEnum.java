@@ -52,14 +52,14 @@ public enum RoleTypeEnum {
         }
         return false;
     }
-    public static boolean isAdmin(RoleTypeEnum roleTypeEnum){
-        return admin.equals(roleTypeEnum);
+    public boolean isAdmin(){
+        return admin.equals(this);
     }
-    public static boolean isManage(RoleTypeEnum roleTypeEnum){
-        return manage.equals(roleTypeEnum);
+    public boolean isManage(){
+        return manage.equals(this);
     }
-    public static boolean isNormal(RoleTypeEnum roleTypeEnum){
-        return normal.equals(roleTypeEnum);
+    public boolean isNormal(){
+        return normal.equals(this);
     }
 
     public static boolean isAdminRoleType(String roleType){

@@ -36,6 +36,7 @@ public enum ErrorCode {
      * USER_NOT_AUTH
      */
     USER_NOT_AUTH("1106", "用户未被授权"),
+    NO_DATA_PERM("1107", "无数据权限"),
 
     /**
      * WITHOUT_PERMISSION
