@@ -7,6 +7,7 @@ import com.tuya.iot.suite.ability.idaas.model.RoleGrantPermissionsReq;
 import com.tuya.iot.suite.ability.idaas.model.RoleUpdateReq;
 import com.tuya.iot.suite.ability.idaas.model.RolesPaginationQueryReq;
 import com.tuya.iot.suite.core.constant.Response;
+import com.tuya.iot.suite.core.util.ContextUtil;
 import com.tuya.iot.suite.service.dto.RoleCreateReqDTO;
 import com.tuya.iot.suite.service.idaas.GrantService;
 import com.tuya.iot.suite.service.idaas.PermissionService;
@@ -20,7 +21,6 @@ import com.tuya.iot.suite.web.model.request.role.RoleAddReq;
 import com.tuya.iot.suite.web.model.request.role.RoleEditReq;
 import com.tuya.iot.suite.web.model.request.role.RolePermissionReq;
 import com.tuya.iot.suite.web.model.response.permission.PermissionDto;
-import com.tuya.iot.suite.web.util.SessionContext;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -68,7 +68,7 @@ public class RoleController {
     @PostMapping("/roles")
     @RequiresPermissions("3002")
     public Response<Boolean> createRole(@RequestBody RoleAddReq req) {
-        String uid = SessionContext.getUserToken().getUserId();
+        String uid = ContextUtil.getUserId();
         Boolean res = roleService.createRole(projectProperties.getSpaceId(), RoleCreateReqDTO.builder()
                 .roleCode(RoleCodeGenerator.generate(req.getRoleType()))
                 .roleName(req.getRoleName())
@@ -160,7 +160,7 @@ public class RoleController {
                                                 .permissionType(p.getType().name())
                                                 .order(p.getOrder())
                                                 .remark(p.getRemark())
-                                                //.parentCode(p.getParentId())
+                                                .parentCode(p.getParentCode())
                                                 .build())
                 ).collect(Collectors.toList());
         return Response.buildSuccess(list);

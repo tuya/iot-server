@@ -31,9 +31,9 @@ public class PermissionCreateReq {
     PermissionTypeEnum type;
 
     /**
-     * 父级权限id
+     * 父级权限code
      */
-    Integer parentId;
+    String parentCode;
 
     /**
      * 展示顺序
