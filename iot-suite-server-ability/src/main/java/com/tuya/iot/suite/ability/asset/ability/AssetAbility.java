@@ -66,5 +66,13 @@ public interface AssetAbility {
 
     Boolean authorized(AssetAuthorizationRequest assetAuthorizationRequest);
 
+    /**
+     * 批量给资产授权
+     * @param userId
+     * @param assetAuthToUser
+     * @return
+     */
+    Boolean batchAssetsAuthorizedToUser(String userId, AssetAuthToUser assetAuthToUser);
+
     PageResultWithTotal<AuthorizedAsset> pageListAuthorizedAssets(String uid, int pageNo, int pageSize);
 }

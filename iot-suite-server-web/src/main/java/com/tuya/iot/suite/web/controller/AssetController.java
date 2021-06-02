@@ -3,7 +3,6 @@ package com.tuya.iot.suite.web.controller;
 
 import com.tuya.iot.suite.core.constant.Response;
 import com.tuya.iot.suite.core.util.ContextUtil;
-import com.tuya.iot.suite.core.util.Todo;
 import com.tuya.iot.suite.service.asset.AssetService;
 import com.tuya.iot.suite.service.dto.AssetConvertor;
 import com.tuya.iot.suite.service.dto.AssetVO;
@@ -76,6 +75,7 @@ public class AssetController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "asset_name", value = "资产名称", required = true, paramType = "string")
     })
+
     @GetMapping
     @RequiresPermissions("1001")
     public Response<List<AssetVO>> getAssetByName(@RequestParam("asset_name") String assetName) {
@@ -113,21 +113,22 @@ public class AssetController {
     @PutMapping(value = "/auths")
     @RequiresPermissions("1005")
     public Response<Boolean> authAssetToUser(@RequestBody AssetAuths req) {
-        return Todo.todo();
+        return  Response.buildSuccess(assetService.authAssetToUser(req.getUserId(),req.getAssetIds()));
     }
 
     @ApiOperation(value = "用户被授权的资产")
     @GetMapping(value = "/auths")
     @RequiresPermissions("1005")
     public Response<List<AssetVO>> authAssetOfUser() {
-        return Todo.todo();
+        return Response.buildSuccess(AssetConvertor.$.toAssetVOList(assetService.getTreeByUser(ContextUtil.getUserId())));
     }
 
     @ApiOperation(value = "系统所有资产")
     @GetMapping(value = "/all")
     @RequiresPermissions("1005")
     public Response<List<AssetVO>> sysAssetAll() {
-        return Todo.todo();
+        String roleCode = "admin";
+        return Response.buildSuccess(AssetConvertor.$.toAssetVOList(assetService.getAllTree(roleCode,ContextUtil.getUserId())));
     }
 
 

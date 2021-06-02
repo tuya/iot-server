@@ -8,6 +8,7 @@ import com.tuya.connector.open.api.model.PageResult;
 import com.tuya.iot.suite.ability.asset.ability.AssetAbility;
 import com.tuya.iot.suite.ability.asset.model.*;
 import com.tuya.iot.suite.core.constant.Response;
+import com.tuya.iot.suite.core.constant.RoleType;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
 import com.tuya.iot.suite.core.util.SimpleConvertUtil;
 import com.tuya.iot.suite.service.asset.AssetService;
@@ -274,18 +275,6 @@ public class AssetServiceImpl implements AssetService {
     @Override
     public List<AssetDTO> getAssetByName(String assetName, String userId) {
         // TODO 云端API暂时未能提供接口，目前从缓存获取
-        /*List<Asset> assets = new ArrayList<>();
-        final Integer pageSize = 100;
-        boolean hasNext = true;
-        String lastRowKey = "";
-        while (hasNext) {
-            PageResult<Asset> childAssetsBy = assetAbility.selectAssets("", assetName, lastRowKey, pageSize);
-            hasNext = childAssetsBy.getHas_next();
-            lastRowKey = childAssetsBy.getLast_row_key();
-            assets.addAll(childAssetsBy.getList());
-        }
-        List<AssetDTO> result = SimpleConvertUtil.convert(assets, AssetDTO.class);
-        setAssetChildInfo(result);*/
         List<String> authorizedAssetIds = listAuthorizedAssetIds(userId);
         List<AssetDTO> result = new ArrayList<>();
         getAssetByName(assetName, ASSET_CACHE.get("-1"), result, authorizedAssetIds);
@@ -366,21 +355,7 @@ public class AssetServiceImpl implements AssetService {
             return new ArrayList<>();
         }
         return assetAbility.selectAssets(String.join(",", assetIds));
-        // List<Asset> list = new ArrayList<>();
-        // StringBuilder assetIdParam = new StringBuilder();
-        // int i = 0;
-        // for (String assetId : assetIds) {
-        //     i++;
-        //     assetIdParam.append(",").append(assetId);
-        //     if (i % 20 == 0) {
-        //         PageResult<Asset> pageResult = assetAbility.selectAssets(assetIdParam.toString(), "", "", 20);
-        //         if (!CollectionUtils.isEmpty(pageResult.getList())) {
-        //             list.addAll(pageResult.getList());
-        //         }
-        //         assetIdParam = new StringBuilder();
-        //     }
-        // }
-        // return list;
+
     }
 
     /**
@@ -430,7 +405,7 @@ public class AssetServiceImpl implements AssetService {
         }
         // 从底层向上补全资产树
         Map<Integer, List<AssetDTO>> levelMap = assetList.stream().collect(Collectors.groupingBy(AssetDTO::getLevel)); // TODO 是否包含-1
-        int targetLevel = "-1".equals(targetAssetId) ? 0 : assetMap.get(targetAssetId).getLevel() ;
+        int targetLevel = "-1".equals(targetAssetId) ? 0 : assetMap.get(targetAssetId).getLevel();
         for (int i = maxLevel; i > targetLevel; i--) {
             List<AssetDTO> assetDTOS = levelMap.get(i);
             if (CollectionUtils.isEmpty(assetDTOS)) {
@@ -765,6 +740,85 @@ public class AssetServiceImpl implements AssetService {
     public List<AssetDTO> getTreeFast(String assetId, String userId) {
         AssetDTO assetDTO = buildAuthedAssetTree(listAuthorizedAssets(userId), assetId, true);
         return assetDTO.getSubAssets();
+    }
+
+    @Override
+    public List<AssetDTO> getAllTree(String roleCode, String userId) {
+        RoleType roleType = RoleType.valueByCode(roleCode);
+        switch (roleType) {
+            case ADMIN: {
+                return queryAllAssetTree();
+            }
+            default:
+                List<AuthorizedAsset> authorizedAssets = listAuthorizedAssets(userId);
+                AssetDTO assetDTO = buildAuthedAssetTree(authorizedAssets, "-1", false);
+                return assetDTO.getSubAssets();
+        }
+    }
+
+    @Override
+    public List<AssetDTO> getTreeByUser(String userId) {
+        List<AuthorizedAsset> authorizedAssets = listAuthorizedAssets(userId);
+        if (CollectionUtils.isEmpty(authorizedAssets)) {
+            return new ArrayList<>();
+        }
+        AssetDTO assetDTO = buildAuthedAssetTree(authorizedAssets, "-1", false);
+        return assetDTO != null ? assetDTO.getSubAssets() : new ArrayList<>();
+    }
+
+    @Override
+    public Boolean authAssetToUser(String userId, List<String> assetIds) {
+        if (CollectionUtils.isEmpty(assetIds)) {
+            return false;
+        }
+        return assetAbility.batchAssetsAuthorizedToUser(userId, new AssetAuthToUser(assetIds, false));
+    }
+
+    private List<AssetDTO> queryAllAssetTree() {
+        boolean hasNext = true;
+        String lastRowKey = "";
+        List<AssetDTO> resList = new ArrayList<>();
+        while (hasNext) {
+            PageResult<Asset> pageResult = assetAbility.selectAssets("", "", lastRowKey, 100);
+            if (!CollectionUtils.isEmpty(pageResult.getList())) {
+                resList.addAll(AssetConvertor.$.toAssetDTOList(pageResult.getList()));
+            }
+            hasNext = pageResult.getHasNext();
+            lastRowKey = pageResult.getLastRowKey();
+        }
+        resList.stream().forEach(e -> {
+            e.setIs_authorized(true);
+            e.setSubAssets(new ArrayList<>());
+        });
+        resList = buildTree(resList, "-1");
+        return resList;
+    }
+
+    /**
+     * 将list整合为树
+     *
+     * @param resList
+     * @return
+     */
+    private List<AssetDTO> buildTree(List<AssetDTO> resList, String topId) {
+        List<AssetDTO> targetList = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(resList)) {
+            Map<String, AssetDTO> assetDTOMap = resList.stream().collect(Collectors.toMap(AssetDTO::getAsset_id, e -> e));
+            for (AssetDTO assetDTO : resList) {
+                if (assetDTOMap.containsKey(assetDTO.getParent_asset_id())) {
+                    AssetDTO parent = assetDTOMap.get(assetDTO.getParent_asset_id());
+                    parent.getSubAssets().add(assetDTO);
+                    parent.setChild_asset_count(parent.getChild_asset_count() + 1);
+                }
+            }
+            for (String assetId : assetDTOMap.keySet()) {
+                AssetDTO assetDTO = assetDTOMap.get(assetId);
+                if (assetDTO.getParent_asset_id().equals(topId)) {
+                    targetList.add(assetDTO);
+                }
+            }
+        }
+        return targetList;
     }
 
 }
