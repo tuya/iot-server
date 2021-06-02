@@ -69,7 +69,7 @@ public class RoleController {
     @RequiresPermissions("3002")
     public Response<Boolean> createRole(@RequestBody RoleAddReq req) {
         String uid = ContextUtil.getUserId();
-        Boolean res = roleService.createRole(projectProperties.getSpaceId(), RoleCreateReqDTO.builder()
+        Boolean res = roleService.createRole(projectProperties.getPermissionSpaceId(), RoleCreateReqDTO.builder()
                 .roleCode(RoleCodeGenerator.generate(req.getRoleType()))
                 .roleName(req.getRoleName())
                 .uid(uid)
@@ -81,7 +81,7 @@ public class RoleController {
     @GetMapping("/roles")
     @RequiresPermissions("3001")
     public Response<PageVO<RoleVO>> listRoles(Integer pageNo, Integer pageSize, String roleCode, String roleName) {
-        PageVO<IdaasRole> pageVO = roleService.queryRolesPagination(projectProperties.getSpaceId(),
+        PageVO<IdaasRole> pageVO = roleService.queryRolesPagination(projectProperties.getPermissionSpaceId(),
                 RolesPaginationQueryReq.builder()
                         .pageNum(pageNo)
                         .pageSize(pageSize)
@@ -104,7 +104,7 @@ public class RoleController {
     @PutMapping("/roles")
     @RequiresPermissions("3003")
     public Response<Boolean> updateRoleName(@RequestBody RoleEditReq req) {
-        Boolean res = roleService.updateRole(projectProperties.getSpaceId(), req.getRoleCode(),
+        Boolean res = roleService.updateRole(projectProperties.getPermissionSpaceId(), req.getRoleCode(),
                 RoleUpdateReq.builder().roleName(req.getRoleName()).build());
         return Response.buildSuccess(res);
     }
@@ -117,7 +117,7 @@ public class RoleController {
         Set<String> roleCodes = StringUtils.commaDelimitedListToSet(roleCodeList);
         boolean success = true;
         for (String roleCode : roleCodes) {
-            success &= roleService.deleteRole(projectProperties.getSpaceId(), roleCode);
+            success &= roleService.deleteRole(projectProperties.getPermissionSpaceId(), roleCode);
         }
         return Response.buildSuccess(success);
     }
@@ -126,7 +126,7 @@ public class RoleController {
     @DeleteMapping("/roles/{roleCode}")
     @RequiresPermissions("3004")
     public Response<Boolean> deleteRole(@PathVariable String roleCode) {
-        Boolean success = roleService.deleteRole(projectProperties.getSpaceId(), roleCode);
+        Boolean success = roleService.deleteRole(projectProperties.getPermissionSpaceId(), roleCode);
         return Response.buildSuccess(success);
     }
 
@@ -135,7 +135,7 @@ public class RoleController {
     @RequiresPermissions("3005")
     public Response<Boolean> rolePermissions(@RequestBody RolePermissionReq req) {
         Boolean success = grantService.grantPermissionsToRole(RoleGrantPermissionsReq.builder()
-                .spaceId(projectProperties.getSpaceId())
+                .spaceId(projectProperties.getPermissionSpaceId())
                 .roleCode(req.getRoleCode())
                 .permissionCodes(req.getPermissionCodes())
                 .build());
@@ -148,7 +148,7 @@ public class RoleController {
     public Response<List<PermissionDto>> getRolePermissions(@RequestParam String roleCode) {
         List<PermissionDto> list = permissionService.queryPermissionsByRoleCodes(
                 PermissionQueryByRolesReq.builder()
-                        .spaceId(projectProperties.getSpaceId())
+                        .spaceId(projectProperties.getPermissionSpaceId())
                         .roleCodes(Lists.newArrayList(roleCode))
                         .build())
                 .stream().flatMap(it ->

@@ -69,7 +69,7 @@ public class MyController {
     @GetMapping("/permissions")
     public Response<List<PermissionVO>> myPermissions() {
         String uid = ContextUtil.getUserId();
-        List<PermissionVO> perms = permissionService.queryPermissionsByUser(projectProperties.getSpaceId(),uid)
+        List<PermissionVO> perms = permissionService.queryPermissionsByUser(projectProperties.getPermissionSpaceId(),uid)
                 .stream()
                 .map(it->
                         PermissionVO.builder()
@@ -87,7 +87,7 @@ public class MyController {
     @GetMapping("/permissions-trees")
     public Response<List<PermissionNodeVO>> myPermissionsTrees() {
         String uid = ContextUtil.getUserId();
-        List<PermissionNodeVO> perms = permissionService.queryPermissionsByUser(projectProperties.getSpaceId(),uid)
+        List<PermissionNodeVO> perms = permissionService.queryPermissionsByUser(projectProperties.getPermissionSpaceId(),uid)
                 .stream()
                 .map(it->
                         PermissionNodeVO.builder()
@@ -114,7 +114,7 @@ public class MyController {
     @GetMapping("/roles")
     public Response<List<RoleVO>> myRoles() {
         String uid = ContextUtil.getUserId();
-        List<RoleVO> list =  roleService.queryRolesByUser(projectProperties.getSpaceId(),uid)
+        List<RoleVO> list =  roleService.queryRolesByUser(projectProperties.getPermissionSpaceId(),uid)
         .stream().map(it-> RoleVO.builder()
                 .code(it.getRoleCode())
                 .name(it.getRoleName())
