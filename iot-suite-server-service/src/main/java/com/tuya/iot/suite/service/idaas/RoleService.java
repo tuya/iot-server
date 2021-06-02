@@ -21,17 +21,15 @@ import java.util.Set;
 public interface RoleService {
     Boolean createRole(Long spaceId, RoleCreateReqDTO request);
 
-    Boolean updateRole(Long spaceId, String roleCode, RoleUpdateReq request);
+    Boolean updateRole(Long spaceId, String operatorUid, String roleCode, RoleUpdateReq request);
 
-    Boolean deleteRole(Long spaceId, String roleCode);
+    Boolean deleteRole(Long spaceId, String operatorUid, String roleCode);
 
-    IdaasRole getRole(Long spaceId, String roleCode);
-
-    List<IdaasRole> queryRolesByCodes(RoleQueryReq request);
+    IdaasRole getRole(Long spaceId, String operatorUid, String roleCode);
 
     List<IdaasRole> queryRolesByUser(Long spaceId,String uid);
 
     PageVO<IdaasRole> queryRolesPagination(Long spaceId, RolesPaginationQueryReq req);
 
-    boolean deleteRoles(Long permissionSpaceId, Collection<String> roleCodes);
+    boolean deleteRoles(Long permissionSpaceId, String uid, Collection<String> roleCodes);
 }

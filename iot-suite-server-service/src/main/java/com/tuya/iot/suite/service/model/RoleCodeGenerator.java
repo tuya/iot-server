@@ -1,11 +1,5 @@
 package com.tuya.iot.suite.service.model;
 
-import com.tuya.iot.suite.core.exception.ServiceLogicException;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.util.UUID;
 
 /**
@@ -20,9 +14,6 @@ public class RoleCodeGenerator {
      * @return
      */
     public static String generate(String roleType){
-        if(RoleTypeEnum.isAdminRoleType(roleType)){
-            throw new RuntimeException("role type "+roleType+" not supported to generate role code!");
-        }
         return roleType+RoleTypeEnum.SEPARATOR+UUID.randomUUID().toString().replaceAll("-","").toLowerCase();
     }
     public static String generate(RoleTypeEnum roleType){

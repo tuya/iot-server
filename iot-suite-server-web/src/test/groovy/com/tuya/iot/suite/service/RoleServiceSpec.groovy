@@ -28,7 +28,12 @@ class RoleServiceSpec extends BaseSpec {
                                                        .roleCode("admin")
                                                        .build()
         ]
-        roleAbility.createRole(_, _) >> true
+        //roleAbility.createRole(_, _) >> true
+        roleAbility.createRole(_, _) >> {
+            spaceId, req ->
+                println("spaceId=$spaceId,req=$req")
+                true
+        }
 
         def spaceId = 1000
         when:
