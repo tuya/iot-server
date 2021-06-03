@@ -1,8 +1,11 @@
 package com.tuya.iot.suite.service
 
 import com.tuya.iot.suite.ability.idaas.ability.GrantAbility
+import com.tuya.iot.suite.ability.idaas.ability.IdaasUserAbility
 import com.tuya.iot.suite.ability.idaas.ability.RoleAbility
+import com.tuya.iot.suite.ability.idaas.model.IdaasPageResult
 import com.tuya.iot.suite.ability.idaas.model.IdaasRole
+import com.tuya.iot.suite.ability.idaas.model.IdaasUser
 import com.tuya.iot.suite.core.exception.ServiceLogicException
 import com.tuya.iot.suite.service.dto.RoleCreateReqDTO
 import com.tuya.iot.suite.service.idaas.RoleService
@@ -56,7 +59,7 @@ class RoleServiceSpec extends BaseSpec {
     }
 
 
-    void "测试创建角色-创建失败-没有权限"() {
+    void "测试创建角色-没有权限"() {
         given:
         def roleAbility = Mock(RoleAbility)
         def grantAbility = Mock(GrantAbility)
@@ -89,7 +92,7 @@ class RoleServiceSpec extends BaseSpec {
         thrown(ServiceLogicException)
     }
 
-    void "测试创建角色-创建失败-不能创建管理员"() {
+    void "测试创建角色-不能创建管理员"() {
         given:
         def roleAbility = Mock(RoleAbility)
         def grantAbility = Mock(GrantAbility)
@@ -120,5 +123,158 @@ class RoleServiceSpec extends BaseSpec {
                 .build())
         then:
         thrown(IllegalArgumentException)
+    }
+
+
+    void "测试删除角色-不能删除系统管理员"() {
+        given:
+        def roleAbility = Mock(RoleAbility)
+        def grantAbility = Mock(GrantAbility)
+        def idaasUserAbility = Mock(IdaasUserAbility)
+        roleService.roleAbility = roleAbility
+        roleService.grantAbility = grantAbility
+        roleService.idaasUserAbility = idaasUserAbility
+        roleAbility.queryRolesByUser(_, _) >> [IdaasRole.builder()
+                                                       .roleName('admin')
+                                                       .roleCode("admin")
+                                                       .build()
+        ]
+        roleAbility.deleteRole(_, _) >> {
+            spaceId, roleCode ->
+                log.info("spaceId=$spaceId,roleCode=$roleCode")
+                true
+        }
+        grantAbility.grantPermissionsToRole(_) >> {
+            req ->
+                log.info("grant===>{}",req)
+                true
+        }
+        idaasUserAbility.queryUserPage(_,_) >> {
+            spaceId, req->
+                log.info("spaceId=$spaceId,req=$req")
+                IdaasPageResult.builder().build()
+        }
+
+        def spaceId = 1000
+        when:
+        def result = roleService.deleteRole(spaceId, "u123456", "admin")
+        then:
+        thrown(IllegalArgumentException)
+    }
+
+    void "测试删除角色-存在关联的用户"() {
+        given:
+        def roleAbility = Mock(RoleAbility)
+        def grantAbility = Mock(GrantAbility)
+        def idaasUserAbility = Mock(IdaasUserAbility)
+        roleService.roleAbility = roleAbility
+        roleService.grantAbility = grantAbility
+        roleService.idaasUserAbility = idaasUserAbility
+        roleAbility.queryRolesByUser(_, _) >> [IdaasRole.builder()
+                                                       .roleName('admin')
+                                                       .roleCode("admin")
+                                                       .build()
+        ]
+        roleAbility.deleteRole(_, _) >> {
+            spaceId, roleCode ->
+                log.info("spaceId=$spaceId,roleCode=$roleCode")
+                true
+        }
+        grantAbility.grantPermissionsToRole(_) >> {
+            req ->
+                log.info("grant===>{}",req)
+                true
+        }
+        idaasUserAbility.queryUserPage(_,_) >> {
+            spaceId, req->
+                log.info("spaceId=$spaceId,req=$req")
+                IdaasPageResult.builder()
+                .totalCount(1)
+                .results([IdaasUser.builder().username('monkey').build()])
+                        .build()
+        }
+
+        def spaceId = 1000
+        when:
+        def result = roleService.deleteRole(spaceId, "u123456", "manage-1000")
+        then:
+        thrown(ServiceLogicException)
+    }
+
+    void "测试删除角色-权限不足"() {
+        given:
+        def roleAbility = Mock(RoleAbility)
+        def grantAbility = Mock(GrantAbility)
+        def idaasUserAbility = Mock(IdaasUserAbility)
+        roleService.roleAbility = roleAbility
+        roleService.grantAbility = grantAbility
+        roleService.idaasUserAbility = idaasUserAbility
+        roleAbility.queryRolesByUser(_, _) >> [IdaasRole.builder()
+                                                       .roleName('normal1000')
+                                                       .roleCode("normal-1000")
+                                                       .build()
+        ]
+        roleAbility.deleteRole(_, _) >> {
+            spaceId, roleCode ->
+                log.info("spaceId=$spaceId,roleCode=$roleCode")
+                true
+        }
+        grantAbility.grantPermissionsToRole(_) >> {
+            req ->
+                log.info("grant===>{}",req)
+                true
+        }
+        idaasUserAbility.queryUserPage(_,_) >> {
+            spaceId, req->
+                log.info("spaceId=$spaceId,req=$req")
+                IdaasPageResult.builder()
+                        .totalCount(0)
+                        .results([])
+                        .build()
+        }
+
+        def spaceId = 1000
+        when:
+        def result = roleService.deleteRole(spaceId, "u123456", "manage-1000")
+        then:
+        thrown(ServiceLogicException)
+    }
+    void "测试删除角色-成功"() {
+        given:
+        def roleAbility = Mock(RoleAbility)
+        def grantAbility = Mock(GrantAbility)
+        def idaasUserAbility = Mock(IdaasUserAbility)
+        roleService.roleAbility = roleAbility
+        roleService.grantAbility = grantAbility
+        roleService.idaasUserAbility = idaasUserAbility
+        roleAbility.queryRolesByUser(_, _) >> [IdaasRole.builder()
+                                                       .roleName('admin')
+                                                       .roleCode("admin")
+                                                       .build()
+        ]
+        roleAbility.deleteRole(_, _) >> {
+            spaceId, roleCode ->
+                log.info("spaceId=$spaceId,roleCode=$roleCode")
+                true
+        }
+        grantAbility.grantPermissionsToRole(_) >> {
+            req ->
+                log.info("grant===>{}",req)
+                true
+        }
+        idaasUserAbility.queryUserPage(_,_) >> {
+            spaceId, req->
+                log.info("spaceId=$spaceId,req=$req")
+                IdaasPageResult.builder()
+                        .totalCount(0)
+                        .results([])
+                        .build()
+        }
+
+        def spaceId = 1000
+        when:
+        def result = roleService.deleteRole(spaceId, "u123456", "manage-1000")
+        then:
+        result
     }
 }
