@@ -90,7 +90,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
             log.error("init user(admin) failure!");
             return;
         }
-        List<PermissionCreateReq> adminPermissions = PermissionTemplateUtil.loadPermissionsFromTemplate("classpath:template/permissions-admin.json");
+        List<PermissionCreateReq> adminPermissions = PermTemplateUtil.loadAsPermissionCreateReqList("classpath:template/permissions-admin.json");
 
         if (!initPermissions(adminPermissions)) {
             log.error("init permissions failure!");
@@ -123,7 +123,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
             return;
         }
 
-        List<PermissionCreateReq> managePermissions = PermissionTemplateUtil.loadPermissionsFromTemplate("classpath:template/permissions-manage.json");
+        List<PermissionCreateReq> managePermissions = PermTemplateUtil.loadAsPermissionCreateReqList("classpath:template/permissions-manage.json");
 
         if(!grantPermissionsToRole(manageRoleCode,managePermissions)){
             log.error("grant permissions to role(namage) failure!");

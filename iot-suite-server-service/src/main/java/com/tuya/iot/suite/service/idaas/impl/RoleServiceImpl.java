@@ -5,7 +5,6 @@ import com.tuya.iot.suite.ability.idaas.ability.RoleAbility;
 import com.tuya.iot.suite.ability.idaas.model.IdaasPageResult;
 import com.tuya.iot.suite.ability.idaas.model.IdaasRole;
 import com.tuya.iot.suite.ability.idaas.model.IdaasRoleCreateReq;
-import com.tuya.iot.suite.ability.idaas.model.PermissionCreateReq;
 import com.tuya.iot.suite.ability.idaas.model.RoleGrantPermissionsReq;
 import com.tuya.iot.suite.ability.idaas.model.RoleUpdateReq;
 import com.tuya.iot.suite.ability.idaas.model.RolesPaginationQueryReq;
@@ -16,6 +15,7 @@ import com.tuya.iot.suite.core.util.Tuple2;
 import com.tuya.iot.suite.service.dto.RoleCreateReqDTO;
 import com.tuya.iot.suite.service.idaas.RoleService;
 import com.tuya.iot.suite.service.model.PageVO;
+import com.tuya.iot.suite.service.model.PermissionTemplate;
 import com.tuya.iot.suite.service.model.RoleTypeEnum;
 import com.tuya.iot.suite.service.util.PermTemplateUtil;
 import lombok.Setter;
@@ -44,21 +44,37 @@ public class RoleServiceImpl implements RoleService {
     private GrantAbility grantAbility;
 
     /**
-     * roleType=>permissions
+     * roleType=>permissionTemplate
+     *
+     * load only when first call
      */
-    private LazyRef<Map<String, List<PermissionCreateReq>>> rolePermissionsMapRef = LazyRef.lateInit(() ->
+    private LazyRef<Map<String, PermissionTemplate>> rolePermissionTmplMapRef = LazyRef.lateInit(() ->
             Stream.of(RoleTypeEnum.values()).map(it ->
                 new Tuple2<>(it.name(), PermTemplateUtil
-                        .loadPermissionsFromTemplate("classpath:template/permissions-" + it.name() + ".json"))
+                        .load("classpath:template/permissions-" + it.name() + ".json"))
             ).collect(Collectors.toMap(it -> it.first(), it -> it.second()))
     );
 
+    /**
+     * roleType=>permissionList
+     */
+    private LazyRef<Map<String, List<PermissionTemplate>>> rolePermissionsMapRef = LazyRef.lateInit(() ->
+            Stream.of(RoleTypeEnum.values()).map(it ->
+                    new Tuple2<>(it.name(), PermTemplateUtil
+                            .loadAsList("classpath:template/permissions-" + it.name() + ".json"))
+            ).collect(Collectors.toMap(it -> it.first(), it -> it.second()))
+    );
+
+    @Override
+    public PermissionTemplate getPermissionTemplate(String roleType) {
+        return rolePermissionTmplMapRef.get().get(roleType);
+    }
 
     @Override
     public Boolean createRole(Long spaceId, RoleCreateReqDTO req) {
         checkRoleWritePermission(spaceId, req.getUid(), req.getRoleCode());
         String roleType = RoleTypeEnum.fromRoleCode(req.getRoleCode()).name();
-        List<PermissionCreateReq> perms = rolePermissionsMapRef.get().get(roleType);
+        List<PermissionTemplate> perms = rolePermissionsMapRef.get().get(roleType);
         boolean createRoleRes = roleAbility.createRole(spaceId, IdaasRoleCreateReq.builder()
                 .roleCode(req.getRoleCode())
                 .roleName(req.getRoleName())
