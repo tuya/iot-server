@@ -29,50 +29,49 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public Boolean createPermission(Long spaceId, PermissionCreateReq permissionCreateRequest) {
-        return null;
+        return permissionAbility.createPermission(spaceId, permissionCreateRequest);
     }
 
     @Override
     public Boolean batchCreatePermission(Long spaceId, List<PermissionCreateReq> permissionCreateRequestList) {
-        return null;
+        return permissionAbility.batchCreatePermission(spaceId, permissionCreateRequestList);
     }
 
     @Override
     public Boolean updatePermission(Long spaceId, String permissionCode, PermissionUpdateReq permissionUpdateRequest) {
-        return null;
+        return permissionAbility.updatePermission(spaceId, permissionCode, permissionUpdateRequest);
     }
 
     @Override
     public Boolean deletePermission(Long spaceId, String permissionCode) {
-        return null;
+        return permissionAbility.deletePermission(spaceId, permissionCode);
     }
 
     @Override
     public IdaasPermission getPermissionByCode(Long spaceId, String permissionCode) {
-        return null;
+        return permissionAbility.getPermissionByCode(spaceId, permissionCode);
     }
 
     @Override
     public List<IdaasPermission> queryPermissionsByCodes(PermissionQueryReq request) {
-        return null;
+        return permissionAbility.queryPermissionsByCodes(request);
     }
 
     @Override
     public List<PermissionQueryByRolesRespItem> queryPermissionsByRoleCodes(PermissionQueryByRolesReq request) {
-        return null;
+        return permissionAbility.queryPermissionsByRoleCodes(request);
     }
 
     @Override
     public List<IdaasPermission> queryPermissionsByUser(Long spaceId, String uid) {
-        //return Lists.newArrayList(IdaasPermission.builder().permissionCode("get:users").build());
-        return permissionAbility.queryPermissionsByUser(spaceId,uid);
+        return permissionAbility.queryPermissionsByUser(spaceId, uid);
     }
 
     @Override
     public List<PermissionNodeDTO> queryPermissionTrees(Long permissionSpaceId, String uid) {
-        List<PermissionNodeDTO> perms = permissionAbility.queryPermissionsByUser(permissionSpaceId,uid)
+        List<PermissionNodeDTO> perms = permissionAbility.queryPermissionsByUser(permissionSpaceId, uid)
                 .stream()
-                .map(it->
+                .map(it ->
                         PermissionNodeDTO.builder()
                                 .permissionCode(it.getPermissionCode())
                                 .permissionName(it.getName())
@@ -83,13 +82,13 @@ public class PermissionServiceImpl implements PermissionService {
                                 .build())
                 .collect(Collectors.toList());
         //permissionCode=>PermissionNodeDTO
-        Map<String,PermissionNodeDTO> map = perms.stream().collect(Collectors.toMap(it->it.getPermissionCode(), it->it));
+        Map<String, PermissionNodeDTO> map = perms.stream().collect(Collectors.toMap(it -> it.getPermissionCode(), it -> it));
         //permissionCode=>children
-        Map<String,List<PermissionNodeDTO>> childrenMap = perms.stream().collect(Collectors.groupingBy(it->it.getParentCode()));
+        Map<String, List<PermissionNodeDTO>> childrenMap = perms.stream().collect(Collectors.groupingBy(it -> it.getParentCode()));
         //find roots, which parentCode not in map
-        List<PermissionNodeDTO> trees = perms.stream().filter(it->!map.containsKey(it.getParentCode())).collect(Collectors.toList());
+        List<PermissionNodeDTO> trees = perms.stream().filter(it -> !map.containsKey(it.getParentCode())).collect(Collectors.toList());
         //set children
-        perms.forEach(it->it.setChildren(childrenMap.get(it.getParentCode())));
+        perms.forEach(it -> it.setChildren(childrenMap.get(it.getParentCode())));
         return trees;
     }
 }
