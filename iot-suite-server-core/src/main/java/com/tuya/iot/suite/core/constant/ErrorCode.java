@@ -33,6 +33,8 @@ public enum ErrorCode {
 
     USER_DELETE_FAIL("2101", "删除用户失败"),
 
+    USER_DELETE_COUNT_CAN_NOT_MORE_THAN_20("2102", "一次性删除用户不能超过20个"),
+
     USER_AUTH_ROLE_FAIL("2200", "用户授权角色失败"),
 
     /**

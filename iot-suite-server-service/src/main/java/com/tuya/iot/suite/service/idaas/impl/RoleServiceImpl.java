@@ -20,7 +20,7 @@ import com.tuya.iot.suite.core.util.Tuple2;
 import com.tuya.iot.suite.service.dto.PermissionNodeDTO;
 import com.tuya.iot.suite.service.dto.RoleCreateReqDTO;
 import com.tuya.iot.suite.service.idaas.RoleService;
-import com.tuya.iot.suite.service.model.PageVO;
+import com.tuya.iot.suite.core.model.PageVO;
 import com.tuya.iot.suite.service.model.RoleTypeEnum;
 import com.tuya.iot.suite.service.util.PermTemplateUtil;
 import lombok.Setter;
