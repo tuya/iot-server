@@ -58,6 +58,8 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
     @Autowired
     PermissionAbility permissionAbility;
 
+
+    String authentication = "";
     String adminUid = "";
     String adminRoleCode = "admin";
     String manageUid = "";
@@ -254,7 +256,8 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
         // else apply a spaceId.
         spaceId = spaceAbility.applySpace(SpaceApplyReq.builder()
                 .spaceGroup(projectProperties.getPermissionGroup())
-                .spaceCode(projectProperties.getPermissionSpaceCode()).build());
+                .spaceCode(projectProperties.getPermissionSpaceCode())
+                .authentication(authentication).build());
         if (spaceId != null) {
             projectProperties.setPermissionSpaceId(spaceId);
             log.info("applied spaceId: {}", spaceId);

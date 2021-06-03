@@ -19,6 +19,7 @@ import com.tuya.iot.suite.core.util.LazyRef;
 import com.tuya.iot.suite.core.util.Tuple2;
 import com.tuya.iot.suite.service.dto.PermissionNodeDTO;
 import com.tuya.iot.suite.service.dto.RoleCreateReqDTO;
+import com.tuya.iot.suite.service.idaas.PermissionTemplateService;
 import com.tuya.iot.suite.service.idaas.RoleService;
 import com.tuya.iot.suite.core.model.PageVO;
 import com.tuya.iot.suite.service.model.RoleTypeEnum;
@@ -29,10 +30,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -54,39 +57,14 @@ public class RoleServiceImpl implements RoleService {
     private IdaasUserAbility idaasUserAbility;
     @Autowired
     private PermissionAbility permissionAbility;
-
-    /**
-     * roleType=>permissionTemplate
-     *
-     * load only when first call
-     */
-    private LazyRef<Map<String, PermissionNodeDTO>> rolePermissionTmplMapRef = LazyRef.lateInit(() ->
-            Stream.of(RoleTypeEnum.values()).map(it ->
-                new Tuple2<>(it.name(), PermTemplateUtil
-                        .load("classpath:template/permissions-" + it.name() + ".json"))
-            ).collect(Collectors.toMap(it -> it.first(), it -> it.second()))
-    );
-
-    /**
-     * roleType=>permissionList
-     */
-    private LazyRef<Map<String, List<PermissionNodeDTO>>> rolePermissionsMapRef = LazyRef.lateInit(() ->
-            Stream.of(RoleTypeEnum.values()).map(it ->
-                    new Tuple2<>(it.name(), PermTemplateUtil
-                            .loadAsList("classpath:template/permissions-" + it.name() + ".json"))
-            ).collect(Collectors.toMap(it -> it.first(), it -> it.second()))
-    );
-
-    @Override
-    public PermissionNodeDTO getPermissionTemplate(String roleType) {
-        return rolePermissionTmplMapRef.get().get(roleType);
-    }
+    @Autowired
+    private PermissionTemplateService permissionTemplateService;
 
     @Override
     public Boolean createRole(Long spaceId, RoleCreateReqDTO req) {
         checkRoleWritePermission(spaceId, req.getUid(), req.getRoleCode());
         String roleType = RoleTypeEnum.fromRoleCode(req.getRoleCode()).name();
-        List<PermissionNodeDTO> perms = rolePermissionsMapRef.get().get(roleType);
+        List<PermissionNodeDTO> perms = permissionTemplateService.getPermissionTemplate(roleType).getChildren();
         boolean createRoleRes = roleAbility.createRole(spaceId, IdaasRoleCreateReq.builder()
                 .roleCode(req.getRoleCode())
                 .roleName(req.getRoleName())
@@ -185,10 +163,11 @@ public class RoleServiceImpl implements RoleService {
         List<String> existPerms = permissionAbility.queryPermissionsByRoleCodes(PermissionQueryByRolesReq.builder()
                 .spaceId(spaceId)
                 .roleCodes(Lists.newArrayList(roleCode))
-                .build()).stream().flatMap(it->it.getPermissionList().stream()).map(it->it.getPermissionCode())
+                .build()).stream().flatMap(it -> it.getPermissionList().stream()).map(it -> it.getPermissionCode())
                 .collect(Collectors.toList());
         RoleTypeEnum roleType = RoleTypeEnum.fromRoleCode(roleCode);
-        List<String> templatePerms = rolePermissionsMapRef.get().get(roleType.name()).stream().map(it->it.getPermissionCode())
+        List<String> templatePerms = permissionTemplateService.getPermissionTemplate(roleType.name()).getChildren()
+                .stream().map(it -> it.getPermissionCode())
                 .collect(Collectors.toList());
 
         List<String> permsToAdd = new ArrayList<>(templatePerms);
@@ -197,20 +176,21 @@ public class RoleServiceImpl implements RoleService {
         List<String> permsToDel = new ArrayList<>(existPerms);
         permsToDel.removeAll(templatePerms);
 
-        if(!permsToAdd.isEmpty()){
+        if (!permsToAdd.isEmpty()) {
             boolean addRes = grantAbility.grantPermissionsToRole(RoleGrantPermissionsReq.builder().build());
-            if(!addRes){
+            if (!addRes) {
                 log.info("grant permissions to role failed");
                 return false;
             }
         }
-        if(!permsToDel.isEmpty()){
+        if (!permsToDel.isEmpty()) {
             boolean delRes = grantAbility.revokePermissionsFromRole(RoleRevokePermissionsReq.builder().build());
-            if(!delRes){
+            if (!delRes) {
                 log.info("revoke permissions from role failed");
                 return false;
             }
         }
         return true;
     }
+
 }

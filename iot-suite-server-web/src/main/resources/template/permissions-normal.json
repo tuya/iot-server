@@ -1,6 +1,26 @@
 {
   "children": [
     {
+      "permissionName": "资产",
+      "permissionType": "menu",
+      "permissionCode": "1000",
+      "parentCode": "0",
+      "order": "1",
+      "remark": "资产能力",
+      "dependencies": [],
+      "children": [
+        {
+          "permissionName": "查看资产",
+          "permissionType": "api",
+          "permissionCode": "1001",
+          "parentCode": "1000",
+          "order": "1",
+          "dependencies": [],
+          "remark": "资产列表"
+        }
+      ]
+    },
+    {
       "permissionName": "设备",
       "permissionType": "menu",
       "permissionCode": "2000",
@@ -17,7 +37,8 @@
           "order": "1",
           "dependencies": [],
           "remark": "设备列表"
-        },{
+        },
+        {
           "permissionName": "添加设备",
           "permissionType": "api",
           "permissionCode": "2002",
@@ -25,7 +46,8 @@
           "order": "2",
           "dependencies": [],
           "remark": "添加设备"
-        },{
+        },
+        {
           "permissionName": "修改设备",
           "permissionType": "api",
           "permissionCode": "2003",
@@ -33,25 +55,32 @@
           "order": "3",
           "dependencies": [],
           "remark": "修改设备"
-        },{
+        },
+        {
           "permissionName": "控制设备",
           "permissionType": "api",
           "permissionCode": "2004",
           "parentCode": "2000",
           "order": "4",
-          "dependencies": ["2001"],
+          "dependencies": [
+            "2001"
+          ],
           "remark": "控制设备"
-        },{
+        },
+        {
           "permissionName": "移除设备",
           "permissionType": "api",
           "permissionCode": "2005",
           "parentCode": "2000",
           "order": "5",
-          "dependencies": ["2001"],
+          "dependencies": [
+            "2001"
+          ],
           "remark": "移除设备"
         }
       ]
-    },{
+    },
+    {
       "permissionName": "角色",
       "permissionType": "menu",
       "permissionCode": "3000",
@@ -68,49 +97,21 @@
           "order": "1",
           "dependencies": [],
           "remark": "角色列表"
-        },{
-          "permissionName": "创建角色",
-          "permissionType": "api",
-          "permissionCode": "3002",
-          "parentCode": "3000",
-          "order": "3",
-          "dependencies": ["3001"],
-          "remark": "新增角色"
-        },{
-          "permissionName": "编辑角色",
-          "permissionType": "api",
-          "permissionCode": "3003",
-          "parentCode": "3000",
-          "order": "3",
-          "dependencies": ["3001"],
-          "remark": "修改角色"
-        },{
-          "permissionName": "删除角色",
-          "permissionType": "api",
-          "permissionCode": "3004",
-          "parentCode": "3000",
-          "order": "4",
-          "dependencies": ["3001"],
-          "remark": "删除角色"
-        },{
-          "permissionName": "角色授权",
-          "permissionType": "api",
-          "permissionCode": "3005",
-          "parentCode": "3000",
-          "order": "4",
-          "dependencies": ["3001"],
-          "remark": "给角色授权"
-        },{
+        },
+        {
           "permissionName": "角色权限",
           "permissionType": "api",
           "permissionCode": "3006",
           "parentCode": "3000",
           "order": "5",
-          "dependencies": ["3001"],
+          "dependencies": [
+            "3001"
+          ],
           "remark": "查询角色拥有权限"
         }
       ]
-    },{
+    },
+    {
       "permissionName": "用户",
       "permissionType": "menu",
       "permissionCode": "4000",
@@ -127,49 +128,32 @@
           "order": "1",
           "dependencies": [],
           "remark": "用户列表"
-        },{
-          "permissionName": "创建用户",
-          "permissionType": "api",
-          "permissionCode": "4002",
-          "parentCode": "4000",
-          "order": "3",
-          "dependencies": ["4001"],
-          "remark": "新增用户"
-        },{
+        },
+        {
           "permissionName": "编辑用户",
           "permissionType": "api",
           "permissionCode": "4003",
           "parentCode": "4000",
           "order": "3",
-          "dependencies": ["4001"],
+          "dependencies": [
+            "4001"
+          ],
           "remark": "修改用户"
-        },{
-          "permissionName": "删除用户",
-          "permissionType": "api",
-          "permissionCode": "4004",
-          "parentCode": "4000",
-          "order": "4",
-          "dependencies": ["4001"],
-          "remark": "删除用户"
-        },{
+        },
+        {
           "permissionName": "修改密码",
           "permissionType": "api",
           "permissionCode": "4005",
           "parentCode": "4000",
           "order": "5",
-          "dependencies": ["3001"],
+          "dependencies": [
+            "3001"
+          ],
           "remark": "修改密码"
-        },{
-          "permissionName": "分配角色",
-          "permissionType": "api",
-          "permissionCode": "4006",
-          "parentCode": "4000",
-          "order": "6",
-          "dependencies": ["3001"],
-          "remark": "分配角色"
         }
       ]
-    },{
+    },
+    {
       "permissionName": "告警中心",
       "permissionType": "menu",
       "permissionCode": "5000",
