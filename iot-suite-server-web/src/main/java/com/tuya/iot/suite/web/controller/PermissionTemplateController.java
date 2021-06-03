@@ -25,9 +25,9 @@ public class PermissionTemplateController {
     @Autowired
     PermissionTemplateService permissionTemplateService;
 
-    @ApiOperation("查询权限模版列表")
+    @ApiOperation("查询模板权限森林")
     @GetMapping("/permission-template/role")
-    public Response<List<PermissionNodeDTO>> listPermTemplates(@RequestParam  String roleCode){
+    public Response<List<PermissionNodeDTO>> listTemplateTrees(@RequestParam  String roleCode){
         return Response.buildSuccess(permissionTemplateService.getTemplatePermissionTree(roleCode).getChildren());
     }
 }

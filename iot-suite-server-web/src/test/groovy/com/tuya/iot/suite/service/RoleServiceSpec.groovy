@@ -2,10 +2,13 @@ package com.tuya.iot.suite.service
 
 import com.tuya.iot.suite.ability.idaas.ability.GrantAbility
 import com.tuya.iot.suite.ability.idaas.ability.IdaasUserAbility
+import com.tuya.iot.suite.ability.idaas.ability.PermissionAbility
 import com.tuya.iot.suite.ability.idaas.ability.RoleAbility
 import com.tuya.iot.suite.ability.idaas.model.IdaasPageResult
+import com.tuya.iot.suite.ability.idaas.model.IdaasPermission
 import com.tuya.iot.suite.ability.idaas.model.IdaasRole
 import com.tuya.iot.suite.ability.idaas.model.IdaasUser
+import com.tuya.iot.suite.ability.idaas.model.PermissionQueryByRolesRespItem
 import com.tuya.iot.suite.core.exception.ServiceLogicException
 import com.tuya.iot.suite.service.dto.RoleCreateReqDTO
 import com.tuya.iot.suite.service.idaas.RoleService
@@ -44,14 +47,14 @@ class RoleServiceSpec extends BaseSpec {
         }
         grantAbility.grantPermissionsToRole(_) >> {
             req ->
-                log.info("grant===>{}",req)
+                log.info("grant===>{}", req)
                 true
         }
 
         def spaceId = 1000
         when:
         def createResult = roleService.createRole(spaceId, RoleCreateReqDTO.builder()
-                .roleCode(RoleCodeGenerator.generate(RoleTypeEnum.manage,"1000"))
+                .roleCode(RoleCodeGenerator.generate(RoleTypeEnum.manage, "1000"))
                 .roleName('manage1000')
                 .build())
         then:
@@ -78,14 +81,14 @@ class RoleServiceSpec extends BaseSpec {
         }
         grantAbility.grantPermissionsToRole(_) >> {
             req ->
-                log.info("grant===>{}",req)
+                log.info("grant===>{}", req)
                 true
         }
 
         def spaceId = 1000
         when:
         def createResult = roleService.createRole(spaceId, RoleCreateReqDTO.builder()
-                .roleCode(RoleCodeGenerator.generate(RoleTypeEnum.manage,"1000"))
+                .roleCode(RoleCodeGenerator.generate(RoleTypeEnum.manage, "1000"))
                 .roleName('manage1000')
                 .build())
         then:
@@ -111,14 +114,14 @@ class RoleServiceSpec extends BaseSpec {
         }
         grantAbility.grantPermissionsToRole(_) >> {
             req ->
-                log.info("grant===>{}",req)
+                log.info("grant===>{}", req)
                 true
         }
 
         def spaceId = 1000
         when:
         def createResult = roleService.createRole(spaceId, RoleCreateReqDTO.builder()
-                .roleCode(RoleCodeGenerator.generate(RoleTypeEnum.admin,"1000"))
+                .roleCode(RoleCodeGenerator.generate(RoleTypeEnum.admin, "1000"))
                 .roleName('admin1000')
                 .build())
         then:
@@ -146,11 +149,11 @@ class RoleServiceSpec extends BaseSpec {
         }
         grantAbility.grantPermissionsToRole(_) >> {
             req ->
-                log.info("grant===>{}",req)
+                log.info("grant===>{}", req)
                 true
         }
-        idaasUserAbility.queryUserPage(_,_) >> {
-            spaceId, req->
+        idaasUserAbility.queryUserPage(_, _) >> {
+            spaceId, req ->
                 log.info("spaceId=$spaceId,req=$req")
                 IdaasPageResult.builder().build()
         }
@@ -182,15 +185,15 @@ class RoleServiceSpec extends BaseSpec {
         }
         grantAbility.grantPermissionsToRole(_) >> {
             req ->
-                log.info("grant===>{}",req)
+                log.info("grant===>{}", req)
                 true
         }
-        idaasUserAbility.queryUserPage(_,_) >> {
-            spaceId, req->
+        idaasUserAbility.queryUserPage(_, _) >> {
+            spaceId, req ->
                 log.info("spaceId=$spaceId,req=$req")
                 IdaasPageResult.builder()
-                .totalCount(1)
-                .results([IdaasUser.builder().username('monkey').build()])
+                        .totalCount(1)
+                        .results([IdaasUser.builder().username('monkey').build()])
                         .build()
         }
 
@@ -221,11 +224,11 @@ class RoleServiceSpec extends BaseSpec {
         }
         grantAbility.grantPermissionsToRole(_) >> {
             req ->
-                log.info("grant===>{}",req)
+                log.info("grant===>{}", req)
                 true
         }
-        idaasUserAbility.queryUserPage(_,_) >> {
-            spaceId, req->
+        idaasUserAbility.queryUserPage(_, _) >> {
+            spaceId, req ->
                 log.info("spaceId=$spaceId,req=$req")
                 IdaasPageResult.builder()
                         .totalCount(0)
@@ -239,6 +242,7 @@ class RoleServiceSpec extends BaseSpec {
         then:
         thrown(ServiceLogicException)
     }
+
     void "测试删除角色-成功"() {
         given:
         def roleAbility = Mock(RoleAbility)
@@ -259,11 +263,11 @@ class RoleServiceSpec extends BaseSpec {
         }
         grantAbility.grantPermissionsToRole(_) >> {
             req ->
-                log.info("grant===>{}",req)
+                log.info("grant===>{}", req)
                 true
         }
-        idaasUserAbility.queryUserPage(_,_) >> {
-            spaceId, req->
+        idaasUserAbility.queryUserPage(_, _) >> {
+            spaceId, req ->
                 log.info("spaceId=$spaceId,req=$req")
                 IdaasPageResult.builder()
                         .totalCount(0)
@@ -274,6 +278,54 @@ class RoleServiceSpec extends BaseSpec {
         def spaceId = 1000
         when:
         def result = roleService.deleteRole(spaceId, "u123456", "manage-1000")
+        then:
+        result
+    }
+
+    void "重新设置角色权限-成功"() {
+        given:
+        def roleAbility = Mock(RoleAbility)
+        def grantAbility = Mock(GrantAbility)
+        def idaasUserAbility = Mock(IdaasUserAbility)
+        def permissionAbility = Mock(PermissionAbility)
+        roleService.roleAbility = roleAbility
+        roleService.grantAbility = grantAbility
+        roleService.idaasUserAbility = idaasUserAbility
+        roleService.permissionAbility = permissionAbility
+        roleAbility.queryRolesByUser(_, _) >> [IdaasRole.builder()
+                                                       .roleName('admin')
+                                                       .roleCode("admin")
+                                                       .build()
+        ]
+        permissionAbility.queryPermissionsByRoleCodes(_) >> {
+            req ->
+                log.info("req=$req")
+                [PermissionQueryByRolesRespItem.builder()
+                         .roleCode("admin")
+                         .permissionList([IdaasPermission.builder()
+                                                  .permissionCode("1000")
+                                                  .build(),
+                                          IdaasPermission.builder()
+                                                  .permissionCode("9001")
+                                                  .build()
+                         ])
+                         .build()
+                ]
+        }
+        grantAbility.grantPermissionsToRole(_) >> {
+            req ->
+                log.info("grant===>{}", req)
+                true
+        }
+        grantAbility.revokePermissionsFromRole(_) >> {
+            req ->
+                log.info("revoke===>{}",req)
+                true
+        }
+
+        def spaceId = 1000
+        when:
+        def result = roleService.resetRolePermissionsFromTemplate(spaceId, "u123456", "manage-1000")
         then:
         result
     }

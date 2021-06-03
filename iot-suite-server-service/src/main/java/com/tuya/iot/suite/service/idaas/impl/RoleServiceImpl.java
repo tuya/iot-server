@@ -174,7 +174,7 @@ public class RoleServiceImpl implements RoleService {
         RoleTypeEnum roleType = RoleTypeEnum.fromRoleCode(roleCode);
 
         // 1. get permissions from template
-        List<String> templatePerms = permissionTemplateService.getTemplatePermissionTree(roleType.name()).getChildren()
+        List<String> templatePerms = permissionTemplateService.getTemplatePermissionList(roleType.name())
                 .stream().map(it -> it.getPermissionCode())
                 .collect(Collectors.toList());
 
@@ -185,7 +185,11 @@ public class RoleServiceImpl implements RoleService {
         permsToDel.removeAll(templatePerms);
         // 2. add permissions if need
         if (!permsToAdd.isEmpty()) {
-            boolean addRes = grantAbility.grantPermissionsToRole(RoleGrantPermissionsReq.builder().build());
+            boolean addRes = grantAbility.grantPermissionsToRole(RoleGrantPermissionsReq.builder()
+                    .spaceId(spaceId)
+                    .permissionCodes(permsToAdd)
+                    .roleCode(roleCode)
+                    .build());
             if (!addRes) {
                 log.info("grant permissions to role failed");
                 return false;
@@ -193,7 +197,11 @@ public class RoleServiceImpl implements RoleService {
         }
         // 3. delete permissions if need
         if (!permsToDel.isEmpty()) {
-            boolean delRes = grantAbility.revokePermissionsFromRole(RoleRevokePermissionsReq.builder().build());
+            boolean delRes = grantAbility.revokePermissionsFromRole(RoleRevokePermissionsReq.builder()
+                    .spaceId(spaceId)
+                    .permissionCodes(permsToDel)
+                    .roleCode(roleCode)
+                    .build());
             if (!delRes) {
                 log.info("revoke permissions from role failed");
                 return false;
