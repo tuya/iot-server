@@ -31,6 +31,8 @@ public enum ErrorCode {
 
     USER_CREATE_FAIL("2100", "创建用户失败"),
 
+    USER_DELETE_FAIL("2101", "删除用户失败"),
+
     USER_AUTH_ROLE_FAIL("2200", "用户授权角色失败"),
 
     /**
