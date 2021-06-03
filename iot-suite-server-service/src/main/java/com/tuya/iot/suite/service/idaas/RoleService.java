@@ -8,6 +8,7 @@ import com.tuya.iot.suite.service.dto.RoleCreateReqDTO;
 import com.tuya.iot.suite.core.model.PageVO;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author benguan.zhou@tuya.com
@@ -15,8 +16,6 @@ import java.util.List;
  * @date 2021/05/31
  */
 public interface RoleService {
-
-    PermissionNodeDTO getPermissionTemplate(String roleType);
 
     Boolean createRole(Long spaceId, RoleCreateReqDTO request);
 
@@ -33,4 +32,5 @@ public interface RoleService {
     boolean deleteRoles(Long permissionSpaceId, String operatorUid, Collection<String> roleCodes);
 
     Boolean resetRolePermissionsFromTemplate(Long permissionSpaceId, String operatorUid, String roleCode);
+
 }
