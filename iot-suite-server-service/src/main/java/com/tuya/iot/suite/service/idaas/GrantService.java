@@ -15,23 +15,23 @@ import java.util.List;
  * @date 2021/05/31
  */
 public interface GrantService {
-    Boolean grantPermissionToRole(String operatorUid,RoleGrantPermissionReq request);
+    Boolean grantPermissionToRole(String operatorUid, RoleGrantPermissionReq request);
 
-    Boolean grantPermissionsToRole(RoleGrantPermissionsReq request);
+    Boolean grantPermissionsToRole(String operatorUid, RoleGrantPermissionsReq request);
 
-    Boolean setPermissionsToRole(RoleGrantPermissionsReq request);
+    Boolean setPermissionsToRole(String operatorUid, RoleGrantPermissionsReq request);
 
-    Boolean revokePermissionFromRole(Long spaceId,String roleCode,String permissionCode);
+    Boolean revokePermissionFromRole(Long spaceId, String operatorUid, String roleCode,String permissionCode);
 
-    Boolean revokePermissionsFromRole(RoleRevokePermissionsReq request);
+    Boolean revokePermissionsFromRole(String operatorUid, RoleRevokePermissionsReq request);
 
-    Boolean grantRoleToUser(UserGrantRoleReq req);
+    Boolean grantRoleToUser(String operatorUid, UserGrantRoleReq req);
 
-    Boolean setRolesToUser(UserGrantRolesReq req);
+    Boolean setRolesToUser(String operatorUid, UserGrantRolesReq req);
 
-    Boolean revokeRoleFromUser(Long spaceId,String uid,String roleCode);
+    Boolean revokeRoleFromUser(Long spaceId,String operatorUid, String roleCode,String uid);
 
-    Boolean revokeRolesFromUser(UserRevokeRolesReq req);
+    Boolean revokeRolesFromUser(String operatorUid, UserRevokeRolesReq req);
 
-    Boolean setRoleToUsers(Long spaceId, String uid, String roleCode, List<String> uidList);
+    Boolean setRoleToUsers(Long spaceId,String operatorUid, String roleCode, List<String> uidList);
 }

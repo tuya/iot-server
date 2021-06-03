@@ -14,7 +14,6 @@ import com.tuya.iot.suite.service.idaas.PermissionService;
 import com.tuya.iot.suite.service.idaas.RoleService;
 import com.tuya.iot.suite.service.model.PageVO;
 import com.tuya.iot.suite.service.model.RoleCodeGenerator;
-import com.tuya.iot.suite.service.model.RoleTypeEnum;
 import com.tuya.iot.suite.web.config.ProjectProperties;
 import com.tuya.iot.suite.web.model.RoleVO;
 import com.tuya.iot.suite.web.model.request.role.RoleAddReq;
@@ -138,7 +137,7 @@ public class RoleController {
     @PutMapping("/roles/permissions")
     @RequiresPermissions("3005")
     public Response<Boolean> rolePermissions(@RequestBody RolePermissionReq req) {
-        Boolean success = grantService.grantPermissionsToRole(RoleGrantPermissionsReq.builder()
+        Boolean success = grantService.grantPermissionsToRole(ContextUtil.getUserId(), RoleGrantPermissionsReq.builder()
                 .spaceId(projectProperties.getPermissionSpaceId())
                 .roleCode(req.getRoleCode())
                 .permissionCodes(req.getPermissionCodes())
