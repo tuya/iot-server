@@ -30,5 +30,7 @@ public interface RoleService {
 
     PageVO<IdaasRole> queryRolesPagination(Long spaceId, RolesPaginationQueryReq req);
 
-    boolean deleteRoles(Long permissionSpaceId, String uid, Collection<String> roleCodes);
+    boolean deleteRoles(Long permissionSpaceId, String operatorUid, Collection<String> roleCodes);
+
+    Boolean resetRolePermissionsFromTemplate(Long permissionSpaceId, String operatorUid, String roleCode);
 }
