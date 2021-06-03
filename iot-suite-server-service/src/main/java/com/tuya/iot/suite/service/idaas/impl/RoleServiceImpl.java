@@ -1,12 +1,16 @@
 package com.tuya.iot.suite.service.idaas.impl;
 
+import com.google.common.collect.Lists;
 import com.tuya.iot.suite.ability.idaas.ability.GrantAbility;
 import com.tuya.iot.suite.ability.idaas.ability.IdaasUserAbility;
+import com.tuya.iot.suite.ability.idaas.ability.PermissionAbility;
 import com.tuya.iot.suite.ability.idaas.ability.RoleAbility;
 import com.tuya.iot.suite.ability.idaas.model.IdaasPageResult;
 import com.tuya.iot.suite.ability.idaas.model.IdaasRole;
 import com.tuya.iot.suite.ability.idaas.model.IdaasRoleCreateReq;
+import com.tuya.iot.suite.ability.idaas.model.PermissionQueryByRolesReq;
 import com.tuya.iot.suite.ability.idaas.model.RoleGrantPermissionsReq;
+import com.tuya.iot.suite.ability.idaas.model.RoleRevokePermissionsReq;
 import com.tuya.iot.suite.ability.idaas.model.RoleUpdateReq;
 import com.tuya.iot.suite.ability.idaas.model.RolesPaginationQueryReq;
 import com.tuya.iot.suite.core.constant.ErrorCode;
@@ -20,10 +24,12 @@ import com.tuya.iot.suite.core.model.PageVO;
 import com.tuya.iot.suite.service.model.RoleTypeEnum;
 import com.tuya.iot.suite.service.util.PermTemplateUtil;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +43,7 @@ import java.util.stream.Stream;
  */
 @Service
 @Setter
+@Slf4j
 public class RoleServiceImpl implements RoleService {
 
     @Autowired
@@ -45,6 +52,8 @@ public class RoleServiceImpl implements RoleService {
     private GrantAbility grantAbility;
     @Autowired
     private IdaasUserAbility idaasUserAbility;
+    @Autowired
+    private PermissionAbility permissionAbility;
 
     /**
      * roleType=>permissionTemplate
@@ -168,5 +177,40 @@ public class RoleServiceImpl implements RoleService {
         checkRoleWritePermission(permissionSpaceId, uid, roleCodes);
         long count = roleCodes.stream().map(roleCode -> roleAbility.deleteRole(permissionSpaceId, roleCode)).count();
         return count == roleCodes.size();
+    }
+
+    @Override
+    public Boolean resetRolePermissionsFromTemplate(Long spaceId, String operatorUid, String roleCode) {
+
+        List<String> existPerms = permissionAbility.queryPermissionsByRoleCodes(PermissionQueryByRolesReq.builder()
+                .spaceId(spaceId)
+                .roleCodes(Lists.newArrayList(roleCode))
+                .build()).stream().flatMap(it->it.getPermissionList().stream()).map(it->it.getPermissionCode())
+                .collect(Collectors.toList());
+        RoleTypeEnum roleType = RoleTypeEnum.fromRoleCode(roleCode);
+        List<String> templatePerms = rolePermissionsMapRef.get().get(roleType.name()).stream().map(it->it.getPermissionCode())
+                .collect(Collectors.toList());
+
+        List<String> permsToAdd = new ArrayList<>(templatePerms);
+        permsToAdd.removeAll(existPerms);
+
+        List<String> permsToDel = new ArrayList<>(existPerms);
+        permsToDel.removeAll(templatePerms);
+
+        if(!permsToAdd.isEmpty()){
+            boolean addRes = grantAbility.grantPermissionsToRole(RoleGrantPermissionsReq.builder().build());
+            if(!addRes){
+                log.info("grant permissions to role failed");
+                return false;
+            }
+        }
+        if(!permsToDel.isEmpty()){
+            boolean delRes = grantAbility.revokePermissionsFromRole(RoleRevokePermissionsReq.builder().build());
+            if(!delRes){
+                log.info("revoke permissions from role failed");
+                return false;
+            }
+        }
+        return true;
     }
 }
