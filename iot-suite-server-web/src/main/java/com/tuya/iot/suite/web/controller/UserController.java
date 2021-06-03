@@ -201,12 +201,11 @@ public class UserController {
                             .roleCode(e.getRoleCode())
                             .roleName(e.getRoleName())
                             .build());
-                    UserDto userDto = UserDto.builder()
+                   return  UserDto.builder()
                             .userName(e.getUserName())
                             .userId(e.getUserId())
                             .roles(roleDtos)
                             .build();
-                    return userDto;
         }
         ).collect(Collectors.toList()));
         result.setTotal(userBaseInfoPageVO.getTotal());
@@ -221,7 +220,7 @@ public class UserController {
         return Todo.todo();
     }
 
-    @ApiOperation("批量用户角色授权")
+    @ApiOperation("批量给用户授角色")
     @PutMapping("/users/roles")
     @RequiresPermissions("4003")
     public Response<Boolean> grantRole(@RequestBody BatchUserGrantRoleReq req){
