@@ -145,6 +145,14 @@ public class RoleController {
         return Response.buildSuccess(success);
     }
 
+    @ApiOperation("角色权限重置")
+    @PutMapping("/roles/permissions/reset")
+    @RequiresPermissions("3005")
+    public Response<Boolean> resetRolePermissionsFromTemplate(@ApiParam(value = "角色编码",required = true) @RequestParam String roleCode) {
+        Boolean success = roleService.resetRolePermissionsFromTemplate(projectProperties.getPermissionSpaceId(),ContextUtil.getUserId(),roleCode);
+        return Response.buildSuccess(success);
+    }
+
     @ApiOperation("查角色拥有的授权")
     @GetMapping("/roles/permissions")
     @RequiresPermissions("3006")
