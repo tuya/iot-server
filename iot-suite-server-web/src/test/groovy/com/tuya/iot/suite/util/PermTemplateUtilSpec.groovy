@@ -11,14 +11,26 @@ import spock.lang.Specification
  * @date 2021/06/03
  */
 @Slf4j
-class PermTemplateUtilSpec extends Specification{
-    void "测试加载权限模版为列表"(){
+class PermTemplateUtilSpec extends Specification {
+    void "测试加载权限模版为列表"() {
         given:
         when:
         def trees = PermTemplateUtil.loadAsList("classpath:template/permissions-admin.json")
+        log.info(JSON.toJSONString(trees, true))
         then:
-        trees.collect{it.code}
-                .containsAll(['1000','1001','2001','2000'])
-        //log.info(JSON.toJSONString(trees,true))
+        trees.collect { it.permissionCode }
+                .containsAll(['1000', '1001', '2001', '2000'])
     }
+
+    void "测试加载权限模版为请求列表"() {
+        given:
+        when:
+        def list = PermTemplateUtil.loadAsPermissionCreateReqList("classpath:template/permissions-manage.json")
+        log.info(JSON.toJSONString(list, true))
+        then:
+        list.collect {
+            it.permissionCode
+        }.containsAll(['1000', '1001', '2000', '2001'])
+    }
+
 }
