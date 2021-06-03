@@ -93,9 +93,9 @@ public class RoleController {
                 .total(pageVO.getTotal())
                 .data((List) pageVO.getData().stream().map(
                         it ->
-                                RoleVO.builder().typeCode(RoleTypeEnum.fromRoleCode(it.getRoleCode()).name())
-                        .code(it.getRoleCode())
-                        .name(it.getRoleName())
+                                RoleVO.builder()
+                        .roleCode(it.getRoleCode())
+                        .roleName(it.getRoleName())
                         .build()
                 ).collect(Collectors.toList())).build());
     }

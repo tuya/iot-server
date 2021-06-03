@@ -12,10 +12,10 @@ import com.tuya.iot.suite.core.constant.ErrorCode;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
 import com.tuya.iot.suite.core.util.LazyRef;
 import com.tuya.iot.suite.core.util.Tuple2;
+import com.tuya.iot.suite.service.dto.PermissionNodeDTO;
 import com.tuya.iot.suite.service.dto.RoleCreateReqDTO;
 import com.tuya.iot.suite.service.idaas.RoleService;
 import com.tuya.iot.suite.service.model.PageVO;
-import com.tuya.iot.suite.service.model.PermissionTemplate;
 import com.tuya.iot.suite.service.model.RoleTypeEnum;
 import com.tuya.iot.suite.service.util.PermTemplateUtil;
 import lombok.Setter;
@@ -48,7 +48,7 @@ public class RoleServiceImpl implements RoleService {
      *
      * load only when first call
      */
-    private LazyRef<Map<String, PermissionTemplate>> rolePermissionTmplMapRef = LazyRef.lateInit(() ->
+    private LazyRef<Map<String, PermissionNodeDTO>> rolePermissionTmplMapRef = LazyRef.lateInit(() ->
             Stream.of(RoleTypeEnum.values()).map(it ->
                 new Tuple2<>(it.name(), PermTemplateUtil
                         .load("classpath:template/permissions-" + it.name() + ".json"))
@@ -58,7 +58,7 @@ public class RoleServiceImpl implements RoleService {
     /**
      * roleType=>permissionList
      */
-    private LazyRef<Map<String, List<PermissionTemplate>>> rolePermissionsMapRef = LazyRef.lateInit(() ->
+    private LazyRef<Map<String, List<PermissionNodeDTO>>> rolePermissionsMapRef = LazyRef.lateInit(() ->
             Stream.of(RoleTypeEnum.values()).map(it ->
                     new Tuple2<>(it.name(), PermTemplateUtil
                             .loadAsList("classpath:template/permissions-" + it.name() + ".json"))
@@ -66,7 +66,7 @@ public class RoleServiceImpl implements RoleService {
     );
 
     @Override
-    public PermissionTemplate getPermissionTemplate(String roleType) {
+    public PermissionNodeDTO getPermissionTemplate(String roleType) {
         return rolePermissionTmplMapRef.get().get(roleType);
     }
 
@@ -74,7 +74,7 @@ public class RoleServiceImpl implements RoleService {
     public Boolean createRole(Long spaceId, RoleCreateReqDTO req) {
         checkRoleWritePermission(spaceId, req.getUid(), req.getRoleCode());
         String roleType = RoleTypeEnum.fromRoleCode(req.getRoleCode()).name();
-        List<PermissionTemplate> perms = rolePermissionsMapRef.get().get(roleType);
+        List<PermissionNodeDTO> perms = rolePermissionsMapRef.get().get(roleType);
         boolean createRoleRes = roleAbility.createRole(spaceId, IdaasRoleCreateReq.builder()
                 .roleCode(req.getRoleCode())
                 .roleName(req.getRoleName())

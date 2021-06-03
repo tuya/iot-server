@@ -1,7 +1,5 @@
 package com.tuya.iot.suite.web.config;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
 import com.google.common.collect.Lists;
 import com.tuya.iot.suite.ability.idaas.ability.GrantAbility;
 import com.tuya.iot.suite.ability.idaas.ability.IdaasUserAbility;
@@ -15,26 +13,18 @@ import com.tuya.iot.suite.ability.idaas.model.IdaasUserCreateReq;
 import com.tuya.iot.suite.ability.idaas.model.PermissionCreateReq;
 import com.tuya.iot.suite.ability.idaas.model.PermissionQueryByRolesReq;
 import com.tuya.iot.suite.ability.idaas.model.PermissionQueryByRolesRespItem;
-import com.tuya.iot.suite.ability.idaas.model.PermissionTypeEnum;
 import com.tuya.iot.suite.ability.idaas.model.RoleGrantPermissionsReq;
 import com.tuya.iot.suite.ability.idaas.model.RoleRevokePermissionsReq;
 import com.tuya.iot.suite.ability.idaas.model.SpaceApplyReq;
 import com.tuya.iot.suite.ability.idaas.model.UserGrantRoleReq;
 import com.tuya.iot.suite.service.util.PermTemplateUtil;
 import lombok.AccessLevel;
-import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
-import org.springframework.util.ResourceUtils;
-import org.springframework.util.StreamUtils;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -126,7 +116,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
         List<PermissionCreateReq> managePermissions = PermTemplateUtil.loadAsPermissionCreateReqList("classpath:template/permissions-manage.json");
 
         if(!grantPermissionsToRole(manageRoleCode,managePermissions)){
-            log.error("grant permissions to role(namage) failure!");
+            log.error("grant permissions to role(manage) failure!");
             return;
         }
         log.info("permission data has been initialized successful!");
@@ -146,8 +136,8 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
                                 .parentCode(it.getParentCode())
                                 .build())
                 .collect(Collectors.toMap(it->it.getPermissionCode(),it->it));
-        Map<String,PermissionCreateReq> toAdd = new HashMap<>();
-        Map<String,PermissionCreateReq> toDelete = new HashMap<>();
+        Map<String,PermissionCreateReq> toAdd = new HashMap<>(16);
+        Map<String,PermissionCreateReq> toDelete = new HashMap<>(16);
 
         toAdd.putAll(allPerms);
         ownedPerms.forEach((code,it)->toAdd.remove(code));

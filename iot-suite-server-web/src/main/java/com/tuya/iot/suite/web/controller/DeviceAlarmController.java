@@ -2,13 +2,15 @@ package com.tuya.iot.suite.web.controller;
 
 import com.tuya.iot.suite.core.constant.Response;
 import com.tuya.iot.suite.core.util.Todo;
-import com.tuya.iot.suite.service.model.PageDataVO;
+import com.tuya.iot.suite.service.alarm.AlarmService;
 import com.tuya.iot.suite.service.model.PageVO;
 import com.tuya.iot.suite.web.model.response.alarm.DeviceAlarmVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,7 +24,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/device-alarms")
 @Api(description = "设备告警")
+@Slf4j
 public class DeviceAlarmController {
+
+    @Autowired
+    AlarmService alarmService;
 
     @ApiOperation("查询设备告警")
     @GetMapping

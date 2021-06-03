@@ -2,8 +2,10 @@ package com.tuya.iot.suite.service.dto;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 import java.util.List;
@@ -15,16 +17,18 @@ import java.util.List;
  */
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PermissionNodeDTO {
     @ApiModelProperty("权限名称")
-    String name;
+    String permissionName;
     @ApiModelProperty("权限编码")
-    String code;
+    String permissionCode;
     @ApiModelProperty("权限说明")
     String remark;
     @ApiModelProperty("权限类型，菜单/api/按钮/数据")
-    String type;
+    String permissionType;
     @ApiModelProperty("顺序")
     Integer order;
     @ApiModelProperty("权限的依赖，权限编码列表")

@@ -7,16 +7,15 @@ import com.tuya.iot.suite.service.asset.AssetService;
 import com.tuya.iot.suite.service.dto.PermissionNodeDTO;
 import com.tuya.iot.suite.service.idaas.PermissionService;
 import com.tuya.iot.suite.service.idaas.RoleService;
-import com.tuya.iot.suite.service.model.RoleTypeEnum;
 import com.tuya.iot.suite.service.user.UserService;
 import com.tuya.iot.suite.service.user.model.CaptchaPushBo;
 import com.tuya.iot.suite.service.user.model.ResetPasswordBo;
 import com.tuya.iot.suite.web.config.ProjectProperties;
 import com.tuya.iot.suite.web.i18n.I18nMessage;
-import com.tuya.iot.suite.web.model.PermissionVO;
 import com.tuya.iot.suite.web.model.ResetPasswordReq;
 import com.tuya.iot.suite.web.model.RoleVO;
 import com.tuya.iot.suite.web.model.criteria.UserCriteria;
+import com.tuya.iot.suite.web.model.response.permission.PermissionDto;
 import com.tuya.iot.suite.web.util.Responses;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -28,10 +27,11 @@ import org.apache.shiro.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
+
 import static com.tuya.iot.suite.core.constant.ErrorCode.*;
 import static com.tuya.iot.suite.core.constant.ErrorCode.USER_NOT_EXIST;
 
@@ -67,15 +67,15 @@ public class MyController {
 
     @ApiOperation("我的权限列表")
     @GetMapping("/permissions")
-    public Response<List<PermissionVO>> myPermissions() {
+    public Response<List<PermissionDto>> myPermissions() {
         String uid = ContextUtil.getUserId();
-        List<PermissionVO> perms = permissionService.queryPermissionsByUser(projectProperties.getPermissionSpaceId(),uid)
+        List<PermissionDto> perms = permissionService.queryPermissionsByUser(projectProperties.getPermissionSpaceId(), uid)
                 .stream()
-                .map(it->
-                        PermissionVO.builder()
-                                .code(it.getPermissionCode())
-                                .name(it.getName())
-                                .type(it.getType().name())
+                .map(it ->
+                        PermissionDto.builder()
+                                .permissionCode(it.getPermissionCode())
+                                .permissionName(it.getName())
+                                .permissionType(it.getType().name())
                                 .remark(it.getRemark())
                                 .order(it.getOrder())
                                 .build())
@@ -87,7 +87,7 @@ public class MyController {
     @GetMapping("/permissions-trees")
     public Response<List<PermissionNodeDTO>> myPermissionsTrees() {
         String uid = ContextUtil.getUserId();
-        List<PermissionNodeDTO> trees = permissionService.queryPermissionTrees(projectProperties.getPermissionSpaceId(),uid);
+        List<PermissionNodeDTO> trees = permissionService.queryPermissionTrees(projectProperties.getPermissionSpaceId(), uid);
         return Response.buildSuccess(trees);
     }
 
@@ -95,11 +95,12 @@ public class MyController {
     @GetMapping("/roles")
     public Response<List<RoleVO>> myRoles() {
         String uid = ContextUtil.getUserId();
-        List<RoleVO> list =  roleService.queryRolesByUser(projectProperties.getPermissionSpaceId(),uid)
-        .stream().map(it-> RoleVO.builder()
-                .code(it.getRoleCode())
-                .name(it.getRoleName())
-                .typeCode(RoleTypeEnum.fromRoleCode(it.getRoleCode()).name()).build()).collect(Collectors.toList());
+        List<RoleVO> list = roleService.queryRolesByUser(projectProperties.getPermissionSpaceId(), uid)
+                .stream().map(it -> RoleVO.builder()
+                        .roleCode(it.getRoleCode())
+                        .roleName(it.getRoleName())
+                        .build()
+                ).collect(Collectors.toList());
         return Response.buildSuccess(list);
     }
 
@@ -121,9 +122,9 @@ public class MyController {
     @PostMapping(value = "/password/reset/captcha")
     public Response<Boolean> restPasswordCaptcha(@RequestBody ResetPasswordReq req) {
         String principal = SecurityUtils.getSubject().getPrincipal().toString();
-        if(UserNameUtil.isEmail(principal)){
+        if (UserNameUtil.isEmail(principal)) {
             req.setMail(principal);
-        }else{
+        } else {
             req.setPhone(principal);
         }
         resetPasswordCheck(req);
@@ -134,13 +135,14 @@ public class MyController {
         captchaPushBo.setMail(req.getMail());
         return Response.buildSuccess(userService.sendRestPasswordCaptcha(captchaPushBo));
     }
+
     @ApiOperation(value = "用户密码重置")
     @PostMapping(value = "/password/reset")
     public Response<Boolean> resetPassword(@RequestBody @Valid ResetPasswordReq req) {
         String principal = SecurityUtils.getSubject().getPrincipal().toString();
-        if(UserNameUtil.isEmail(principal)){
+        if (UserNameUtil.isEmail(principal)) {
             req.setMail(principal);
-        }else{
+        } else {
             req.setPhone(principal);
         }
         // 参数校验
@@ -157,6 +159,7 @@ public class MyController {
         resetPasswordBo.setCode(req.getCode());
         return Response.buildSuccess(userService.resetPassword(resetPasswordBo));
     }
+
     /**
      * 重置密码参数校验
      *

@@ -33,5 +33,5 @@ public class RoleAddReq implements Serializable {
      *
      */
     @ApiModelProperty("角色备注")
-    private String remark;
+    private String roleRemark;
 }
