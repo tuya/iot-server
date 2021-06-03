@@ -8,6 +8,8 @@ import com.tuya.iot.suite.ability.idaas.ability.RoleAbility;
 import com.tuya.iot.suite.ability.idaas.model.IdaasPageResult;
 import com.tuya.iot.suite.ability.idaas.model.IdaasRole;
 import com.tuya.iot.suite.ability.idaas.model.IdaasRoleCreateReq;
+import com.tuya.iot.suite.ability.idaas.model.IdaasUser;
+import com.tuya.iot.suite.ability.idaas.model.IdaasUserPageReq;
 import com.tuya.iot.suite.ability.idaas.model.PermissionQueryByRolesReq;
 import com.tuya.iot.suite.ability.idaas.model.RoleGrantPermissionsReq;
 import com.tuya.iot.suite.ability.idaas.model.RoleRevokePermissionsReq;
@@ -119,7 +121,12 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Boolean deleteRole(Long spaceId, String operatorUid, String roleCode) {
         checkRoleWritePermission(spaceId, operatorUid, roleCode);
-        //如果底层api没有判断删除角色时是否存在关联的用户，那么我们就需要实现这个逻辑.但是需要底层api提供接口，根据角色查询用户列表
+        //底层api没有判断删除角色时是否存在关联的用户，那么我们就需要实现这个逻辑
+        IdaasPageResult<IdaasUser> pageResult = idaasUserAbility.queryUserPage(spaceId, IdaasUserPageReq.builder()
+                .roleCode(roleCode).build());
+        if(pageResult.getTotalCount()>0){
+            throw new ServiceLogicException(ErrorCode.ROLE_DEL_FAIL_FOR_RELATED_USERS);
+        }
         return roleAbility.deleteRole(spaceId, roleCode);
     }
 

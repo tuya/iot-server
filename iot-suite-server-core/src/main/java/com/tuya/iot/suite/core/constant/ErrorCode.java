@@ -45,7 +45,16 @@ public enum ErrorCode {
      * USER_NOT_AUTH
      */
     USER_NOT_AUTH("1106", "用户未被授权"),
+
+    /**
+     * NO_DATA_PERM
+     * */
     NO_DATA_PERM("1107", "无数据权限"),
+
+    /**
+     * ROLE_DEL_FAIL_FOR_RELATED_USERS
+     * */
+    ROLE_DEL_FAIL_FOR_RELATED_USERS("1108","角色删除失败，存在关联用户"),
 
     /**
      * WITHOUT_PERMISSION
