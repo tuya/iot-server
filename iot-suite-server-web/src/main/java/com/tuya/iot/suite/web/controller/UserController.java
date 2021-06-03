@@ -11,6 +11,7 @@ import com.tuya.iot.suite.core.util.MixUtil;
 import com.tuya.iot.suite.core.util.Todo;
 import com.tuya.iot.suite.service.idaas.GrantService;
 import com.tuya.iot.suite.core.model.PageVO;
+import com.tuya.iot.suite.service.idaas.PermissionService;
 import com.tuya.iot.suite.service.user.UserService;
 import com.tuya.iot.suite.service.user.model.ResetPasswordBo;
 import com.tuya.iot.suite.web.config.ProjectProperties;
@@ -65,6 +66,9 @@ public class UserController {
 
     @Autowired
     private GrantService grantService;
+
+    @Autowired
+    private PermissionService permissionService;
 
     /**
      * @return
@@ -217,7 +221,16 @@ public class UserController {
     @RequiresPermissions("4001")
     public Response<List<PermissionDto>> listUserPermissions(
             @ApiParam(value = "用户id") @PathVariable String uid) {
-        return Todo.todo();
+        return Response.buildSuccess(permissionService.queryPermissionsByUser(projectProperties.getPermissionSpaceId(),uid)
+                .stream().map(it->PermissionDto.builder()
+                        .permissionType(it.getType().name())
+                        .permissionName(it.getName())
+                        .permissionCode(it.getPermissionCode())
+                        .remark(it.getRemark())
+                        .order(it.getOrder())
+                        .parentCode(it.getParentCode())
+                        .build()).collect(Collectors.toList())
+        );
     }
 
     @ApiOperation("批量给用户授角色")
