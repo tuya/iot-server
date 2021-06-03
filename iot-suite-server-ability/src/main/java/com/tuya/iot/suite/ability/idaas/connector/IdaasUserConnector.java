@@ -36,7 +36,7 @@ public interface IdaasUserConnector extends IdaasUserAbility {
     IdaasUser getUserByUid(@Path("space_id")Long spaceId,
                            @Path("uid")String uid);
 
-    @POST("/v1.0/iot-03/idaas/spaces/{space_id}/page-role")
+    @POST("/v1.0/iot-03/idaas/spaces/{space_id}/page-user")
     @Override
     IdaasPageResult<IdaasUser> queryUserPage(@Path("space_id")Long spaceId,
                                              @Body IdaasUserPageReq req);
