@@ -95,7 +95,7 @@ class RoleServiceSpec extends BaseSpec {
         thrown(ServiceLogicException)
     }
 
-    void "测试创建角色-不能创建管理员"() {
+    void "测试创建角色-不能创建系统管理员"() {
         given:
         def roleAbility = Mock(RoleAbility)
         def grantAbility = Mock(GrantAbility)
