@@ -1,4 +1,4 @@
-package com.tuya.iot.suite.web.model;
+package com.tuya.iot.suite.service.model;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -28,7 +28,7 @@ public class PermissionTemplate implements Serializable {
     @ApiModelProperty("权限上级code")
     private String parentCode;
     @ApiModelProperty("权限排序")
-    private String order;
+    private Integer order;
     @ApiModelProperty("备注")
     private String remark;
     @ApiModelProperty("权限依赖")

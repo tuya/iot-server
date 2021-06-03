@@ -1,11 +1,12 @@
 package com.tuya.iot.suite.web.controller;
 
 import com.tuya.iot.suite.core.constant.Response;
-import com.tuya.iot.suite.core.util.Todo;
-import com.tuya.iot.suite.web.model.PermissionTemplate;
+import com.tuya.iot.suite.service.idaas.RoleService;
+import com.tuya.iot.suite.service.model.PermissionTemplate;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,11 +22,13 @@ import java.util.List;
 @Api(value = "权限模板")
 public class PermissionTemplateController {
 
+    @Autowired
+    RoleService roleService;
 
     @ApiOperation("查询权限模版列表")
     @GetMapping("/permission-template/role")
     public Response<List<PermissionTemplate>> listPermTemplates(@RequestParam  String roleCode){
-        return Todo.todo();
+        return Response.buildSuccess(roleService.getPermissionTemplate(roleCode).getPermissionList());
     }
 
 }

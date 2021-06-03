@@ -8,6 +8,7 @@ import com.tuya.iot.suite.ability.idaas.model.RoleUpdateReq;
 import com.tuya.iot.suite.ability.idaas.model.RolesPaginationQueryReq;
 import com.tuya.iot.suite.service.dto.RoleCreateReqDTO;
 import com.tuya.iot.suite.service.model.PageVO;
+import com.tuya.iot.suite.service.model.PermissionTemplate;
 
 import java.util.Collection;
 import java.util.List;
@@ -19,6 +20,9 @@ import java.util.Set;
  * @date 2021/05/31
  */
 public interface RoleService {
+
+    PermissionTemplate getPermissionTemplate(String roleType);
+
     Boolean createRole(Long spaceId, RoleCreateReqDTO request);
 
     Boolean updateRole(Long spaceId, String operatorUid, String roleCode, RoleUpdateReq request);
