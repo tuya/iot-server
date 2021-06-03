@@ -1,3 +1,5 @@
+[English](README.md) | [中文版](README_zh.md)
+
 # General Management Portal
 ## Overview
 
