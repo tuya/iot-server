@@ -17,6 +17,7 @@ import com.tuya.iot.suite.ability.idaas.model.RoleGrantPermissionsReq;
 import com.tuya.iot.suite.ability.idaas.model.RoleRevokePermissionsReq;
 import com.tuya.iot.suite.ability.idaas.model.SpaceApplyReq;
 import com.tuya.iot.suite.ability.idaas.model.UserGrantRoleReq;
+import com.tuya.iot.suite.service.model.RoleTypeEnum;
 import com.tuya.iot.suite.service.util.PermTemplateUtil;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -61,25 +62,20 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
     String adminRoleCode = "admin";
     String manageUid = "";
     String manageRoleCode = "manage-1000";
+    String normalUid = "";
+    String normalRoleCode = "normal-1000";
 
     /**
      *
      */
     @Override
     public void run(ApplicationArguments args) throws Exception {
+        //space
         if (!initPermissionSpace()) {
             log.error("apply space failure!");
             return;
         }
-        if (!initRole(adminRoleCode)) {
-            log.error("init role(admin) failure!");
-            return;
-        }
-
-        if (!initUser(adminUid,adminRoleCode)) {
-            log.error("init user(admin) failure!");
-            return;
-        }
+        //permissions
         List<PermissionCreateReq> adminPermissions = PermTemplateUtil.loadAsPermissionCreateReqList("classpath:template/permissions-admin.json");
 
         if (!initPermissions(adminPermissions)) {
@@ -87,39 +83,36 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
             return;
         }
 
-        if (!grantRoleToUser(adminRoleCode,adminUid)) {
-            log.error("grant role(admin) to user(admin) failure!");
-            return;
-        }
+        //admin
+        initFromTemplate(adminRoleCode,adminUid);
+        initFromTemplate(manageRoleCode,manageUid);
+        initFromTemplate(normalRoleCode,normalUid);
 
-
-        if(!grantPermissionsToRole(adminRoleCode, adminPermissions)){
-            log.error("grant permissions to role(admin) failure!");
-            return;
-        }
-
-        if(!initRole(manageRoleCode)){
-            log.error("init role(manage) failure!");
-            return;
-        }
-
-        if(!initUser(manageUid,manageRoleCode)){
-            log.error("init user(manage) failure!");
-            return;
-        }
-
-        if (!grantRoleToUser(manageRoleCode,manageUid)) {
-            log.error("grant role(manage) to user(manage) failure!");
-            return;
-        }
-
-        List<PermissionCreateReq> managePermissions = PermTemplateUtil.loadAsPermissionCreateReqList("classpath:template/permissions-manage.json");
-
-        if(!grantPermissionsToRole(manageRoleCode,managePermissions)){
-            log.error("grant permissions to role(manage) failure!");
-            return;
-        }
         log.info("permission data has been initialized successful!");
+    }
+
+    private void initFromTemplate(String roleCode, String uid){
+        if (!initRole(roleCode)) {
+            log.error("init role({}) failure!",roleCode);
+            return;
+        }
+
+        if (!initUser(uid,roleCode)) {
+            log.error("init user({}) failure!",roleCode);
+            return;
+        }
+
+        if (!grantRoleToUser(roleCode,uid)) {
+            log.error("grant role({}) to user({}) failure!",roleCode,roleCode);
+            return;
+        }
+        String roleType = RoleTypeEnum.fromRoleCode(roleCode).name();
+        List<PermissionCreateReq> perms = PermTemplateUtil.loadAsPermissionCreateReqList("classpath:template/permissions-"+roleType+".json");
+
+        if(!grantPermissionsToRole(roleCode, perms)){
+            log.error("grant permissions to role({}) failure!",roleCode);
+            return;
+        }
     }
 
     private boolean initPermissions(List<PermissionCreateReq> perms) {
