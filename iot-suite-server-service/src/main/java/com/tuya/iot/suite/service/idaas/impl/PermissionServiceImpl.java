@@ -74,22 +74,22 @@ public class PermissionServiceImpl implements PermissionService {
                 .stream()
                 .map(it->
                         PermissionNodeDTO.builder()
-                                .code(it.getPermissionCode())
-                                .name(it.getName())
-                                .type(it.getType().name())
+                                .permissionCode(it.getPermissionCode())
+                                .permissionName(it.getName())
+                                .permissionType(it.getType().name())
                                 .remark(it.getRemark())
                                 .order(it.getOrder())
                                 .parentCode(it.getParentCode())
                                 .build())
                 .collect(Collectors.toList());
         //permissionCode=>PermissionNodeDTO
-        Map<String,PermissionNodeDTO> map = perms.stream().collect(Collectors.toMap(it->it.getCode(), it->it));
+        Map<String,PermissionNodeDTO> map = perms.stream().collect(Collectors.toMap(it->it.getPermissionCode(), it->it));
         //permissionCode=>children
         Map<String,List<PermissionNodeDTO>> childrenMap = perms.stream().collect(Collectors.groupingBy(it->it.getParentCode()));
         //find roots, which parentCode not in map
         List<PermissionNodeDTO> trees = perms.stream().filter(it->!map.containsKey(it.getParentCode())).collect(Collectors.toList());
         //set children
-        perms.forEach(it->it.setChildren(childrenMap.get(it.getCode())));
+        perms.forEach(it->it.setChildren(childrenMap.get(it.getParentCode())));
         return trees;
     }
 }

@@ -16,9 +16,11 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RoleVO {
     @ApiModelProperty("角色编码")
-    String code;
+    String roleCode;
     @ApiModelProperty("角色名称")
-    String name;
-    @ApiModelProperty("角色类型编码")
-    String typeCode;
+    String roleName;
+    /*@ApiModelProperty("角色类型编码")
+    String typeCode;*/
+    @ApiModelProperty("说明")
+    String remark;
 }

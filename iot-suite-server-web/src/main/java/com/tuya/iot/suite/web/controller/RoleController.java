@@ -71,6 +71,7 @@ public class RoleController {
         Boolean res = roleService.createRole(projectProperties.getPermissionSpaceId(), RoleCreateReqDTO.builder()
                 .roleCode(RoleCodeGenerator.generate(req.getRoleType()))
                 .roleName(req.getRoleName())
+                .remark(req.getRoleRemark())
                 .uid(uid)
                 .build());
         return Response.buildSuccess(res);
@@ -92,9 +93,10 @@ public class RoleController {
                 .total(pageVO.getTotal())
                 .data((List) pageVO.getData().stream().map(
                         it ->
-                                RoleVO.builder().typeCode(RoleTypeEnum.fromRoleCode(it.getRoleCode()).name())
-                                        .code(it.getRoleCode())
-                                        .name(it.getRoleName())
+                                RoleVO.builder()
+                                        .roleCode(it.getRoleCode())
+                                        .roleName(it.getRoleName())
+                                        .remark(it.getRemark())
                                         .build()
                 ).collect(Collectors.toList())).build());
     }
@@ -106,7 +108,9 @@ public class RoleController {
         Boolean res = roleService.updateRole(projectProperties.getPermissionSpaceId(),
                 ContextUtil.getUserId(),
                 req.getRoleCode(),
-                RoleUpdateReq.builder().roleName(req.getRoleName()).build());
+                RoleUpdateReq.builder().roleName(req.getRoleName())
+                        .remark(req.getRoleRemark())
+                        .build());
         return Response.buildSuccess(res);
     }
 

@@ -1,18 +1,13 @@
 package com.tuya.iot.suite.service.idaas;
 
-import com.tuya.iot.suite.ability.idaas.model.IdaasPageResult;
 import com.tuya.iot.suite.ability.idaas.model.IdaasRole;
-import com.tuya.iot.suite.ability.idaas.model.IdaasRoleCreateReq;
-import com.tuya.iot.suite.ability.idaas.model.RoleQueryReq;
 import com.tuya.iot.suite.ability.idaas.model.RoleUpdateReq;
 import com.tuya.iot.suite.ability.idaas.model.RolesPaginationQueryReq;
+import com.tuya.iot.suite.service.dto.PermissionNodeDTO;
 import com.tuya.iot.suite.service.dto.RoleCreateReqDTO;
 import com.tuya.iot.suite.service.model.PageVO;
-import com.tuya.iot.suite.service.model.PermissionTemplate;
-
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author benguan.zhou@tuya.com
@@ -21,7 +16,7 @@ import java.util.Set;
  */
 public interface RoleService {
 
-    PermissionTemplate getPermissionTemplate(String roleType);
+    PermissionNodeDTO getPermissionTemplate(String roleType);
 
     Boolean createRole(Long spaceId, RoleCreateReqDTO request);
 
