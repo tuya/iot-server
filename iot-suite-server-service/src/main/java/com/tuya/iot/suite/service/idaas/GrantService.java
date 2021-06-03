@@ -7,13 +7,15 @@ import com.tuya.iot.suite.ability.idaas.model.UserGrantRoleReq;
 import com.tuya.iot.suite.ability.idaas.model.UserGrantRolesReq;
 import com.tuya.iot.suite.ability.idaas.model.UserRevokeRolesReq;
 
+import java.util.List;
+
 /**
  * @author benguan.zhou@tuya.com
  * @description
  * @date 2021/05/31
  */
 public interface GrantService {
-    Boolean grantPermissionToRole(RoleGrantPermissionReq request);
+    Boolean grantPermissionToRole(String operatorUid,RoleGrantPermissionReq request);
 
     Boolean grantPermissionsToRole(RoleGrantPermissionsReq request);
 
@@ -30,4 +32,6 @@ public interface GrantService {
     Boolean revokeRoleFromUser(Long spaceId,String uid,String roleCode);
 
     Boolean revokeRolesFromUser(UserRevokeRolesReq req);
+
+    Boolean setRoleToUsers(Long spaceId, String uid, String roleCode, List<String> uidList);
 }
