@@ -7,7 +7,7 @@ import com.tuya.iot.suite.service.asset.AssetService;
 import com.tuya.iot.suite.service.dto.AssetConvertor;
 import com.tuya.iot.suite.service.dto.AssetVO;
 import com.tuya.iot.suite.service.dto.DeviceDTO;
-import com.tuya.iot.suite.service.model.PageDataVO;
+import com.tuya.iot.suite.core.model.PageDataVO;
 import com.tuya.iot.suite.web.model.response.device.DeviceInfoVO;
 import com.tuya.iot.suite.web.model.convert.DeviceInfoConvert;
 import com.tuya.iot.suite.web.model.criteria.AssetCriteria;

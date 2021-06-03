@@ -4,7 +4,7 @@ package com.tuya.iot.suite.service.asset;
 import com.tuya.iot.suite.core.constant.Response;
 import com.tuya.iot.suite.service.dto.AssetDTO;
 import com.tuya.iot.suite.service.dto.DeviceDTO;
-import com.tuya.iot.suite.service.model.PageDataVO;
+import com.tuya.iot.suite.core.model.PageDataVO;
 
 import java.util.List;
 

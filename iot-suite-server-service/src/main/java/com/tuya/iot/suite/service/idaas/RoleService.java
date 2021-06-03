@@ -5,7 +5,7 @@ import com.tuya.iot.suite.ability.idaas.model.RoleUpdateReq;
 import com.tuya.iot.suite.ability.idaas.model.RolesPaginationQueryReq;
 import com.tuya.iot.suite.service.dto.PermissionNodeDTO;
 import com.tuya.iot.suite.service.dto.RoleCreateReqDTO;
-import com.tuya.iot.suite.service.model.PageVO;
+import com.tuya.iot.suite.core.model.PageVO;
 import java.util.Collection;
 import java.util.List;
 

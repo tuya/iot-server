@@ -1,9 +1,10 @@
 package com.tuya.iot.suite.ability.idaas.model;
 
+import com.tuya.iot.suite.ability.model.PageRequestInfo;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
 
 /**
  * @author benguan.zhou@tuya.com
@@ -12,13 +13,13 @@ import lombok.experimental.FieldDefaults;
  */
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Builder
-public class IdaasUser {
+@SuperBuilder
+public class IdaasUserPageReq extends PageRequestInfo {
 
     /**
-     * 用户uid
+     * 角色名
      */
-    String uid;
+    String roleName;
 
     /**
      * 外部用户名
@@ -26,14 +27,8 @@ public class IdaasUser {
     String username;
 
     /**
-     * 备注
+     * 角色code
      */
-    String remark;
-
-    Long spaceId;
-
     String roleCode;
-
-    String roleName;
 
 }

@@ -2,10 +2,10 @@ package com.tuya.iot.suite.web.model.response.user;
 
 import com.tuya.iot.suite.web.model.response.role.RoleDto;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AccessLevel;
-import lombok.Data;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -13,7 +13,10 @@ import java.util.List;
  * @author: benguan.zhou@tuya.com
  * @date: 2021/05/28
  */
-@Data
+@Getter
+@Setter
+@ToString
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserDto {
 
@@ -26,5 +29,5 @@ public class UserDto {
     @ApiModelProperty("创建时间")
     String createTime;
     @ApiModelProperty("角色名称列表")
-    List<RoleDto> roles;
+    List<RoleDto> roles ;
 }
