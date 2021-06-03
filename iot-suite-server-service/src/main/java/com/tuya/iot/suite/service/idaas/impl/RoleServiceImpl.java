@@ -15,29 +15,22 @@ import com.tuya.iot.suite.ability.idaas.model.RoleUpdateReq;
 import com.tuya.iot.suite.ability.idaas.model.RolesPaginationQueryReq;
 import com.tuya.iot.suite.core.constant.ErrorCode;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
-import com.tuya.iot.suite.core.util.LazyRef;
-import com.tuya.iot.suite.core.util.Tuple2;
 import com.tuya.iot.suite.service.dto.PermissionNodeDTO;
 import com.tuya.iot.suite.service.dto.RoleCreateReqDTO;
 import com.tuya.iot.suite.service.idaas.PermissionTemplateService;
 import com.tuya.iot.suite.service.idaas.RoleService;
 import com.tuya.iot.suite.core.model.PageVO;
 import com.tuya.iot.suite.service.model.RoleTypeEnum;
-import com.tuya.iot.suite.service.util.PermTemplateUtil;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.security.Permission;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * @author benguan.zhou@tuya.com
@@ -62,9 +55,11 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public Boolean createRole(Long spaceId, RoleCreateReqDTO req) {
+        // 0. check permission
         checkRoleWritePermission(spaceId, req.getUid(), req.getRoleCode());
         String roleType = RoleTypeEnum.fromRoleCode(req.getRoleCode()).name();
         List<PermissionNodeDTO> perms = permissionTemplateService.getPermissionTemplate(roleType).getChildren();
+        // 1. create role
         boolean createRoleRes = roleAbility.createRole(spaceId, IdaasRoleCreateReq.builder()
                 .roleCode(req.getRoleCode())
                 .roleName(req.getRoleName())
@@ -72,7 +67,8 @@ public class RoleServiceImpl implements RoleService {
         if (!createRoleRes) {
             return false;
         }
-        //if grant failure, need not rollback
+        // 2. grant permissions from template
+        // if grant failure, need not rollback
         return grantAbility.grantPermissionsToRole(RoleGrantPermissionsReq.builder()
                 .spaceId(spaceId)
                 .roleCode(req.getRoleCode())
@@ -84,6 +80,7 @@ public class RoleServiceImpl implements RoleService {
     private void checkRoleWritePermission(Long spaceId, String operatorUid, String targetRoleCode) {
         Assert.isTrue(!RoleTypeEnum.fromRoleCode(targetRoleCode).isAdmin(), "can not write a 'admin' role!");
         //数据权限校验，校验操作者自己是否为更高的角色。
+        //比如有从高到低低角色 a->b->c->d->e。当前用户有角色 a、e，修改角色c，由于当前用户存在比c高级低角色a，所以该操作是允许的。
         roleAbility.queryRolesByUser(spaceId, operatorUid).stream().filter(
                 it -> RoleTypeEnum.fromRoleCode(targetRoleCode).isOffspringOrSelfOf(RoleTypeEnum.fromRoleCode(it.getRoleCode()))
         ).findAny().orElseThrow(() -> new ServiceLogicException(ErrorCode.NO_DATA_PERM));
@@ -159,6 +156,8 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public Boolean resetRolePermissionsFromTemplate(Long spaceId, String operatorUid, String roleCode) {
+        // 0. check permission
+        checkRoleWritePermission(spaceId,operatorUid,roleCode);
 
         List<String> existPerms = permissionAbility.queryPermissionsByRoleCodes(PermissionQueryByRolesReq.builder()
                 .spaceId(spaceId)
@@ -166,6 +165,8 @@ public class RoleServiceImpl implements RoleService {
                 .build()).stream().flatMap(it -> it.getPermissionList().stream()).map(it -> it.getPermissionCode())
                 .collect(Collectors.toList());
         RoleTypeEnum roleType = RoleTypeEnum.fromRoleCode(roleCode);
+
+        // 1. get permissions from template
         List<String> templatePerms = permissionTemplateService.getPermissionTemplate(roleType.name()).getChildren()
                 .stream().map(it -> it.getPermissionCode())
                 .collect(Collectors.toList());
@@ -175,7 +176,7 @@ public class RoleServiceImpl implements RoleService {
 
         List<String> permsToDel = new ArrayList<>(existPerms);
         permsToDel.removeAll(templatePerms);
-
+        // 2. add permissions if need
         if (!permsToAdd.isEmpty()) {
             boolean addRes = grantAbility.grantPermissionsToRole(RoleGrantPermissionsReq.builder().build());
             if (!addRes) {
@@ -183,6 +184,7 @@ public class RoleServiceImpl implements RoleService {
                 return false;
             }
         }
+        // 3. delete permissions if need
         if (!permsToDel.isEmpty()) {
             boolean delRes = grantAbility.revokePermissionsFromRole(RoleRevokePermissionsReq.builder().build());
             if (!delRes) {

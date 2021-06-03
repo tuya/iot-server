@@ -15,6 +15,7 @@ import com.tuya.iot.suite.ability.idaas.model.UserRevokeRolesReq;
 import com.tuya.iot.suite.core.constant.ErrorCode;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
 import com.tuya.iot.suite.service.idaas.GrantService;
+import com.tuya.iot.suite.service.idaas.PermissionTemplateService;
 import com.tuya.iot.suite.service.model.RoleTypeEnum;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -43,6 +45,9 @@ public class GrantServiceImpl implements GrantService {
     @Autowired
     PermissionAbility permissionAbility;
 
+    @Autowired
+    PermissionTemplateService permissionTemplateService;
+
     @Override
     public Boolean grantPermissionToRole(String operatorUid, RoleGrantPermissionReq req) {
         checkForModifyPermissionToRole(req.getSpaceId(), operatorUid, req.getPermissionCode(), req.getRoleCode());
@@ -54,17 +59,23 @@ public class GrantServiceImpl implements GrantService {
     }
 
     private void checkForModifyPermissionToRole(Long spaceId, String operatorUid, List<String> permissionCodes, String roleCode) {
+        // 0. target role cannot be admin
         Assert.isTrue(!RoleTypeEnum.fromRoleCode(roleCode).isAdmin(), "can not grant permission to a admin role!");
         List<IdaasPermission> perms = permissionAbility.queryPermissionsByUser(spaceId, operatorUid);
         List<IdaasRole> roles = roleAbility.queryRolesByUser(spaceId, operatorUid);
         Assert.isTrue(roles.size() == 1, "a user can at most have one role!");
         IdaasRole role = roles.get(0);
-        //操作者角色更高级
+        // 1. 操作者角色更高级
         if (!RoleTypeEnum.valueOf(roleCode).isOffspringOrSelfOf(role.getRoleCode())) {
             throw new ServiceLogicException(ErrorCode.NO_DATA_PERM);
         }
-        //操作者拥有该权限
+        // 2. 操作者拥有该权限
         if (!perms.stream().map(it -> it.getPermissionCode()).collect(Collectors.toList()).containsAll(permissionCodes)) {
+            throw new ServiceLogicException(ErrorCode.NO_DATA_PERM);
+        }
+        // 3. permissions are authorizable
+        Set<String> authorizablePerms = permissionTemplateService.getAuthorizablePermissions();
+        if(authorizablePerms.containsAll(permissionCodes)){
             throw new ServiceLogicException(ErrorCode.NO_DATA_PERM);
         }
     }
@@ -145,16 +156,16 @@ public class GrantServiceImpl implements GrantService {
 
     @Override
     public Boolean setRoleToUsers(Long spaceId, String operatorUid, String roleCode, List<String> uidList) {
-        //不能把系统管理员角色设置给用户
+        // 0. 不能把系统管理员角色设置给用户
         Assert.isTrue(!RoleTypeEnum.fromRoleCode(roleCode).isAdmin(), "can not set 'admin' role to any users!");
-        //操作者有更高级的角色（或相同的角色），才可以把这个角色设置给用户
+        // 1. 操作者有更高级的角色（或相同的角色），才可以把这个角色设置给用户
         List<IdaasRole> operatorRoles = roleAbility.queryRolesByUser(spaceId, operatorUid);
         Assert.isTrue(operatorRoles.size() == 1, "a user can at most have one role!");
         String operateRoleCode = operatorRoles.get(0).getRoleCode();
         if (!RoleTypeEnum.fromRoleCode(roleCode).isOffspringOrSelfOf(operateRoleCode)) {
             throw new ServiceLogicException(ErrorCode.NO_DATA_PERM);
         }
-        //被设置角色的用户，如果有比操作者更高级的角色，则不允许操作。（不允许 普通员工 把 部门经理 设置为 项目经理）
+        // 2. 被设置角色的用户，如果有比操作者更高级的角色，则不允许操作。（不允许 普通员工 把 部门经理 设置为 项目经理）
         RoleTypeEnum operatorRoleType = RoleTypeEnum.fromRoleCode(operateRoleCode);
 
         for (String uid : uidList) {
@@ -163,7 +174,7 @@ public class GrantServiceImpl implements GrantService {
                 throw new ServiceLogicException(ErrorCode.NO_DATA_PERM);
             }
         }
-        //逐个授权
+        // 3. 逐个授权
         boolean success;
         for (String uid : uidList) {
             success = grantAbility.grantRoleToUser(UserGrantRoleReq.builder()
