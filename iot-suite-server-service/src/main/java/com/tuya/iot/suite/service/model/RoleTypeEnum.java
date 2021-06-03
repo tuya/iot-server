@@ -38,7 +38,7 @@ public enum RoleTypeEnum {
     /**
      * 是否为target的子级角色 或 当前角色
      * */
-    public boolean isOffspringOrSelf(RoleTypeEnum target){
+    public boolean isOffspringOrSelfOf(RoleTypeEnum target){
         RoleTypeEnum type = this;
         while(type!=null){
             if(type.equals(target)){
@@ -48,7 +48,7 @@ public enum RoleTypeEnum {
         }
         return false;
     }
-    public boolean isOffspringOrSelf(String roleCode){
+    public boolean isOffspringOrSelfOf(String roleCode){
         RoleTypeEnum target = RoleTypeEnum.fromRoleCode(roleCode);
         RoleTypeEnum type = this;
         while(type!=null){
@@ -59,8 +59,8 @@ public enum RoleTypeEnum {
         }
         return false;
     }
-    public boolean isAllOffspringOrSelf(List<String> roleCodes){
-        return roleCodes.stream().allMatch(it->isOffspringOrSelf(it));
+    public boolean isOffspringOrSelfOfAll(List<String> roleCodes){
+        return roleCodes.stream().allMatch(it-> isOffspringOrSelfOf(it));
     }
     public boolean isAdmin(){
         return admin.equals(this);

@@ -1,7 +1,9 @@
 package com.tuya.iot.suite.service.idaas.impl;
 
+import com.tuya.iot.suite.ability.idaas.ability.PermissionCheckAbility;
 import com.tuya.iot.suite.service.idaas.PermissionCheckService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -13,22 +15,21 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class PermissionCheckServiceImpl implements PermissionCheckService {
 
+    @Autowired
+    PermissionCheckAbility permissionCheckAbility;
 
     @Override
     public Boolean checkPermissionForRole(Long spaceId, String roleCode, String permissionCode) {
-        return null;
+        return permissionCheckAbility.checkPermissionForRole(spaceId,roleCode,permissionCode);
     }
 
     @Override
     public Boolean checkRoleForUser(Long spaceId, String uid, String roleCode) {
-        return null;
+        return permissionCheckAbility.checkRoleForUser(spaceId,uid,roleCode);
     }
 
     @Override
     public Boolean checkPermissionForUser(Long spaceId, String userId, String permissionCode) {
-        if(permissionCode.contains("users")){
-            return true;
-        }
-        return false;
+        return permissionCheckAbility.checkPermissionForUser(spaceId,userId,permissionCode);
     }
 }

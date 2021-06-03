@@ -1,5 +1,6 @@
 package com.tuya.iot.suite.service.idaas.impl;
 
+import com.google.common.collect.Lists;
 import com.tuya.iot.suite.ability.idaas.ability.GrantAbility;
 import com.tuya.iot.suite.ability.idaas.ability.PermissionAbility;
 import com.tuya.iot.suite.ability.idaas.ability.RoleAbility;
@@ -12,7 +13,6 @@ import com.tuya.iot.suite.ability.idaas.model.UserGrantRoleReq;
 import com.tuya.iot.suite.ability.idaas.model.UserGrantRolesReq;
 import com.tuya.iot.suite.ability.idaas.model.UserRevokeRolesReq;
 import com.tuya.iot.suite.core.constant.ErrorCode;
-import com.tuya.iot.suite.core.constant.RoleType;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
 import com.tuya.iot.suite.service.idaas.GrantService;
 import com.tuya.iot.suite.service.model.RoleTypeEnum;
@@ -44,61 +44,103 @@ public class GrantServiceImpl implements GrantService {
     PermissionAbility permissionAbility;
 
     @Override
-    public Boolean grantPermissionToRole(String operatorUid,RoleGrantPermissionReq req) {
-        Assert.isTrue(!RoleTypeEnum.fromRoleCode(req.getRoleCode()).isAdmin(), "can grant permission to a admin role!");
-        List<IdaasPermission> perms = permissionAbility.queryPermissionsByUser(req.getSpaceId(),operatorUid);
-        List<IdaasRole> roles = roleAbility.queryRolesByUser(req.getSpaceId(), operatorUid);
-        Assert.isTrue(roles.size()==1, "a user can at most have one role!");
-        IdaasRole role = roles.get(0);
-        //操作者角色更高级
-        if(!RoleTypeEnum.valueOf(req.getRoleCode()).isOffspringOrSelf(role.getRoleCode())){
-            throw new ServiceLogicException(ErrorCode.NO_DATA_PERM);
-        }
-        //操作者拥有该权限
-        if(!perms.stream().anyMatch(it->it.getPermissionCode().equals(req.getPermissionCode()))){
-            throw new ServiceLogicException(ErrorCode.NO_DATA_PERM);
-        }
+    public Boolean grantPermissionToRole(String operatorUid, RoleGrantPermissionReq req) {
+        checkForModifyPermissionToRole(req.getSpaceId(), operatorUid, req.getPermissionCode(), req.getRoleCode());
         return grantAbility.grantPermissionToRole(req);
     }
 
-    @Override
-    public Boolean grantPermissionsToRole(RoleGrantPermissionsReq request) {
-        return grantAbility.grantPermissionsToRole(request);
+    private void checkForModifyPermissionToRole(Long spaceId, String operatorUid, String permissionCode, String roleCode) {
+        checkForModifyPermissionToRole(spaceId, operatorUid, Lists.newArrayList(permissionCode), roleCode);
+    }
+
+    private void checkForModifyPermissionToRole(Long spaceId, String operatorUid,  List<String> permissionCodes, String roleCode) {
+        Assert.isTrue(!RoleTypeEnum.fromRoleCode(roleCode).isAdmin(), "can not grant permission to a admin role!");
+        List<IdaasPermission> perms = permissionAbility.queryPermissionsByUser(spaceId, operatorUid);
+        List<IdaasRole> roles = roleAbility.queryRolesByUser(spaceId, operatorUid);
+        Assert.isTrue(roles.size() == 1, "a user can at most have one role!");
+        IdaasRole role = roles.get(0);
+        //操作者角色更高级
+        if (!RoleTypeEnum.valueOf(roleCode).isOffspringOrSelfOf(role.getRoleCode())) {
+            throw new ServiceLogicException(ErrorCode.NO_DATA_PERM);
+        }
+        //操作者拥有该权限
+        if (!perms.stream().map(it -> it.getPermissionCode()).collect(Collectors.toList()).containsAll(permissionCodes)) {
+            throw new ServiceLogicException(ErrorCode.NO_DATA_PERM);
+        }
     }
 
     @Override
-    public Boolean setPermissionsToRole(RoleGrantPermissionsReq request) {
-        return null;
+    public Boolean grantPermissionsToRole(String operatorUid, RoleGrantPermissionsReq req) {
+        checkForModifyPermissionToRole(req.getSpaceId(), operatorUid, req.getPermissionCodes(), req.getRoleCode());
+        return grantAbility.grantPermissionsToRole(req);
     }
 
     @Override
-    public Boolean revokePermissionFromRole(Long spaceId, String roleCode, String permissionCode) {
-        return null;
+    public Boolean setPermissionsToRole(String operatorUid, RoleGrantPermissionsReq req) {
+        checkForModifyPermissionToRole(req.getSpaceId(), operatorUid, req.getPermissionCodes(), req.getRoleCode());
+        return grantAbility.grantPermissionsToRole(req);
     }
 
     @Override
-    public Boolean revokePermissionsFromRole(RoleRevokePermissionsReq request) {
-        return null;
+    public Boolean revokePermissionFromRole(Long spaceId, String operatorUid, String roleCode, String permissionCode) {
+        checkForModifyPermissionToRole(spaceId, operatorUid, roleCode, permissionCode);
+        return grantAbility.revokePermissionFromRole(spaceId, permissionCode, roleCode);
     }
 
     @Override
-    public Boolean grantRoleToUser(UserGrantRoleReq req) {
-        return null;
+    public Boolean revokePermissionsFromRole(String operatorUid, RoleRevokePermissionsReq req) {
+        checkForModifyPermissionToRole(req.getSpaceId(), operatorUid, req.getPermissionCodes(), req.getRoleCode());
+        return grantAbility.revokePermissionsFromRole(req);
     }
 
     @Override
-    public Boolean setRolesToUser(UserGrantRolesReq req) {
-        return null;
+    public Boolean grantRoleToUser(String operatorUid, UserGrantRoleReq req) {
+        checkForModifyRoleToUser(req.getSpaceId(), operatorUid, req.getRoleCode(), req.getUid());
+        return grantAbility.grantRoleToUser(req);
+    }
+
+    private void checkForModifyRoleToUser(Long spaceId, String operatorUid, String roleCode, String uid) {
+        checkForModifyRoleToUser(spaceId, operatorUid, Lists.newArrayList(roleCode), uid);
+    }
+
+    private void checkForModifyRoleToUser(Long spaceId, String operatorUid, List<String> roleCodes, String uid) {
+        roleCodes.forEach(roleCode ->
+                Assert.isTrue(!RoleTypeEnum.fromRoleCode(roleCode).isAdmin(), "can not grant permission to a admin role!")
+        );
+        List<IdaasRole> roles = roleAbility.queryRolesByUser(spaceId, operatorUid);
+        Assert.isTrue(roles.size() == 1, "a user can at most have one role!");
+        IdaasRole role = roles.get(0);
+        //操作者角色更高级
+        roleCodes.forEach(roleCode -> {
+            if (!RoleTypeEnum.valueOf(roleCode).isOffspringOrSelfOf(role.getRoleCode())) {
+                throw new ServiceLogicException(ErrorCode.NO_DATA_PERM);
+            }
+        });
+        //被操作的用户不能是系统管理员
+        List<IdaasRole> userRoles = roleAbility.queryRolesByUser(spaceId,uid);
+        userRoles.forEach(userRole->{
+            if (!RoleTypeEnum.valueOf(userRole.getRoleCode()).isOffspringOrSelfOf(role.getRoleCode())) {
+                throw new ServiceLogicException(ErrorCode.NO_DATA_PERM);
+            }
+        });
     }
 
     @Override
-    public Boolean revokeRoleFromUser(Long spaceId, String uid, String roleCode) {
-        return null;
+    public Boolean setRolesToUser(String operatorUid, UserGrantRolesReq req) {
+        checkForModifyRoleToUser(req.getSpaceId(), operatorUid, req.getRoleCodes(), req.getUid());
+        return grantAbility.setRolesToUser(req);
     }
 
     @Override
-    public Boolean revokeRolesFromUser(UserRevokeRolesReq req) {
-        return null;
+    public Boolean revokeRoleFromUser(Long spaceId, String operatorUid, String roleCode, String uid) {
+        checkForModifyRoleToUser(spaceId, operatorUid, roleCode, uid);
+        return grantAbility.revokeRoleFromUser(spaceId,roleCode,uid);
+    }
+
+    @Override
+    public Boolean revokeRolesFromUser(String operatorUid, UserRevokeRolesReq req) {
+        checkForModifyRoleToUser(req.getSpaceId(), operatorUid, req.getRoleCodes(), req.getUid());
+        return grantAbility.revokeRolesFromUser(req);
     }
 
     @Override
@@ -107,17 +149,17 @@ public class GrantServiceImpl implements GrantService {
         Assert.isTrue(!RoleTypeEnum.fromRoleCode(roleCode).isAdmin(), "can not set 'admin' role to any users!");
         //操作者有更高级的角色（或相同的角色），才可以把这个角色设置给用户
         List<IdaasRole> operatorRoles = roleAbility.queryRolesByUser(spaceId, operatorUid);
-        Assert.isTrue(operatorRoles.size()==1, "a user can at most have one role!");
+        Assert.isTrue(operatorRoles.size() == 1, "a user can at most have one role!");
         String operateRoleCode = operatorRoles.get(0).getRoleCode();
-        if(!RoleTypeEnum.fromRoleCode(roleCode).isOffspringOrSelf(operateRoleCode)){
+        if (!RoleTypeEnum.fromRoleCode(roleCode).isOffspringOrSelfOf(operateRoleCode)) {
             throw new ServiceLogicException(ErrorCode.NO_DATA_PERM);
         }
         //被设置角色的用户，如果有比操作者更高级的角色，则不允许操作。（不允许 普通员工 把 部门经理 设置为 项目经理）
         RoleTypeEnum operatorRoleType = RoleTypeEnum.fromRoleCode(operateRoleCode);
 
         for (String uid : uidList) {
-            List<IdaasRole> userRoles = roleAbility.queryRolesByUser(spaceId,uid);
-            if(!operatorRoleType.isAllOffspringOrSelf(userRoles.stream().map(it->it.getRoleCode()).collect(Collectors.toList()))){
+            List<IdaasRole> userRoles = roleAbility.queryRolesByUser(spaceId, uid);
+            if (!operatorRoleType.isOffspringOrSelfOfAll(userRoles.stream().map(it -> it.getRoleCode()).collect(Collectors.toList()))) {
                 throw new ServiceLogicException(ErrorCode.NO_DATA_PERM);
             }
         }
@@ -128,7 +170,7 @@ public class GrantServiceImpl implements GrantService {
                     .spaceId(spaceId)
                     .uid(uid)
                     .roleCode(roleCode).build());
-            if(!success){
+            if (!success) {
                 return false;
             }
         }

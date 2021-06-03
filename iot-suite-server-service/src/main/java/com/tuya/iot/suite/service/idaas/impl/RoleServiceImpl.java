@@ -1,6 +1,7 @@
 package com.tuya.iot.suite.service.idaas.impl;
 
 import com.tuya.iot.suite.ability.idaas.ability.GrantAbility;
+import com.tuya.iot.suite.ability.idaas.ability.IdaasUserAbility;
 import com.tuya.iot.suite.ability.idaas.ability.RoleAbility;
 import com.tuya.iot.suite.ability.idaas.model.IdaasPageResult;
 import com.tuya.iot.suite.ability.idaas.model.IdaasRole;
@@ -42,6 +43,8 @@ public class RoleServiceImpl implements RoleService {
     private RoleAbility roleAbility;
     @Autowired
     private GrantAbility grantAbility;
+    @Autowired
+    private IdaasUserAbility idaasUserAbility;
 
     /**
      * roleType=>permissionTemplate
@@ -95,7 +98,7 @@ public class RoleServiceImpl implements RoleService {
         Assert.isTrue(!RoleTypeEnum.fromRoleCode(targetRoleCode).isAdmin(), "can not write a 'admin' role!");
         //数据权限校验，校验操作者自己是否为更高的角色。
         roleAbility.queryRolesByUser(spaceId, operatorUid).stream().filter(
-                it -> RoleTypeEnum.fromRoleCode(targetRoleCode).isOffspringOrSelf(RoleTypeEnum.fromRoleCode(it.getRoleCode()))
+                it -> RoleTypeEnum.fromRoleCode(targetRoleCode).isOffspringOrSelfOf(RoleTypeEnum.fromRoleCode(it.getRoleCode()))
         ).findAny().orElseThrow(() -> new ServiceLogicException(ErrorCode.NO_DATA_PERM));
     }
 
@@ -107,7 +110,7 @@ public class RoleServiceImpl implements RoleService {
         for (String targetRoleCode : targetRoleCodes) {
             for (IdaasRole myRole : roles) {
                 boolean enabled =
-                        RoleTypeEnum.fromRoleCode(targetRoleCode).isOffspringOrSelf(RoleTypeEnum.fromRoleCode(myRole.getRoleCode()));
+                        RoleTypeEnum.fromRoleCode(targetRoleCode).isOffspringOrSelfOf(RoleTypeEnum.fromRoleCode(myRole.getRoleCode()));
                 if (!enabled) {
                     throw new ServiceLogicException(ErrorCode.NO_DATA_PERM);
                 }
@@ -118,7 +121,7 @@ public class RoleServiceImpl implements RoleService {
     private void checkRoleReadPermission(Long spaceId, String operatorUid, String targetRoleCode) {
         //数据权限校验，校验操作者自己是否为更高的角色。
         roleAbility.queryRolesByUser(spaceId, operatorUid).stream().filter(
-                it -> RoleTypeEnum.fromRoleCode(targetRoleCode).isOffspringOrSelf(RoleTypeEnum.fromRoleCode(it.getRoleCode()))
+                it -> RoleTypeEnum.fromRoleCode(targetRoleCode).isOffspringOrSelfOf(RoleTypeEnum.fromRoleCode(it.getRoleCode()))
         ).findAny().orElseThrow(() -> new ServiceLogicException(ErrorCode.NO_DATA_PERM));
     }
 
@@ -132,6 +135,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Boolean deleteRole(Long spaceId, String operatorUid, String roleCode) {
         checkRoleWritePermission(spaceId, operatorUid, roleCode);
+        //如果底层api没有判断删除角色时是否存在关联的用户，那么我们就需要实现这个逻辑.但是需要底层api提供接口，根据角色查询用户列表
         return roleAbility.deleteRole(spaceId, roleCode);
     }
 
