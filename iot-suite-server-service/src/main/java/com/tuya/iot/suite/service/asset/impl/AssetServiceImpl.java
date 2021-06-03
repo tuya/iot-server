@@ -16,7 +16,7 @@ import com.tuya.iot.suite.service.device.DeviceService;
 import com.tuya.iot.suite.service.dto.AssetConvertor;
 import com.tuya.iot.suite.service.dto.AssetDTO;
 import com.tuya.iot.suite.service.dto.DeviceDTO;
-import com.tuya.iot.suite.service.model.PageDataVO;
+import com.tuya.iot.suite.core.model.PageDataVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pulsar.shade.org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;

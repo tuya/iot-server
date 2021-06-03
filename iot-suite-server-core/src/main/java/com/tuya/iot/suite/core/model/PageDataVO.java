@@ -1,5 +1,6 @@
-package com.tuya.iot.suite.service.model;
+package com.tuya.iot.suite.core.model;
 
+import com.tuya.iot.suite.core.model.PageVO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -3,7 +3,7 @@ package com.tuya.iot.suite.web.controller;
 import com.tuya.iot.suite.core.constant.Response;
 import com.tuya.iot.suite.core.util.Todo;
 import com.tuya.iot.suite.service.alarm.AlarmService;
-import com.tuya.iot.suite.service.model.PageVO;
+import com.tuya.iot.suite.core.model.PageVO;
 import com.tuya.iot.suite.web.model.response.alarm.DeviceAlarmVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

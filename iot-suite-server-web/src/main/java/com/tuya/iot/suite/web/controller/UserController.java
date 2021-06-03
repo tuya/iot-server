@@ -4,12 +4,13 @@ import com.tuya.iot.suite.ability.user.model.MobileCountries;
 import com.tuya.iot.suite.ability.user.model.UserRegisteredRequest;
 import com.tuya.iot.suite.core.constant.Response;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
+import com.tuya.iot.suite.core.model.UserBaseInfo;
 import com.tuya.iot.suite.core.util.ContextUtil;
 import com.tuya.iot.suite.core.util.LibPhoneNumberUtil;
 import com.tuya.iot.suite.core.util.MixUtil;
 import com.tuya.iot.suite.core.util.Todo;
 import com.tuya.iot.suite.service.idaas.GrantService;
-import com.tuya.iot.suite.service.model.PageVO;
+import com.tuya.iot.suite.core.model.PageVO;
 import com.tuya.iot.suite.service.user.UserService;
 import com.tuya.iot.suite.service.user.model.ResetPasswordBo;
 import com.tuya.iot.suite.web.config.ProjectProperties;
@@ -21,6 +22,7 @@ import com.tuya.iot.suite.web.model.request.user.UserEditReq;
 import com.tuya.iot.suite.web.model.request.user.UserPasswordModifyReq;
 import com.tuya.iot.suite.web.model.request.user.UserPwdReq;
 import com.tuya.iot.suite.web.model.response.permission.PermissionDto;
+import com.tuya.iot.suite.web.model.response.role.RoleDto;
 import com.tuya.iot.suite.web.model.response.user.UserDto;
 import com.tuya.iot.suite.web.util.Responses;
 import io.swagger.annotations.Api;
@@ -36,7 +38,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.tuya.iot.suite.core.constant.ErrorCode.*;
 
@@ -75,7 +79,9 @@ public class UserController {
                 Responses.buildFailure(USER_NOT_EXIST);
     }
 
-    /** 这个还需要吗？要验证码的 */
+    /**
+     * 这个还需要吗？要验证码的
+     */
     @ApiOperation(value = "用户密码重置")
     @PostMapping(value = "/user/password/reset")
     public Response<Boolean> resetPassword(@RequestBody @Valid ResetPasswordReq req) {
@@ -149,14 +155,14 @@ public class UserController {
     @RequiresPermissions("4003")
     public Response<Boolean> updateUserName(@RequestBody UserEditReq req) {
         Long spaceId = 0L;
-        return Response.buildSuccess(userService.updateUser(spaceId,req.getUserId(),req.getNickName(),req.getRoleCodes()));
+        return Response.buildSuccess(userService.updateUser(spaceId, req.getUserId(), req.getNickName(), req.getRoleCodes()));
     }
 
     @ApiOperation("修改用户密码")
     @PutMapping("/users/pwd")
     @RequiresPermissions("4005")
     public Response<Boolean> updateUserPwd(@RequestBody UserPwdReq req) {
-        return Response.buildSuccess(userService.updateUserPassword(req.getUserName(),req.getNewPwd()));
+        return Response.buildSuccess(userService.updateUserPassword(req.getUserName(), req.getNewPwd()));
     }
 
     @ApiOperation("删除用户")
@@ -164,7 +170,7 @@ public class UserController {
     @RequiresPermissions("4004")
     public Response<Boolean> updateUserPwd(@PathVariable("userId") String userId) {
         Long spaceId = 0L;
-        return Response.buildSuccess(userService.deleteUser(spaceId,userId));
+        return Response.buildSuccess(userService.deleteUser(spaceId, userId));
     }
 
     /**
@@ -176,15 +182,35 @@ public class UserController {
     public Response<Boolean> batchDeleteUser(@ApiParam(value = "uid列表，逗号分隔", required = true)
                                              @RequestParam String uidList) {
         Long spaceId = 0L;
-        return Response.buildSuccess(userService.batchDeleteUser(spaceId,uidList.split(",")));
+        return Response.buildSuccess(userService.batchDeleteUser(spaceId, uidList.split(",")));
     }
 
     @ApiOperation("用户列表")
     @GetMapping("/users")
     @RequiresPermissions("4001")
-    public Response<PageVO<UserDto>> listUsers(@ApiParam(value = "搜索关键字")@RequestParam String searchKey,
-                                               @ApiParam(value = "角色编码")@RequestParam String roleCode) {
-        return Todo.todo();
+    public Response<PageVO<UserDto>> listUsers(@ApiParam(value = "搜索关键字") @RequestParam String searchKey,
+                                               @ApiParam(value = "角色编码") @RequestParam String roleCode) {
+        Long spaceId = 0L;
+        PageVO<UserBaseInfo> userBaseInfoPageVO = userService.queryUserByPage(spaceId, searchKey, roleCode);
+        PageVO<UserDto> result = new PageVO<>();
+        result.setPageNo(userBaseInfoPageVO.getPageNo());
+        result.setPageSize(userBaseInfoPageVO.getPageSize());
+        result.setData(userBaseInfoPageVO.getData().stream().map(e->{
+                    List<RoleDto> roleDtos = new ArrayList<>();
+                    roleDtos.add(RoleDto.builder()
+                            .roleCode(e.getRoleCode())
+                            .roleName(e.getRoleName())
+                            .build());
+                    UserDto userDto = UserDto.builder()
+                            .userName(e.getUserName())
+                            .userId(e.getUserId())
+                            .roles(roleDtos)
+                            .build();
+                    return userDto;
+        }
+        ).collect(Collectors.toList()));
+        result.setTotal(userBaseInfoPageVO.getTotal());
+        return Response.buildSuccess(result);
     }
 
     @ApiOperation("用户权限列表")

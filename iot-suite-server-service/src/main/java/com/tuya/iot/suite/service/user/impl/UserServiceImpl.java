@@ -11,6 +11,8 @@ import com.tuya.iot.suite.core.constant.CaptchaType;
 import com.tuya.iot.suite.core.constant.ErrorCode;
 import com.tuya.iot.suite.core.constant.NoticeType;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
+import com.tuya.iot.suite.core.model.PageVO;
+import com.tuya.iot.suite.core.model.UserBaseInfo;
 import com.tuya.iot.suite.service.notice.template.CaptchaNoticeTemplate;
 import com.tuya.iot.suite.service.user.CaptchaService;
 import com.tuya.iot.suite.service.user.UserService;
@@ -23,6 +25,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.tuya.iot.suite.core.constant.ErrorCode.*;
 
@@ -39,7 +42,7 @@ public class UserServiceImpl implements UserService {
     private UserAbility userAbility;
     @Autowired
     private IdaasUserAbility idaasUserAbility;
-@Autowired
+    @Autowired
     private GrantAbility grantAbility;
 
     @Autowired
@@ -175,7 +178,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Boolean updateUser(Long spaceId, String uid, String nickName,List<String> roleCodes) {
+    public Boolean updateUser(Long spaceId, String uid, String nickName, List<String> roleCodes) {
         if (!StringUtils.isEmpty(nickName)) {
             //修改昵称 TODO 等待云端开放
 
@@ -198,10 +201,13 @@ public class UserServiceImpl implements UserService {
         //向云端删除用户
         Boolean del = userAbility.destroyUser(uid);
         if (!del) {
-            throw new ServiceLogicException(USER_DELETE_FAIL);
+            throw new ServiceLogicException(USER_DELETE_FAIL, uid);
         }
         //向基础服务删除用户
         del = idaasUserAbility.deleteUser(spaceId, uid);
+        if (!del) {
+            throw new ServiceLogicException(USER_DELETE_FAIL, uid);
+        }
         return del;
     }
 
@@ -211,13 +217,41 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Boolean updateUserPassword( String userName, String newPwd) {
+    public Boolean updateUserPassword(String userName, String newPwd) {
         return userAbility.resetPassword(new ResetPasswordReq(userName, newPwd));
     }
 
     @Override
     public Boolean batchDeleteUser(Long spaceId, String... userIds) {
-        return null;
+        if (userIds == null || userIds.length < 1) {
+            throw new ServiceLogicException(PARAM_LOST, "userId");
+        }
+        if (userIds.length > 20) {
+            throw new ServiceLogicException(USER_DELETE_COUNT_CAN_NOT_MORE_THAN_20);
+        }
+        for (String userId : userIds) {
+            deleteUser(spaceId, userId);
+        }
+        return true;
+    }
+
+    @Override
+    public PageVO<UserBaseInfo> queryUserByPage(Long spaceId, String searchKey, String roleCode) {
+        IdaasPageResult<IdaasUser> pageResult = idaasUserAbility.queryUserPage(spaceId, IdaasUserPageReq.builder()
+                .roleCode(roleCode)
+                .username(searchKey)
+                .build());
+        PageVO<UserBaseInfo> result = new PageVO<>();
+        result.setPageNo(pageResult.getPageNumber());
+        result.setPageSize(pageResult.getPageSize());
+        result.setData(pageResult.getResults().stream().map(e->UserBaseInfo.builder()
+                .userName(e.getUsername())
+                .userId(e.getUid())
+                .roleCode(e.getRoleCode())
+                .roleName(e.getRoleName())
+                .build()).collect(Collectors.toList()));
+        result.setTotal(pageResult.getTotalCount());
+        return result;
     }
 }
 

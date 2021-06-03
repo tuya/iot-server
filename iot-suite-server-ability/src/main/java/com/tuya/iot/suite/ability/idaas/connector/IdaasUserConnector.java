@@ -7,9 +7,7 @@ import com.tuya.connector.api.annotations.POST;
 import com.tuya.connector.api.annotations.PUT;
 import com.tuya.connector.api.annotations.Path;
 import com.tuya.iot.suite.ability.idaas.ability.IdaasUserAbility;
-import com.tuya.iot.suite.ability.idaas.model.IdaasUser;
-import com.tuya.iot.suite.ability.idaas.model.IdaasUserCreateReq;
-import com.tuya.iot.suite.ability.idaas.model.IdaasUserUpdateReq;
+import com.tuya.iot.suite.ability.idaas.model.*;
 
 /**
  * @author benguan.zhou@tuya.com
@@ -37,6 +35,11 @@ public interface IdaasUserConnector extends IdaasUserAbility {
     @Override
     IdaasUser getUserByUid(@Path("space_id")Long spaceId,
                            @Path("uid")String uid);
+
+    @POST("/v1.0/iot-03/idaas/spaces/{space_id}/page-role")
+    @Override
+    IdaasPageResult<IdaasUser> queryUserPage(@Path("space_id")Long spaceId,
+                                             @Body IdaasUserPageReq req);
 
 
 }
