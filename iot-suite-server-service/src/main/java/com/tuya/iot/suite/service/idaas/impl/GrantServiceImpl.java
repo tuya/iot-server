@@ -53,7 +53,7 @@ public class GrantServiceImpl implements GrantService {
         checkForModifyPermissionToRole(spaceId, operatorUid, Lists.newArrayList(permissionCode), roleCode);
     }
 
-    private void checkForModifyPermissionToRole(Long spaceId, String operatorUid,  List<String> permissionCodes, String roleCode) {
+    private void checkForModifyPermissionToRole(Long spaceId, String operatorUid, List<String> permissionCodes, String roleCode) {
         Assert.isTrue(!RoleTypeEnum.fromRoleCode(roleCode).isAdmin(), "can not grant permission to a admin role!");
         List<IdaasPermission> perms = permissionAbility.queryPermissionsByUser(spaceId, operatorUid);
         List<IdaasRole> roles = roleAbility.queryRolesByUser(spaceId, operatorUid);
@@ -117,8 +117,8 @@ public class GrantServiceImpl implements GrantService {
             }
         });
         //被操作的用户不能是系统管理员
-        List<IdaasRole> userRoles = roleAbility.queryRolesByUser(spaceId,uid);
-        userRoles.forEach(userRole->{
+        List<IdaasRole> userRoles = roleAbility.queryRolesByUser(spaceId, uid);
+        userRoles.forEach(userRole -> {
             if (!RoleTypeEnum.valueOf(userRole.getRoleCode()).isOffspringOrSelfOf(role.getRoleCode())) {
                 throw new ServiceLogicException(ErrorCode.NO_DATA_PERM);
             }
@@ -134,7 +134,7 @@ public class GrantServiceImpl implements GrantService {
     @Override
     public Boolean revokeRoleFromUser(Long spaceId, String operatorUid, String roleCode, String uid) {
         checkForModifyRoleToUser(spaceId, operatorUid, roleCode, uid);
-        return grantAbility.revokeRoleFromUser(spaceId,roleCode,uid);
+        return grantAbility.revokeRoleFromUser(spaceId, roleCode, uid);
     }
 
     @Override

@@ -25,6 +25,8 @@ public class PermissionNodeDTO {
     String permissionName;
     @ApiModelProperty("权限编码")
     String permissionCode;
+    @ApiModelProperty("是否可授权")
+    Boolean authorizable;
     @ApiModelProperty("权限说明")
     String remark;
     @ApiModelProperty("权限类型，菜单/api/按钮/数据")
