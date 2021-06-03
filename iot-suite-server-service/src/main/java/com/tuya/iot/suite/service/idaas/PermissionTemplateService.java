@@ -2,6 +2,7 @@ package com.tuya.iot.suite.service.idaas;
 
 import com.tuya.iot.suite.service.dto.PermissionNodeDTO;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -11,7 +12,9 @@ import java.util.Set;
  */
 public interface PermissionTemplateService {
 
-    PermissionNodeDTO getPermissionTemplate(String roleType);
+    PermissionNodeDTO getTemplatePermissionTree(String roleType);
+
+    List<PermissionNodeDTO> getTemplatePermissionList(String roleType);
 
     Set<String> getAuthorizablePermissions();
 

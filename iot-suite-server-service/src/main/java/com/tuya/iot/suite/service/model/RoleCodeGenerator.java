@@ -16,6 +16,9 @@ public class RoleCodeGenerator {
     public static String generate(String roleType){
         return roleType+RoleTypeEnum.SEPARATOR+UUID.randomUUID().toString().replaceAll("-","").toLowerCase();
     }
+    public static String generate(RoleTypeEnum roleType,String suffix){
+        return roleType.name()+RoleTypeEnum.SEPARATOR+suffix;
+    }
     public static String generate(RoleTypeEnum roleType){
         return generate(roleType.name());
     }
