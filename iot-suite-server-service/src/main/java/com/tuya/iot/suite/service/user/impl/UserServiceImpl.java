@@ -3,10 +3,7 @@ package com.tuya.iot.suite.service.user.impl;
 import com.tuya.connector.api.exceptions.ConnectorException;
 import com.tuya.iot.suite.ability.idaas.ability.GrantAbility;
 import com.tuya.iot.suite.ability.idaas.ability.IdaasUserAbility;
-import com.tuya.iot.suite.ability.idaas.model.IdaasUser;
-import com.tuya.iot.suite.ability.idaas.model.IdaasUserCreateReq;
-import com.tuya.iot.suite.ability.idaas.model.IdaasUserUpdateReq;
-import com.tuya.iot.suite.ability.idaas.model.UserRevokeRolesReq;
+import com.tuya.iot.suite.ability.idaas.model.*;
 import com.tuya.iot.suite.ability.notice.model.ResetPasswordReq;
 import com.tuya.iot.suite.ability.user.ability.UserAbility;
 import com.tuya.iot.suite.ability.user.model.*;
@@ -22,6 +19,7 @@ import com.tuya.iot.suite.service.user.model.ResetPasswordBo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
@@ -166,7 +164,7 @@ public class UserServiceImpl implements UserService {
             throw new ServiceLogicException(USER_CREATE_FAIL);
         }
         //3、给用户授权
-        Boolean auth = grantAbility.revokeRolesFromUser(UserRevokeRolesReq.builder()
+        Boolean auth = grantAbility.setRolesToUser(UserGrantRolesReq.builder()
                 .spaceId(spaceId)
                 .roleCodes(roleCodes)
                 .uid(user.getUser_id()).build());
@@ -177,17 +175,48 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Boolean updateUser(Long spaceId, String uid, IdaasUserUpdateReq req) {
-        return null;
+    public Boolean updateUser(Long spaceId, String uid, String nickName,List<String> roleCodes) {
+        if (!StringUtils.isEmpty(nickName)) {
+            //修改昵称 TODO 等待云端开放
+
+        }
+        //修改角色
+        if (!CollectionUtils.isEmpty(roleCodes)) {
+            Boolean auth = grantAbility.setRolesToUser(UserGrantRolesReq.builder()
+                    .spaceId(spaceId)
+                    .roleCodes(roleCodes)
+                    .uid(uid).build());
+            if (!auth) {
+                throw new ServiceLogicException(USER_CREATE_FAIL);
+            }
+        }
+        return true;
     }
 
     @Override
     public Boolean deleteUser(Long spaceId, String uid) {
-        return null;
+        //向云端删除用户
+        Boolean del = userAbility.destroyUser(uid);
+        if (!del) {
+            throw new ServiceLogicException(USER_DELETE_FAIL);
+        }
+        //向基础服务删除用户
+        del = idaasUserAbility.deleteUser(spaceId, uid);
+        return del;
     }
 
     @Override
     public IdaasUser getUserByUid(Long spaceId, String uid) {
+        return null;
+    }
+
+    @Override
+    public Boolean updateUserPassword( String userName, String newPwd) {
+        return userAbility.resetPassword(new ResetPasswordReq(userName, newPwd));
+    }
+
+    @Override
+    public Boolean batchDeleteUser(Long spaceId, String... userIds) {
         return null;
     }
 }
