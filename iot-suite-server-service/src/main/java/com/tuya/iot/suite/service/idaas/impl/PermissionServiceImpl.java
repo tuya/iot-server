@@ -88,7 +88,7 @@ public class PermissionServiceImpl implements PermissionService {
         //find roots, which parentCode not in map
         List<PermissionNodeDTO> trees = perms.stream().filter(it -> !map.containsKey(it.getParentCode())).collect(Collectors.toList());
         //set children
-        perms.forEach(it -> it.setChildren(childrenMap.get(it.getParentCode())));
+        perms.forEach(it -> it.setChildren(childrenMap.get(it.getPermissionCode())));
         return trees;
     }
 }

@@ -72,6 +72,11 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
      */
     @Override
     public void run(ApplicationArguments args) throws Exception {
+        log.info("permission-auto-init==>{}",projectProperties.permissionAutoInit);
+        if(!projectProperties.permissionAutoInit){
+            return;
+        }
+
         //space
         if (!initPermissionSpace()) {
             log.error("apply space failure!");

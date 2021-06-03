@@ -1,11 +1,14 @@
 package com.tuya.iot.suite.service
 
+import com.alibaba.fastjson.JSON
 import com.alibaba.fastjson.JSONArray
 import com.alibaba.fastjson.JSONObject
 import com.tuya.iot.suite.ability.idaas.ability.PermissionAbility
 import com.tuya.iot.suite.ability.idaas.model.IdaasPermission
 import com.tuya.iot.suite.ability.idaas.model.PermissionTypeEnum
 import com.tuya.iot.suite.service.idaas.PermissionService
+import com.tuya.iot.suite.service.util.PermTemplateUtil
+import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.util.ResourceUtils
 import org.springframework.util.StreamUtils
@@ -18,6 +21,7 @@ import java.util.stream.Collectors
  * @author benguan.zhou@tuya.com
  * @date 2021/06/02
  */
+@Slf4j
 class PermissionServiceSpec extends BaseSpec{
     @Autowired
     PermissionService permissionService
@@ -31,29 +35,21 @@ class PermissionServiceSpec extends BaseSpec{
         def uid = "1000"
         when:
         def trees = permissionService.queryPermissionTrees(spaceId, uid)
+        log.info(JSON.toJSONString(trees,true))
         then:
         trees.size() == 5
     }
     private List<IdaasPermission> loadAllPerms() {
-        File file = ResourceUtils.getFile("classpath:permissions-admin.json");
-        String json = StreamUtils.copyToString(new FileInputStream(file), StandardCharsets.UTF_8);
-        JSONObject root = JSONObject.parseObject(json);
-        JSONArray menuPerms = root.getJSONArray("permissionList");
-        return menuPerms.stream().flatMap({menuPermObj->
-            JSONObject menuPerm = (JSONObject) menuPermObj;
-            def perms = menuPerm.getJSONArray("permissionList")
-            perms.add(menuPerm)
-            return perms.stream();
-        }).map( {perm->
-            JSONObject it = (JSONObject) perm;
-            return IdaasPermission.builder()
-                    .parentCode(it.getString("parentCode"))
-                    .permissionCode(it.getString("permissionCode"))
-                    .name(it.getString("permissionName"))
-                    .type(PermissionTypeEnum.valueOf(it.getString("type")))
-                    .order(it.getInteger("order"))
-                    .remark(it.getString("remark"))
-                    .build();
-        }).collect(Collectors.toList());
+        PermTemplateUtil.loadAsList("classpath:template/permissions-admin.json")
+        .collect{
+            it->IdaasPermission.builder()
+            .name(it.permissionName)
+            .parentCode(it.parentCode)
+            .type(PermissionTypeEnum.valueOf(it.permissionType))
+            .remark(it.remark)
+            .order(it.order)
+            .permissionCode(it.permissionCode)
+                    .build()
+        }
     }
 }
