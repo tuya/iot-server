@@ -60,7 +60,7 @@ public class RoleServiceImpl implements RoleService {
         // 0. check permission
         checkRoleWritePermission(spaceId, req.getUid(), req.getRoleCode());
         String roleType = RoleTypeEnum.fromRoleCode(req.getRoleCode()).name();
-        List<PermissionNodeDTO> perms = permissionTemplateService.getPermissionTemplate(roleType).getChildren();
+        List<PermissionNodeDTO> perms = permissionTemplateService.getTemplatePermissionList(roleType);
         // 1. create role
         boolean createRoleRes = roleAbility.createRole(spaceId, IdaasRoleCreateReq.builder()
                 .roleCode(req.getRoleCode())
@@ -174,7 +174,7 @@ public class RoleServiceImpl implements RoleService {
         RoleTypeEnum roleType = RoleTypeEnum.fromRoleCode(roleCode);
 
         // 1. get permissions from template
-        List<String> templatePerms = permissionTemplateService.getPermissionTemplate(roleType.name()).getChildren()
+        List<String> templatePerms = permissionTemplateService.getTemplatePermissionTree(roleType.name()).getChildren()
                 .stream().map(it -> it.getPermissionCode())
                 .collect(Collectors.toList());
 

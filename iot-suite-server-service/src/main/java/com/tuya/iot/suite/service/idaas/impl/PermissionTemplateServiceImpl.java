@@ -27,7 +27,7 @@ public class PermissionTemplateServiceImpl implements PermissionTemplateService 
      * <p>
      * load only when first call
      */
-    private LazyRef<Map<String, PermissionNodeDTO>> rolePermissionTmplMapRef = LazyRef.lateInit(() ->
+    private LazyRef<Map<String, PermissionNodeDTO>> permTreeMapHolder = LazyRef.lateInit(() ->
             Stream.of(RoleTypeEnum.values()).map(it ->
                     new Tuple2<>(it.name(), PermTemplateUtil
                             .load("classpath:template/permissions-" + it.name() + ".json"))
@@ -37,7 +37,7 @@ public class PermissionTemplateServiceImpl implements PermissionTemplateService 
     /**
      * roleType=>permissionList
      */
-    private LazyRef<Map<String, List<PermissionNodeDTO>>> rolePermissionsMapRef = LazyRef.lateInit(() ->
+    private LazyRef<Map<String, List<PermissionNodeDTO>>> permListMapHolder = LazyRef.lateInit(() ->
             Stream.of(RoleTypeEnum.values()).map(it ->
                     new Tuple2<>(it.name(), PermTemplateUtil
                             .loadAsList("classpath:template/permissions-" + it.name() + ".json"))
@@ -46,15 +46,20 @@ public class PermissionTemplateServiceImpl implements PermissionTemplateService 
 
     @Override
     public Set<String> getAuthorizablePermissions() {
-        return rolePermissionsMapRef.get().get(RoleTypeEnum.admin.name())
+        return permListMapHolder.get().get(RoleTypeEnum.admin.name())
                 .stream().filter(it->it.getAuthorizable()).map(it->it.getPermissionCode())
                 .collect(Collectors.toSet());
     }
 
 
     @Override
-    public PermissionNodeDTO getPermissionTemplate(String roleTypeOrRoleCode) {
-        return rolePermissionTmplMapRef.get().get(RoleTypeEnum.fromRoleCode(roleTypeOrRoleCode));
+    public PermissionNodeDTO getTemplatePermissionTree(String roleTypeOrRoleCode) {
+        return permTreeMapHolder.get().get(RoleTypeEnum.fromRoleCode(roleTypeOrRoleCode).name());
+    }
+
+    @Override
+    public List<PermissionNodeDTO> getTemplatePermissionList(String roleType) {
+        return permListMapHolder.get().get(roleType);
     }
 
 
