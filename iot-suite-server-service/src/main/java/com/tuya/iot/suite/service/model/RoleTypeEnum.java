@@ -1,5 +1,7 @@
 package com.tuya.iot.suite.service.model;
 
+import java.util.List;
+
 /**
  * @author benguan.zhou@tuya.com
  * @description
@@ -26,17 +28,11 @@ public enum RoleTypeEnum {
     }
 
     public static RoleTypeEnum fromRoleCode(String roleCode){
-        if(isAdminRoleCode(roleCode)){
-            return admin;
-        }
         int pos = roleCode.indexOf(SEPARATOR);
         if(pos<0){
-            return null;
+            return RoleTypeEnum.valueOf(roleCode);
         }
         String name = roleCode.substring(0,pos);
-        if(admin.name().equals(name)){
-            return null;
-        }
         return RoleTypeEnum.valueOf(name);
     }
     /**
@@ -51,6 +47,20 @@ public enum RoleTypeEnum {
             type = type.parent;
         }
         return false;
+    }
+    public boolean isOffspringOrSelf(String roleCode){
+        RoleTypeEnum target = RoleTypeEnum.fromRoleCode(roleCode);
+        RoleTypeEnum type = this;
+        while(type!=null){
+            if(type.equals(target)){
+                return true;
+            }
+            type = type.parent;
+        }
+        return false;
+    }
+    public boolean isAllOffspringOrSelf(List<String> roleCodes){
+        return roleCodes.stream().allMatch(it->isOffspringOrSelf(it));
     }
     public boolean isAdmin(){
         return admin.equals(this);

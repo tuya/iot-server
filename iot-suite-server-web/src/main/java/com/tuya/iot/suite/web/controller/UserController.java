@@ -4,15 +4,18 @@ import com.tuya.iot.suite.ability.user.model.MobileCountries;
 import com.tuya.iot.suite.ability.user.model.UserRegisteredRequest;
 import com.tuya.iot.suite.core.constant.Response;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
+import com.tuya.iot.suite.core.util.ContextUtil;
 import com.tuya.iot.suite.core.util.LibPhoneNumberUtil;
 import com.tuya.iot.suite.core.util.MixUtil;
 import com.tuya.iot.suite.core.util.Todo;
+import com.tuya.iot.suite.service.idaas.GrantService;
 import com.tuya.iot.suite.service.model.PageVO;
 import com.tuya.iot.suite.service.user.UserService;
 import com.tuya.iot.suite.service.user.model.ResetPasswordBo;
 import com.tuya.iot.suite.web.config.ProjectProperties;
 import com.tuya.iot.suite.web.i18n.I18nMessage;
 import com.tuya.iot.suite.web.model.ResetPasswordReq;
+import com.tuya.iot.suite.web.model.request.user.BatchUserGrantRoleReq;
 import com.tuya.iot.suite.web.model.request.user.UserAddReq;
 import com.tuya.iot.suite.web.model.request.user.UserEditReq;
 import com.tuya.iot.suite.web.model.request.user.UserPasswordModifyReq;
@@ -55,6 +58,9 @@ public class UserController {
 
     @Autowired
     private ProjectProperties projectProperties;
+
+    @Autowired
+    private GrantService grantService;
 
     /**
      * @return
@@ -186,5 +192,12 @@ public class UserController {
         return Todo.todo();
     }
 
-    //TODO 分配角色 4006
+    @ApiOperation("批量用户角色授权")
+    @PutMapping("/users/roles")
+    @RequiresPermissions("4003")
+    public Response<Boolean> grantRole(@RequestBody BatchUserGrantRoleReq req){
+        Long spaceId = projectProperties.getPermissionSpaceId();
+        String uid = ContextUtil.getUserId();
+        return Response.buildSuccess(grantService.setRoleToUsers(spaceId,uid,req.getRoleCode(),req.getUserIds()));
+    }
 }
