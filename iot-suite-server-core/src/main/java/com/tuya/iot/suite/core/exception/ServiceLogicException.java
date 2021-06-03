@@ -11,11 +11,26 @@ public class ServiceLogicException extends RuntimeException {
 
     private ErrorCode errorCode;
 
+    private String outMsg;
+
     public ServiceLogicException(ErrorCode errorCode) {
         this.errorCode = errorCode;
     }
 
+    public ServiceLogicException(ErrorCode errorCode, String outMsg) {
+        this.errorCode = errorCode;
+        this.outMsg = outMsg;
+    }
+
     public ErrorCode getErrorCode() {
         return errorCode;
+    }
+
+    public String getOutMsg() {
+        return outMsg;
+    }
+
+    public void setOutMsg(String outMsg) {
+        this.outMsg = outMsg;
     }
 }

@@ -26,7 +26,7 @@ import java.util.regex.Pattern;
 /**
  * Description  TODO
  *
- * @author Chyern,benguan
+ * @author Chyern, benguan
  * @since 2021/3/17
  */
 @Slf4j
@@ -69,8 +69,10 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public Response handleServiceLogicException(ServiceLogicException e) {
         log.info("全局拦截ServiceLogicException提示: code={} , message={} ", e.getErrorCode().getCode(), e.getErrorCode().getMsg());
+        String outMsg = StringUtils.isEmpty(e.getOutMsg()) ? "" : "[" + e.getOutMsg() + "]";
         return Response
-                .buildFailure(e.getErrorCode().getCode(), getI18nMessageByCode(e.getErrorCode().getCode(), e.getErrorCode().getMsg()));
+                .buildFailure(e.getErrorCode().getCode(),
+                        getI18nMessageByCode(e.getErrorCode().getCode(), e.getErrorCode().getMsg()) + outMsg);
     }
 
 
@@ -88,7 +90,7 @@ public class GlobalExceptionHandler {
      * 我们返回的时候，要去掉后面的",traceId=xxxx
      */
     private String fixErrMsgIfNeed(String errorMsg) {
-        if(StringUtils.hasText(errorMsg)){
+        if (StringUtils.hasText(errorMsg)) {
             return errMsgFixPattern.matcher(errorMsg).replaceFirst("");
         }
         return errorMsg;
@@ -123,7 +125,7 @@ public class GlobalExceptionHandler {
 
     /**
      * 未登陆
-     * */
+     */
     @ExceptionHandler(UnauthenticatedException.class)
     @ResponseBody
     public Response handleException(UnauthenticatedException e) {
@@ -134,7 +136,7 @@ public class GlobalExceptionHandler {
 
     /**
      * 未授权
-     * */
+     */
     @ExceptionHandler(UnauthorizedException.class)
     @ResponseBody
     public Response handleException(UnauthorizedException e) {
@@ -142,6 +144,7 @@ public class GlobalExceptionHandler {
         return Response.buildFailure(ErrorCode.USER_NOT_AUTH.getCode(),
                 getI18nMessageByCode(ErrorCode.USER_NOT_AUTH.getCode(), ErrorCode.USER_NOT_AUTH.getMsg()));
     }
+
     /***
      *
      * @param errorCode

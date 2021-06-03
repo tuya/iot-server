@@ -148,21 +148,23 @@ public class UserController {
     @PutMapping("/users")
     @RequiresPermissions("4003")
     public Response<Boolean> updateUserName(@RequestBody UserEditReq req) {
-        return Todo.todo();
+        Long spaceId = 0L;
+        return Response.buildSuccess(userService.updateUser(spaceId,req.getUserId(),req.getNickName(),req.getRoleCodes()));
     }
 
     @ApiOperation("修改用户密码")
     @PutMapping("/users/pwd")
     @RequiresPermissions("4005")
     public Response<Boolean> updateUserPwd(@RequestBody UserPwdReq req) {
-        return Todo.todo();
+        return Response.buildSuccess(userService.updateUserPassword(req.getUserName(),req.getNewPwd()));
     }
 
     @ApiOperation("删除用户")
     @DeleteMapping("/users/{userId}")
     @RequiresPermissions("4004")
     public Response<Boolean> updateUserPwd(@PathVariable("userId") String userId) {
-        return Todo.todo();
+        Long spaceId = 0L;
+        return Response.buildSuccess(userService.deleteUser(spaceId,userId));
     }
 
     /**
@@ -173,7 +175,8 @@ public class UserController {
     @RequiresPermissions("4003")
     public Response<Boolean> batchDeleteUser(@ApiParam(value = "uid列表，逗号分隔", required = true)
                                              @RequestParam String uidList) {
-        return Todo.todo();
+        Long spaceId = 0L;
+        return Response.buildSuccess(userService.batchDeleteUser(spaceId,uidList.split(",")));
     }
 
     @ApiOperation("用户列表")

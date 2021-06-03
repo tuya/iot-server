@@ -61,9 +61,25 @@ public interface UserService {
 
     Boolean createUser(Long spaceId, UserRegisteredRequest req, List<String> roleCodes);
 
-    Boolean updateUser(Long spaceId, String uid, IdaasUserUpdateReq req);
+    Boolean updateUser(Long spaceId, String uid, String nickName,List<String> roleCodes);
 
     Boolean deleteUser(Long spaceId, String uid);
 
     IdaasUser getUserByUid(Long spaceId, String uid);
+
+    /**
+     *  修改用户密码
+     * @param userName
+     * @param newPwd
+     * @return
+     */
+    Boolean updateUserPassword( String userName, String newPwd);
+
+    /**
+     * 批量删除ID
+     * @param spaceId
+     * @param userIds
+     * @return
+     */
+    Boolean batchDeleteUser(Long spaceId, String... userIds);
 }
