@@ -3,21 +3,14 @@ package com.tuya.iot.suite.web.config.shiro;
 import com.tuya.iot.suite.web.i18n.I18nMessage;
 import org.apache.shiro.spring.LifecycleBeanPostProcessor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
-import org.apache.shiro.spring.web.config.DefaultShiroFilterChainDefinition;
-import org.apache.shiro.spring.web.config.ShiroFilterChainDefinition;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 import org.apache.shiro.web.session.mgt.ServletContainerSessionManager;
-import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
-import org.springframework.web.filter.DelegatingFilterProxy;
-
 import javax.servlet.Filter;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -30,7 +23,7 @@ import java.util.Map;
 @Component
 public class ShiroConfig {
 
-    //Shiro生命周期处理器
+    /** Shiro生命周期处理器 */
     @Bean("lifecycleBeanPostProcessor")
     public LifecycleBeanPostProcessor injectBeanPostProcessor() {
         return new LifecycleBeanPostProcessor();
@@ -46,8 +39,18 @@ public class ShiroConfig {
         fac.setSecurityManager(securityManager(applicationContext));
         fac.setFilterChainDefinitionMap(getFilterChainDefinitionMap());
         Map<String,Filter> filterMap = fac.getFilters();
-        filterMap.put("authc", loginFilter(i18nMessage));
-        //filterMap.put("perms", permissionFilter(applicationContext));
+
+        /**这里有坑，需要自己new，不能使用spring的@Bean创建。
+         * 否则shiro的过滤器链逻辑有问题。
+         * 否则anon匹配上了某个路径，却还是会和后面的/**匹配
+         * */
+        LoginFilter loginFilter = new LoginFilter();
+        loginFilter.setI18nMessage(i18nMessage);
+        filterMap.put("authc", loginFilter);
+
+        //PermissionFilter permissionFilter = new PermissionFilter();
+        //permissionFilter.setI18nMessage(i18nMessage);
+        //filterMap.put("perms", permissionFilter);
         fac.setFilters(filterMap);
         return fac;
     }
@@ -86,21 +89,6 @@ public class ShiroConfig {
         return map;
     }
 
-    @Bean
-    public LoginFilter loginFilter(I18nMessage i18nMessage) {
-        LoginFilter loginFilter = new LoginFilter();
-        loginFilter.setI18nMessage(i18nMessage);
-        return loginFilter;
-    }
-
-    @Bean
-    @DependsOn({"i18nMessage"})
-    public PermissionFilter permissionFilter(ApplicationContext applicationContext){
-        I18nMessage i18nMessage = applicationContext.getBean(I18nMessage.class);
-        PermissionFilter filter = new PermissionFilter();
-        filter.setI18nMessage(i18nMessage);
-        return filter;
-    }
 
     @Bean
     @DependsOn({"tuyaCloudRealm"})
@@ -109,25 +97,10 @@ public class ShiroConfig {
         TuyaCloudRealm realm = applicationContext.getBean(TuyaCloudRealm.class);
         //禁用shiro的认证和权限缓存，到时候在service层用spring-redis的缓存
         realm.setCachingEnabled(false);
-        //realm.setAuthorizationCacheName("authorCache");
-        //realm.setAuthenticationCacheName("authenCache");
         manager.setRealm(realm);
-        //manager.setCacheManager(cacheManager(applicationContext));
         manager.setSessionManager(sessionManager());
         return manager;
     }
-
-    /*@Bean
-    @DependsOn({"redisTemplate"})
-    public ShiroRedisCacheManager cacheManager(ApplicationContext applicationContext) {
-        RedisTemplate redisTemplate = applicationContext.getBean("redisTemplate",RedisTemplate.class);
-        ShiroRedisCacheManager cacheManager = new ShiroRedisCacheManager();
-        Map<String, ShiroRedisCache> cacheMap = new HashMap<>();
-        cacheMap.put("authenCache", new ShiroRedisCache("authenCache", redisTemplate));
-        cacheMap.put("authorCache", new ShiroRedisCache("authorCache", redisTemplate));
-        cacheManager.setCacheMap(cacheMap);
-        return cacheManager;
-    }*/
 
     /**
      * 我们已经用spring整合redis实现了分布式会话，shiro的会话直接交给容器管理。
