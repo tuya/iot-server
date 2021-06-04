@@ -9,6 +9,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import javax.servlet.Filter;
 import java.util.LinkedHashMap;
@@ -30,6 +32,7 @@ public class ShiroConfig {
     }
 
     @Bean
+    @Order(Ordered.LOWEST_PRECEDENCE-2)
     public ShiroFilterFactoryBean shiroFilterFactoryBean(ApplicationContext applicationContext
             , I18nMessage i18nMessage) {
         ShiroFilterFactoryBean fac = new ShiroFilterFactoryBean();
@@ -76,6 +79,7 @@ public class ShiroConfig {
         map.put("/mobile/countries", "anon");
         map.put("/hc.do", "anon");
         map.put("/v2/api-docs", "anon");
+        map.put("/webjars/**", "anon");
         map.put("/swagger-resources/**", "anon");
         map.put("/configuration/ui", "anon");
         map.put("/configuration/security", "anon");
