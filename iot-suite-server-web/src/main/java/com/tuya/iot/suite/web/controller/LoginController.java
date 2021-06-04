@@ -4,7 +4,7 @@ import com.tuya.iot.suite.core.constant.ErrorCode;
 import com.tuya.iot.suite.core.constant.Response;
 import com.tuya.iot.suite.core.util.LibPhoneNumberUtil;
 import com.tuya.iot.suite.web.model.request.login.LoginReq;
-import com.tuya.iot.suite.web.util.Responses;
+import com.tuya.iot.suite.web.util.ResponseI18n;
 import com.tuya.iot.suite.web.util.SessionContext;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +46,7 @@ public class LoginController {
             //校验手机号码合法性
             if (!LibPhoneNumberUtil.doValid(req.getTelephone(), req.getCountry_code())) {
                 log.info("telephone format error! =>{}{}", req.getCountry_code(), req.getTelephone());
-                return Responses.buildFailure(ErrorCode.TELEPHONE_FORMAT_ERROR);
+                return ResponseI18n.buildFailure(ErrorCode.TELEPHONE_FORMAT_ERROR);
             }
             username = req.getTelephone();
         }

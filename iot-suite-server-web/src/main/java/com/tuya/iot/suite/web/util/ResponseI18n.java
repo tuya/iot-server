@@ -10,7 +10,7 @@ import com.tuya.iot.suite.web.i18n.I18nMessage;
  * @description
  * @date 2021/05/31
  */
-public class Responses {
+public class ResponseI18n {
     private static I18nMessage i18nMessage;
 
     private static I18nMessage getI18nMessage() {

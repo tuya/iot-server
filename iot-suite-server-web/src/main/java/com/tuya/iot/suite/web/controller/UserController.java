@@ -8,7 +8,6 @@ import com.tuya.iot.suite.core.model.UserBaseInfo;
 import com.tuya.iot.suite.core.util.ContextUtil;
 import com.tuya.iot.suite.core.util.LibPhoneNumberUtil;
 import com.tuya.iot.suite.core.util.MixUtil;
-import com.tuya.iot.suite.core.util.Todo;
 import com.tuya.iot.suite.service.idaas.GrantService;
 import com.tuya.iot.suite.core.model.PageVO;
 import com.tuya.iot.suite.service.idaas.PermissionService;
@@ -25,7 +24,7 @@ import com.tuya.iot.suite.web.model.request.user.UserPwdReq;
 import com.tuya.iot.suite.web.model.response.permission.PermissionDto;
 import com.tuya.iot.suite.web.model.response.role.RoleDto;
 import com.tuya.iot.suite.web.model.response.user.UserDto;
-import com.tuya.iot.suite.web.util.Responses;
+import com.tuya.iot.suite.web.util.ResponseI18n;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -80,7 +79,7 @@ public class UserController {
     public Response<Boolean> modifyLoginPassword(@RequestBody UserPasswordModifyReq req) {
         Boolean modifyLoginPassword = userService.modifyLoginPassword(req.getUid(), req.getOldPassword(), req.getNewPassword());
         return modifyLoginPassword ? Response.buildSuccess(true) :
-                Responses.buildFailure(USER_NOT_EXIST);
+                ResponseI18n.buildFailure(USER_NOT_EXIST);
     }
 
     /**
