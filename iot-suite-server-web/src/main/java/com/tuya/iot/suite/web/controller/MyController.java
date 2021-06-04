@@ -16,7 +16,7 @@ import com.tuya.iot.suite.web.model.ResetPasswordReq;
 import com.tuya.iot.suite.web.model.RoleVO;
 import com.tuya.iot.suite.web.model.criteria.UserCriteria;
 import com.tuya.iot.suite.web.model.response.permission.PermissionDto;
-import com.tuya.iot.suite.web.util.Responses;
+import com.tuya.iot.suite.web.util.ResponseI18n;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AccessLevel;
@@ -114,8 +114,8 @@ public class MyController {
         String currentPassword = criteria.getCurrent_password();
         String newPassword = criteria.getNew_password();
         Boolean modifyLoginPassword = userService.modifyLoginPassword(ContextUtil.getUserId(), currentPassword, newPassword);
-        return modifyLoginPassword ? Responses.buildSuccess(true) :
-                Responses.buildFailure(USER_NOT_EXIST);
+        return modifyLoginPassword ? ResponseI18n.buildSuccess(true) :
+                ResponseI18n.buildFailure(USER_NOT_EXIST);
     }
 
     @ApiOperation(value = "获取密码重置验证码")
