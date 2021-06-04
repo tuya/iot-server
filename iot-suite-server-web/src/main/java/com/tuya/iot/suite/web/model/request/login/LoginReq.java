@@ -2,7 +2,10 @@ package com.tuya.iot.suite.web.model.request.login;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 /**
@@ -12,6 +15,9 @@ import lombok.experimental.FieldDefaults;
  */
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class LoginReq {
     @ApiModelProperty(value = "用户名")
     private String user_name;
