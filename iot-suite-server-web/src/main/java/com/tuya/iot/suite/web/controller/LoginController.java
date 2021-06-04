@@ -2,6 +2,7 @@ package com.tuya.iot.suite.web.controller;
 
 import com.tuya.iot.suite.core.constant.ErrorCode;
 import com.tuya.iot.suite.core.constant.Response;
+import com.tuya.iot.suite.core.model.UserToken;
 import com.tuya.iot.suite.core.util.LibPhoneNumberUtil;
 import com.tuya.iot.suite.web.model.request.login.LoginReq;
 import com.tuya.iot.suite.web.util.ResponseI18n;
@@ -31,13 +32,16 @@ public class LoginController {
     @ApiOperation(value = "用户登出")
     @PostMapping(value = "/logout")
     public Response<Boolean> logout() {
+        log.info("用户登出入参:无");
         SecurityUtils.getSubject().logout();
+        log.info("用户登出成功");
         return Response.buildSuccess(true);
     }
 
     @ApiOperation(value = "用户登录")
     @PostMapping("/login")
     public Object login(@RequestBody LoginReq req) {
+        log.info("用户登录入参:略");
         //判断是何种登录方式
         String username = req.getUser_name();
         String password = req.getLogin_password();
@@ -53,6 +57,8 @@ public class LoginController {
         UsernamePasswordToken usernamePasswordToken = new UsernamePasswordToken(username, password);
         Subject subject = SecurityUtils.getSubject();
         subject.login(usernamePasswordToken);
-        return new Response(SessionContext.getUserToken());
+        UserToken userToken = SessionContext.getUserToken();
+        log.info("用户登录成功");
+        return new Response(userToken);
     }
 }

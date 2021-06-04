@@ -68,6 +68,7 @@ public class MyController {
     @ApiOperation("我的权限列表")
     @GetMapping("/permissions")
     public Response<List<PermissionDto>> myPermissions() {
+        log.info("查询我的权限列表入参:无");
         String uid = ContextUtil.getUserId();
         List<PermissionDto> perms = permissionService.queryPermissionsByUser(projectProperties.getPermissionSpaceId(), uid)
                 .stream()
@@ -80,20 +81,24 @@ public class MyController {
                                 .order(it.getOrder())
                                 .build())
                 .collect(Collectors.toList());
+        log.info("查询我的权限列表出参:perms.size={}",perms.size());
         return Response.buildSuccess(perms);
     }
 
     @ApiOperation("我的权限树")
     @GetMapping("/permissions-trees")
     public Response<List<PermissionNodeDTO>> myPermissionsTrees() {
+        log.info("查询我的权限树入参:无");
         String uid = ContextUtil.getUserId();
         List<PermissionNodeDTO> trees = permissionService.queryPermissionTrees(projectProperties.getPermissionSpaceId(), uid);
+        log.info("查询我的权限列表出参:trees.size={}",trees.size());
         return Response.buildSuccess(trees);
     }
 
     @ApiOperation("我的角色列表")
     @GetMapping("/roles")
     public Response<List<RoleVO>> myRoles() {
+        log.info("查询我的角色列表入参:无}");
         String uid = ContextUtil.getUserId();
         List<RoleVO> list = roleService.queryRolesByUser(projectProperties.getPermissionSpaceId(), uid)
                 .stream().map(it -> RoleVO.builder()
@@ -101,6 +106,7 @@ public class MyController {
                         .roleName(it.getRoleName())
                         .build()
                 ).collect(Collectors.toList());
+        log.info("查询我的角色列表出参:list.size={}",list.size());
         return Response.buildSuccess(list);
     }
 
@@ -111,9 +117,11 @@ public class MyController {
     @SneakyThrows
     @PutMapping(value = "/password")
     public Response modifyLoginPassword(@RequestBody UserCriteria criteria) {
+        log.info("修改我的密码入参:略");
         String currentPassword = criteria.getCurrent_password();
         String newPassword = criteria.getNew_password();
         Boolean modifyLoginPassword = userService.modifyLoginPassword(ContextUtil.getUserId(), currentPassword, newPassword);
+        log.info("修改我的密码出参:{}",modifyLoginPassword);
         return modifyLoginPassword ? ResponseI18n.buildSuccess(true) :
                 ResponseI18n.buildFailure(USER_NOT_EXIST);
     }
@@ -121,6 +129,7 @@ public class MyController {
     @ApiOperation(value = "获取密码重置验证码")
     @PostMapping(value = "/password/reset/captcha")
     public Response<Boolean> restPasswordCaptcha(@RequestBody ResetPasswordReq req) {
+        log.info("重置我的密码获取验证码入参:略");
         String principal = SecurityUtils.getSubject().getPrincipal().toString();
         if (UserNameUtil.isEmail(principal)) {
             req.setMail(principal);
@@ -133,12 +142,15 @@ public class MyController {
         captchaPushBo.setCountryCode(req.getCountryCode());
         captchaPushBo.setPhone(req.getPhone());
         captchaPushBo.setMail(req.getMail());
-        return Response.buildSuccess(userService.sendRestPasswordCaptcha(captchaPushBo));
+        boolean sendRes = userService.sendRestPasswordCaptcha(captchaPushBo);
+        log.info("重置我的密码获取验证码出参:{}",sendRes);
+        return Response.buildSuccess(sendRes);
     }
 
     @ApiOperation(value = "用户密码重置")
     @PostMapping(value = "/password/reset")
     public Response<Boolean> resetPassword(@RequestBody @Valid ResetPasswordReq req) {
+        log.info("重置我的密码入参:略");
         String principal = SecurityUtils.getSubject().getPrincipal().toString();
         if (UserNameUtil.isEmail(principal)) {
             req.setMail(principal);
@@ -157,7 +169,9 @@ public class MyController {
         resetPasswordBo.setPhone(req.getPhone());
         resetPasswordBo.setPassword(req.getNewPassword());
         resetPasswordBo.setCode(req.getCode());
-        return Response.buildSuccess(userService.resetPassword(resetPasswordBo));
+        boolean res = userService.resetPassword(resetPasswordBo);
+        log.info("重置我的密码出参:{}",res);
+        return Response.buildSuccess(res);
     }
 
     /**
