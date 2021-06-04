@@ -1,6 +1,7 @@
 package com.tuya.iot.suite.service
 
 import com.tuya.iot.suite.web.IotSuiteServerApplication
+import groovy.util.logging.Slf4j
 import org.springframework.boot.test.context.SpringBootTest
 import spock.lang.Specification
 
