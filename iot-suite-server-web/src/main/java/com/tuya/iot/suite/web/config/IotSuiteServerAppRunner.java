@@ -83,7 +83,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
             return;
         }
         //permissions
-        List<PermissionCreateReq> adminPermissions = PermTemplateUtil.loadAsPermissionCreateReqList("classpath:template/permissions-admin.json");
+        List<PermissionCreateReq> adminPermissions = PermTemplateUtil.loadAsPermissionCreateReqList("classpath:template/permissions.json",it->it.getAuthRoleTypes().contains("admin"));
 
         if (!initPermissions(adminPermissions)) {
             log.error("init permissions failure!");
@@ -114,7 +114,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
             return;
         }
         String roleType = RoleTypeEnum.fromRoleCode(roleCode).name();
-        List<PermissionCreateReq> perms = PermTemplateUtil.loadAsPermissionCreateReqList("classpath:template/permissions-"+roleType+".json");
+        List<PermissionCreateReq> perms = PermTemplateUtil.loadAsPermissionCreateReqList("classpath:template/permissions.json",it->it.getAuthRoleTypes().contains(roleType));
 
         if(!grantPermissionsToRole(roleCode, perms)){
             log.error("grant permissions to role({}) failure!",roleCode);

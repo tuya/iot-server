@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-
 import java.util.List;
 
 /**
@@ -39,4 +38,8 @@ public class PermissionNodeDTO {
     String parentCode;
     @ApiModelProperty("下级权限")
     List<PermissionNodeDTO> children;
+    /**
+     * 允许该操作的角色类型
+     * */
+    List<String> authRoleTypes;
 }

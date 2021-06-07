@@ -23,43 +23,43 @@ import java.util.stream.Stream;
 public class PermissionTemplateServiceImpl implements PermissionTemplateService {
 
     /**
-     * roleType=>permissionTemplate
+     * roleType=>permission trees
      * <p>
      * load only when first call
      */
-    private LazyRef<Map<String, PermissionNodeDTO>> permTreeMapHolder = LazyRef.lateInit(() ->
-            Stream.of(RoleTypeEnum.values()).map(it ->
-                    new Tuple2<>(it.name(), PermTemplateUtil
-                            .load("classpath:template/permissions-" + it.name() + ".json"))
+    private LazyRef<Map<String, List<PermissionNodeDTO>>> permTreesMapHolder = LazyRef.lateInit(() ->
+            Stream.of(RoleTypeEnum.values()).map(roleType ->
+                    new Tuple2<>(roleType.name(), PermTemplateUtil
+                            .loadTrees("classpath:template/permissions.json",node->node.getAuthRoleTypes().contains(roleType.name())))
             ).collect(Collectors.toMap(it -> it.first(), it -> it.second()))
     );
 
     /**
-     * roleType=>permissionList
+     * roleType=>permission flatten list
      */
-    private LazyRef<Map<String, List<PermissionNodeDTO>>> permListMapHolder = LazyRef.lateInit(() ->
+    private LazyRef<Map<String, List<PermissionNodeDTO>>> permFlattenListMapHolder = LazyRef.lateInit(() ->
             Stream.of(RoleTypeEnum.values()).map(it ->
                     new Tuple2<>(it.name(), PermTemplateUtil
-                            .loadAsList("classpath:template/permissions-" + it.name() + ".json"))
+                            .loadAsFlattenList("classpath:template/permissions.json",node->node.getAuthRoleTypes().contains(it.name())))
             ).collect(Collectors.toMap(it -> it.first(), it -> it.second()))
     );
 
     @Override
     public Set<String> getAuthorizablePermissions() {
-        return permListMapHolder.get().get(RoleTypeEnum.admin.name())
+        return permFlattenListMapHolder.get().get(RoleTypeEnum.admin.name())
                 .stream().filter(it->it.getAuthorizable()).map(it->it.getPermissionCode())
                 .collect(Collectors.toSet());
     }
 
 
     @Override
-    public PermissionNodeDTO getTemplatePermissionTree(String roleTypeOrRoleCode) {
-        return permTreeMapHolder.get().get(RoleTypeEnum.fromRoleCode(roleTypeOrRoleCode).name());
+    public List<PermissionNodeDTO> getTemplatePermissionTrees(String roleTypeOrRoleCode) {
+        return permTreesMapHolder.get().get(RoleTypeEnum.fromRoleCode(roleTypeOrRoleCode).name());
     }
 
     @Override
-    public List<PermissionNodeDTO> getTemplatePermissionList(String roleType) {
-        return permListMapHolder.get().get(roleType);
+    public List<PermissionNodeDTO> getTemplatePermissionFlattenList(String roleType) {
+        return permFlattenListMapHolder.get().get(roleType);
     }
 
 
