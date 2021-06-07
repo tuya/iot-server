@@ -17,6 +17,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -119,8 +120,11 @@ public class AssetController {
     @ApiOperation(value = "用户被授权的资产")
     @GetMapping(value = "/auths")
     //@RequiresPermissions("1001")
-    public Response<List<AssetVO>> authAssetOfUser() {
-        return Response.buildSuccess(AssetConvertor.$.toAssetVOList(assetService.getTreeByUser(ContextUtil.getUserId())));
+    public Response<List<AssetVO>> authAssetOfUser(@RequestParam String userId) {
+        if (StringUtils.isEmpty(userId)) {
+            userId = ContextUtil.getUserId();
+        }
+        return Response.buildSuccess(AssetConvertor.$.toAssetVOList(assetService.getTreeByUser(userId)));
     }
 
     @ApiOperation(value = "系统所有资产")
