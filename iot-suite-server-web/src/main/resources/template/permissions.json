@@ -471,7 +471,8 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage"
+            "manage",
+            "normal"
           ],
           "remark": "账号设置"
         },
