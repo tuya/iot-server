@@ -67,16 +67,16 @@ public class GrantServiceImpl implements GrantService {
         IdaasRole role = roles.get(0);
         // 1. 操作者角色更高级
         if (!RoleTypeEnum.valueOf(roleCode).isOffspringOrSelfOf(role.getRoleCode())) {
-            throw new ServiceLogicException(ErrorCode.NO_DATA_PERM);
+            throw new ServiceLogicException(ErrorCode.NO_DATA_PERMISSION);
         }
         // 2. 操作者拥有该权限
         if (!perms.stream().map(it -> it.getPermissionCode()).collect(Collectors.toList()).containsAll(permissionCodes)) {
-            throw new ServiceLogicException(ErrorCode.NO_DATA_PERM);
+            throw new ServiceLogicException(ErrorCode.NO_DATA_PERMISSION);
         }
         // 3. permissions are authorizable
         Set<String> authorizablePerms = permissionTemplateService.getAuthorizablePermissions();
         if(authorizablePerms.containsAll(permissionCodes)){
-            throw new ServiceLogicException(ErrorCode.NO_DATA_PERM);
+            throw new ServiceLogicException(ErrorCode.NO_DATA_PERMISSION);
         }
     }
 
@@ -124,14 +124,14 @@ public class GrantServiceImpl implements GrantService {
         //操作者角色更高级
         roleCodes.forEach(roleCode -> {
             if (!RoleTypeEnum.valueOf(roleCode).isOffspringOrSelfOf(role.getRoleCode())) {
-                throw new ServiceLogicException(ErrorCode.NO_DATA_PERM);
+                throw new ServiceLogicException(ErrorCode.NO_DATA_PERMISSION);
             }
         });
         //被操作的用户不能是系统管理员
         List<IdaasRole> userRoles = roleAbility.queryRolesByUser(spaceId, uid);
         userRoles.forEach(userRole -> {
             if (!RoleTypeEnum.valueOf(userRole.getRoleCode()).isOffspringOrSelfOf(role.getRoleCode())) {
-                throw new ServiceLogicException(ErrorCode.NO_DATA_PERM);
+                throw new ServiceLogicException(ErrorCode.NO_DATA_PERMISSION);
             }
         });
     }
@@ -163,7 +163,7 @@ public class GrantServiceImpl implements GrantService {
         Assert.isTrue(operatorRoles.size() == 1, "a user can at most have one role!");
         String operateRoleCode = operatorRoles.get(0).getRoleCode();
         if (!RoleTypeEnum.fromRoleCode(roleCode).isOffspringOrSelfOf(operateRoleCode)) {
-            throw new ServiceLogicException(ErrorCode.NO_DATA_PERM);
+            throw new ServiceLogicException(ErrorCode.NO_DATA_PERMISSION);
         }
         // 2. 被设置角色的用户，如果有比操作者更高级的角色，则不允许操作。（不允许 普通员工 把 部门经理 设置为 项目经理）
         RoleTypeEnum operatorRoleType = RoleTypeEnum.fromRoleCode(operateRoleCode);
@@ -171,7 +171,7 @@ public class GrantServiceImpl implements GrantService {
         for (String uid : uidList) {
             List<IdaasRole> userRoles = roleAbility.queryRolesByUser(spaceId, uid);
             if (!operatorRoleType.isOffspringOrSelfOfAll(userRoles.stream().map(it -> it.getRoleCode()).collect(Collectors.toList()))) {
-                throw new ServiceLogicException(ErrorCode.NO_DATA_PERM);
+                throw new ServiceLogicException(ErrorCode.NO_DATA_PERMISSION);
             }
         }
         // 3. 逐个授权
