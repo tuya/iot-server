@@ -50,7 +50,7 @@ public class DeviceController {
 
     @ApiOperation(value = "根据设备ID删除设备")
     @RequestMapping(value = "/{device_id}", method = RequestMethod.DELETE)
-    @RequiresPermissions("2005")
+    @RequiresPermissions("2003")
     public Response<Boolean> deleteDeviceBy(@PathVariable("device_id") String deviceId) {
         return Response.buildSuccess(deviceService.deleteDeviceBy(deviceId));
     }
@@ -71,7 +71,7 @@ public class DeviceController {
 
     @ApiOperation(value = "控制设备")
     @RequestMapping(value = "/command/{device_id}", method = RequestMethod.POST)
-    @RequiresPermissions("2004")
+    @RequiresPermissions("2003")
     public Response<Boolean> commandDevice(@PathVariable("device_id") String deviceId, @RequestBody List<DeviceCommandCriteria> criteriaList) {
         List<DeviceCommandRequest.Command> convert = SimpleConvertUtil.convert(criteriaList, DeviceCommandRequest.Command.class);
         DeviceCommandRequest request = new DeviceCommandRequest();
@@ -81,7 +81,7 @@ public class DeviceController {
 
     @ApiOperation(value = "设备配网二维码信息")
     @GetMapping(value = "/qrcode")
-    @RequiresPermissions("2003")
+    @RequiresPermissions("2002")
     public Response<Map<String, String>> qrcode() {
         Map<String, String> map = new HashMap<>(2);
         map.put("project_name", projectName);

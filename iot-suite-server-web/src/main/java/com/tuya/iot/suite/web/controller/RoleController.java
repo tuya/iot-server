@@ -122,7 +122,7 @@ public class RoleController {
 
     @ApiOperation("批量删除角色")
     @DeleteMapping("/batch-roles")
-    @RequiresPermissions("3003")
+    @RequiresPermissions("3004")
     public Response<Boolean> batchDeleteRole(@ApiParam(value = "角色编码列表，逗号分隔", required = true)
                                              @RequestParam("roleCodeList") String roleCodeList) {
         log.info("批量删除角色入参:roleCodeList={}",roleCodeList);
