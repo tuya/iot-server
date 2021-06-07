@@ -181,7 +181,7 @@ public class UserController {
      */
     @ApiOperation("批量删除用户")
     @DeleteMapping("/users")
-    @RequiresPermissions("4003")
+    @RequiresPermissions("4009")
     public Response<Boolean> batchDeleteUser(@ApiParam(value = "uid列表，逗号分隔", required = true)
                                              @RequestParam String uidList) {
         Long spaceId = projectProperties.getPermissionSpaceId();
@@ -234,7 +234,7 @@ public class UserController {
 
     @ApiOperation("批量给用户授角色")
     @PutMapping("/users/roles")
-    @RequiresPermissions("4003")
+    @RequiresPermissions("4009")
     public Response<Boolean> grantRole(@RequestBody BatchUserGrantRoleReq req){
         Long spaceId = projectProperties.getPermissionSpaceId();
         String uid = ContextUtil.getUserId();

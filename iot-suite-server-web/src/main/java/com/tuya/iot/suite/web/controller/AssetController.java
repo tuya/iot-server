@@ -111,21 +111,21 @@ public class AssetController {
 
     @ApiOperation(value = "批量给用户授权资产")
     @PutMapping(value = "/auths")
-    @RequiresPermissions("1005")
+    @RequiresPermissions("4007")
     public Response<Boolean> authAssetToUser(@RequestBody AssetAuths req) {
         return  Response.buildSuccess(assetService.authAssetToUser(req.getUserId(),req.getAssetIds()));
     }
 
     @ApiOperation(value = "用户被授权的资产")
     @GetMapping(value = "/auths")
-    @RequiresPermissions("1005")
+    //@RequiresPermissions("1001")
     public Response<List<AssetVO>> authAssetOfUser() {
         return Response.buildSuccess(AssetConvertor.$.toAssetVOList(assetService.getTreeByUser(ContextUtil.getUserId())));
     }
 
     @ApiOperation(value = "系统所有资产")
     @GetMapping(value = "/all")
-    @RequiresPermissions("1005")
+    @RequiresPermissions("1001")
     public Response<List<AssetVO>> sysAssetAll() {
         String roleCode = "admin";
         return Response.buildSuccess(AssetConvertor.$.toAssetVOList(assetService.getAllTree(roleCode,ContextUtil.getUserId())));

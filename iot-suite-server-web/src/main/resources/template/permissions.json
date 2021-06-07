@@ -396,7 +396,7 @@
         },
         {
           "permissionName": "批量操作",
-          "permissionType": "api",
+          "permissionType": "button",
           "permissionCode": "4009",
           "parentCode": "4000",
           "order": "9",
