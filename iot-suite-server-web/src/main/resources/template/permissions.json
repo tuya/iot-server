@@ -7,6 +7,11 @@
       "parentCode": "0",
       "order": "1",
       "authorizable": true,
+      "authRoleTypes": [
+        "admin",
+        "manage",
+        "normal"
+      ],
       "remark": "资产能力",
       "dependencies": [],
       "children": [
@@ -18,6 +23,11 @@
           "order": "1",
           "dependencies": [],
           "authorizable": true,
+          "authRoleTypes": [
+            "admin",
+            "manage",
+            "normal"
+          ],
           "remark": "资产列表"
         },
         {
@@ -30,6 +40,10 @@
             "1001"
           ],
           "authorizable": true,
+          "authRoleTypes": [
+            "admin",
+            "manage"
+          ],
           "remark": "新增资产"
         },
         {
@@ -42,6 +56,10 @@
             "1001"
           ],
           "authorizable": true,
+          "authRoleTypes": [
+            "admin",
+            "manage"
+          ],
           "remark": "修改资产"
         },
         {
@@ -54,6 +72,10 @@
             "1001"
           ],
           "authorizable": true,
+          "authRoleTypes": [
+            "admin",
+            "manage"
+          ],
           "remark": "删除资产"
         }
       ]
@@ -65,6 +87,11 @@
       "parentCode": "0",
       "order": "2",
       "authorizable": true,
+      "authRoleTypes": [
+        "admin",
+        "manage",
+        "normal"
+      ],
       "remark": "设备能力",
       "dependencies": [],
       "children": [
@@ -76,6 +103,11 @@
           "order": "1",
           "dependencies": [],
           "authorizable": true,
+          "authRoleTypes": [
+            "admin",
+            "manage",
+            "normal"
+          ],
           "remark": "设备列表"
         },
         {
@@ -84,43 +116,33 @@
           "permissionCode": "2002",
           "parentCode": "2000",
           "order": "2",
-          "dependencies": [],
+          "dependencies": [
+            "2001"
+          ],
           "authorizable": true,
+          "authRoleTypes": [
+            "admin",
+            "manage",
+            "normal"
+          ],
           "remark": "添加设备"
         },
         {
-          "permissionName": "修改设备",
-          "permissionType": "api",
+          "permissionName": "设备操作",
+          "permissionType": "button",
           "permissionCode": "2003",
           "parentCode": "2000",
           "order": "3",
-          "dependencies": [],
-          "authorizable": true,
-          "remark": "修改设备"
-        },
-        {
-          "permissionName": "控制设备",
-          "permissionType": "api",
-          "permissionCode": "2004",
-          "parentCode": "2000",
-          "order": "4",
           "dependencies": [
             "2001"
           ],
           "authorizable": true,
-          "remark": "控制设备"
-        },
-        {
-          "permissionName": "移除设备",
-          "permissionType": "api",
-          "permissionCode": "2005",
-          "parentCode": "2000",
-          "order": "5",
-          "dependencies": [
-            "2001"
+          "authRoleTypes": [
+            "admin",
+            "manage",
+            "normal"
           ],
-          "authorizable": true,
-          "remark": "移除设备"
+          "remark": "设备操作"
         }
       ]
     },
@@ -131,6 +153,10 @@
       "parentCode": "0",
       "order": "3",
       "authorizable": true,
+      "authRoleTypes": [
+        "admin",
+        "manage"
+      ],
       "remark": "角色能力",
       "dependencies": [],
       "children": [
@@ -142,6 +168,10 @@
           "order": "1",
           "dependencies": [],
           "authorizable": true,
+          "authRoleTypes": [
+            "admin",
+            "manage"
+          ],
           "remark": "角色列表"
         },
         {
@@ -154,6 +184,9 @@
             "3001"
           ],
           "authorizable": false,
+          "authRoleTypes": [
+            "admin"
+          ],
           "remark": "新增角色"
         },
         {
@@ -166,6 +199,9 @@
             "3001"
           ],
           "authorizable": false,
+          "authRoleTypes": [
+            "admin"
+          ],
           "remark": "修改角色"
         },
         {
@@ -178,6 +214,9 @@
             "3001"
           ],
           "authorizable": false,
+          "authRoleTypes": [
+            "admin"
+          ],
           "remark": "删除角色"
         },
         {
@@ -190,10 +229,13 @@
             "3001"
           ],
           "authorizable": false,
+          "authRoleTypes": [
+            "admin"
+          ],
           "remark": "给角色授权"
         },
         {
-          "permissionName": "角色权限",
+          "permissionName": "查看角色权限",
           "permissionType": "api",
           "permissionCode": "3006",
           "parentCode": "3000",
@@ -202,6 +244,9 @@
             "3001"
           ],
           "authorizable": true,
+          "authRoleTypes": [
+            "admin"
+          ],
           "remark": "查询角色拥有权限"
         }
       ]
@@ -213,6 +258,10 @@
       "parentCode": "0",
       "order": "4",
       "authorizable": true,
+      "authRoleTypes": [
+        "admin",
+        "manage"
+      ],
       "remark": "用户能力",
       "dependencies": [],
       "children": [
@@ -224,6 +273,10 @@
           "order": "1",
           "dependencies": [],
           "authorizable": true,
+          "authRoleTypes": [
+            "admin",
+            "manage"
+          ],
           "remark": "用户列表"
         },
         {
@@ -236,6 +289,10 @@
             "4001"
           ],
           "authorizable": true,
+          "authRoleTypes": [
+            "admin",
+            "manage"
+          ],
           "remark": "新增用户"
         },
         {
@@ -245,9 +302,14 @@
           "parentCode": "4000",
           "order": "3",
           "dependencies": [
-            "4001"
+            "4001",
+            "4008"
           ],
           "authorizable": true,
+          "authRoleTypes": [
+            "admin",
+            "manage"
+          ],
           "remark": "修改用户"
         },
         {
@@ -257,9 +319,14 @@
           "parentCode": "4000",
           "order": "4",
           "dependencies": [
-            "4001"
+            "4001",
+            "4008"
           ],
           "authorizable": true,
+          "authRoleTypes": [
+            "admin",
+            "manage"
+          ],
           "remark": "删除用户"
         },
         {
@@ -269,9 +336,14 @@
           "parentCode": "4000",
           "order": "5",
           "dependencies": [
-            "3001"
+            "4001",
+            "4008"
           ],
           "authorizable": true,
+          "authRoleTypes": [
+            "admin",
+            "manage"
+          ],
           "remark": "修改密码"
         },
         {
@@ -281,10 +353,62 @@
           "parentCode": "4000",
           "order": "6",
           "dependencies": [
-            "3001"
+            "4001"
           ],
           "authorizable": true,
+          "authRoleTypes": [
+            "admin",
+            "manage"
+          ],
           "remark": "分配角色"
+        },
+        {
+          "permissionName": "资产授权",
+          "permissionType": "api",
+          "permissionCode": "4007",
+          "parentCode": "4000",
+          "order": "7",
+          "dependencies": [
+            "4001"
+          ],
+          "authorizable": true,
+          "authRoleTypes": [
+            "admin",
+            "manage"
+          ],
+          "remark": "资产授权"
+        },
+        {
+          "permissionName": "更多操作",
+          "permissionType": "button",
+          "permissionCode": "4008",
+          "parentCode": "4000",
+          "order": "8",
+          "dependencies": [
+            "4001"
+          ],
+          "authorizable": true,
+          "authRoleTypes": [
+            "admin",
+            "manage"
+          ],
+          "remark": "更多操作"
+        },
+        {
+          "permissionName": "批量操作",
+          "permissionType": "api",
+          "permissionCode": "4009",
+          "parentCode": "4000",
+          "order": "9",
+          "dependencies": [
+            "4001"
+          ],
+          "authorizable": true,
+          "authRoleTypes": [
+            "admin",
+            "manage"
+          ],
+          "remark": "批量操作"
         }
       ]
     },
@@ -295,6 +419,11 @@
       "parentCode": "0",
       "order": "5",
       "authorizable": true,
+      "authRoleTypes": [
+        "admin",
+        "manage",
+        "normal"
+      ],
       "remark": "资产能力",
       "dependencies": [],
       "children": [
@@ -306,7 +435,60 @@
           "order": "1",
           "dependencies": [],
           "authorizable": true,
+          "authRoleTypes": [
+            "admin",
+            "manage",
+            "normal"
+          ],
           "remark": "告警列表"
+        }
+      ]
+    },
+    {
+      "permissionName": "账号设置",
+      "permissionType": "menu",
+      "permissionCode": "6000",
+      "parentCode": "0",
+      "order": "6",
+      "authorizable": true,
+      "authRoleTypes": [
+        "admin",
+        "manage",
+        "normal"
+      ],
+      "remark": "账号设置",
+      "dependencies": [],
+      "children": [
+        {
+          "permissionName": "账号设置",
+          "permissionType": "api",
+          "permissionCode": "6001",
+          "parentCode": "6000",
+          "order": "1",
+          "dependencies": [
+            "6002"
+          ],
+          "authorizable": true,
+          "authRoleTypes": [
+            "admin",
+            "manage"
+          ],
+          "remark": "账号设置"
+        },
+        {
+          "permissionName": "查看账号设置",
+          "permissionType": "api",
+          "permissionCode": "6002",
+          "parentCode": "6000",
+          "order": "2",
+          "dependencies": [],
+          "authorizable": true,
+          "authRoleTypes": [
+            "admin",
+            "manage",
+            "normal"
+          ],
+          "remark": "查看账号设置"
         }
       ]
     }

@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -23,8 +24,8 @@ import java.util.stream.Collectors;
  */
 public abstract class PermTemplateUtil {
 
-    public static List<PermissionCreateReq> loadAsPermissionCreateReqList(String path) {
-        return loadAsList(path).stream().map(it->convertToPermissionCreateReq(it)).collect(Collectors.toList());
+    public static List<PermissionCreateReq> loadAsPermissionCreateReqList(String path,Predicate<PermissionNodeDTO> predicate) {
+        return loadAsFlattenList(path,predicate).stream().map(it->convertToPermissionCreateReq(it)).collect(Collectors.toList());
     }
 
     public static PermissionCreateReq convertToPermissionCreateReq(PermissionNodeDTO it){
@@ -40,10 +41,10 @@ public abstract class PermTemplateUtil {
     /**
      * transform tree to list, then set children to null.
      * */
-    public static List<PermissionNodeDTO> loadAsList(String path) {
-        PermissionNodeDTO root = load(path);
+    public static List<PermissionNodeDTO> loadAsFlattenList(String path,Predicate<PermissionNodeDTO> predicate) {
+        List<PermissionNodeDTO> trees = loadTrees(path,predicate);
         List<PermissionNodeDTO> flatten = new ArrayList<>();
-        LinkedList<PermissionNodeDTO> queue1 = new LinkedList<>(root.getChildren());
+        LinkedList<PermissionNodeDTO> queue1 = new LinkedList<>(trees);
         LinkedList<PermissionNodeDTO> queue2 = new LinkedList<>();
         PermissionNodeDTO node;
         List<PermissionNodeDTO> children;
@@ -64,9 +65,20 @@ public abstract class PermTemplateUtil {
     }
 
     @SneakyThrows
-    public static PermissionNodeDTO load(String path) {
+    private static PermissionNodeDTO load(String path) {
         File file = ResourceUtils.getFile(path);
         String json = StreamUtils.copyToString(new FileInputStream(file), StandardCharsets.UTF_8);
         return JSONObject.parseObject(json,PermissionNodeDTO.class);
+    }
+    public static List<PermissionNodeDTO> loadTrees(String path, Predicate<PermissionNodeDTO> predicate) {
+        PermissionNodeDTO node = load(path);
+        filterChildren(node,predicate);
+        return node.getChildren();
+    }
+    private static void filterChildren(PermissionNodeDTO node, Predicate<PermissionNodeDTO> predicate){
+        if(node.getChildren()!=null && !node.getChildren().isEmpty()){
+            node.setChildren(node.getChildren().stream().filter(it->predicate.test(it)).collect(Collectors.toList()));
+            node.getChildren().forEach(child->filterChildren(child,predicate));
+        }
     }
 }
