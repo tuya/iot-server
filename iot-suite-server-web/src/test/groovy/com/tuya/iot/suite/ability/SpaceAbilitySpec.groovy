@@ -16,7 +16,6 @@ import spock.lang.Ignore
  * @date 2021/06/07
  */
 @Slf4j
-@Ignore
 class SpaceAbilitySpec extends BaseSpec{
     static{
         Env.useDailyCn()
@@ -25,6 +24,21 @@ class SpaceAbilitySpec extends BaseSpec{
     SpaceAbility spaceAbility
     @Autowired
     ProjectProperties projectProperties
+
+    void "测试创建权限空间"(){
+        given:
+        when:
+        def spaceId = spaceAbility.applySpace(SpaceApplyReq.builder()
+        .spaceGroup(projectProperties.permissionGroup)
+        .spaceCode(projectProperties.permissionSpaceCode)
+        .authentication(projectProperties.code)
+        .owner(projectProperties.permissionSpaceOwner)
+        .remark('test')
+                .build())
+        then:
+        spaceId
+        //1402084582307659814
+    }
 
     void "测试查询权限空间"(){
         when:
@@ -43,18 +57,4 @@ class SpaceAbilitySpec extends BaseSpec{
         'tuya-iot'|'iot-app-smart-office'|Success
     }
 
-    void "测试创建权限空间"(){
-        given:
-        when:
-        def spaceId = spaceAbility.applySpace(SpaceApplyReq.builder()
-        .spaceGroup(projectProperties.permissionGroup)
-        .spaceCode(projectProperties.permissionSpaceCode)
-        .authentication(projectProperties.code)
-        .owner(projectProperties.permissionSpaceOwner)
-        .remark('test')
-                .build())
-        then:
-        spaceId
-        //1402084582307659814
-    }
 }

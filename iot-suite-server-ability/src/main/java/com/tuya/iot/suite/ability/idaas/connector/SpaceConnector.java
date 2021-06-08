@@ -17,7 +17,7 @@ public interface SpaceConnector extends SpaceAbility {
 
     @POST("/v1.0/iot-03/idaas/spaces")
     @Override
-    Long applySpace(@Body SpaceApplyReq spaceApplyRequest);
+    String applySpace(@Body SpaceApplyReq spaceApplyRequest);
 
     @GET("/v1.0/iot-03/idaas/spaces")
     @Override

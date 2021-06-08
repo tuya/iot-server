@@ -3,7 +3,7 @@ package com.tuya.iot.suite.test
 import com.tuya.connector.open.common.constant.TuyaRegion
 
 /**
- * @description
+ * @description TuyaRegion中并没有定义日常环境，所以，通过反射修改apiUrl
  * @author benguan.zhou@tuya.com
  * @date 2021/06/07
  */

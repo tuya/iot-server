@@ -1,5 +1,6 @@
 package com.tuya.iot.suite.ability.idaas.model;
 
+import com.google.gson.annotations.SerializedName;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
@@ -20,16 +21,19 @@ public class RoleRevokePermissionsReq {
     /**
      * 角色code
      */
+    @SerializedName("roleCode")
     String roleCode;
 
     /**
      * 权限标识
      */
+    @SerializedName("permissionCodes")
     List<String> permissionCodes;
 
     /**
      * 隔离空间id
      */
-    Long spaceId;
+    @SerializedName("spaceId")
+    String spaceId;
 
 }

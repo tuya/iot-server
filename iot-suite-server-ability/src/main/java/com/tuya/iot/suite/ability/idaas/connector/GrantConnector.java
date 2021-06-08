@@ -28,13 +28,13 @@ public interface GrantConnector extends GrantAbility {
     @Override
     Boolean grantPermissionsToRole(@Body RoleGrantPermissionsReq request);
 
-    @PUT("/v1.0/iot-03/idaas/role-batch-permission")
+    @POST("/v1.0/iot-03/idaas/role-batch-permission")
     @Override
     Boolean setPermissionsToRole(@Body RoleGrantPermissionsReq request);
 
     @DELETE("/v1.0/iot-03/idaas/role-permission")
     @Override
-    Boolean revokePermissionFromRole(@Query("spaceId")Long spaceId,
+    Boolean revokePermissionFromRole(@Query("spaceId")String spaceId,
                                      @Query("permissionCode")String permissionCode,
                                      @Query("roleCode")String roleCode);
 
@@ -52,7 +52,7 @@ public interface GrantConnector extends GrantAbility {
 
     @DELETE("/v1.0/iot-03/idaas/user-role")
     @Override
-    Boolean revokeRoleFromUser(@Query("space_id")Long spaceId,
+    Boolean revokeRoleFromUser(@Query("space_id")String spaceId,
                                @Query("role_code") String roleCode,
                                @Query("uid") String uid);
 

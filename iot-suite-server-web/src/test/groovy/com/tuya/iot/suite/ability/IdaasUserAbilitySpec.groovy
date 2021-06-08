@@ -13,12 +13,14 @@ import com.tuya.iot.suite.web.config.ProjectProperties
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Ignore
+import spock.lang.Stepwise
 
 /**
  * @description 该测试用例依赖日常环境* @author benguan.zhou@tuya.com
  * @date 2021/06/07
  */
 @Slf4j
+//@Stepwise//使用该注解，测试按声明顺序执行
 class IdaasUserAbilitySpec extends BaseSpec {
     static {
         Env.useDailyCn()
@@ -27,7 +29,7 @@ class IdaasUserAbilitySpec extends BaseSpec {
     IdaasUserAbility idaasUserAbility
     @Autowired
     ProjectProperties projectProperties
-    long spaceId
+    String spaceId
 
     void setup() {
         spaceId = projectProperties.getPermissionSpaceId()
@@ -44,25 +46,28 @@ class IdaasUserAbilitySpec extends BaseSpec {
 
     void "测试修改用户"() {
         expect:
-        idaasUserAbility.updateUser(spaceId, 'todo', IdaasUserUpdateReq.builder()
+        idaasUserAbility.updateUser(spaceId, 'bsh1623052900346u8pQ', IdaasUserUpdateReq.builder()
                 .username('benguan.zhou')
                 .build())
     }
 
-    void "测试删除用户"() {
-        expect:
-        idaasUserAbility.deleteUser(spaceId, 'todo')
-    }
 
     void "测试查询用户byUid"() {
         expect:
-        idaasUserAbility.getUserByUid(spaceId, 'todo').username == 'benguan.zhou'
+        idaasUserAbility.getUserByUid(spaceId, 'bsh1623052900346u8pQ').username == 'benguan.zhou'
     }
 
     void "测试查询用户分页"() {
-        expect:
+        when:
         idaasUserAbility.queryUserPage(spaceId, IdaasUserPageReq.builder()
                 .roleCode('admin')
-                .build()).totalCount == 1
+                .build())
+        then:
+        noExceptionThrown()
+    }
+
+    void "测试删除用户"() {
+        expect:
+        idaasUserAbility.deleteUser(spaceId, 'bsh1623052900346u8pQ')
     }
 }

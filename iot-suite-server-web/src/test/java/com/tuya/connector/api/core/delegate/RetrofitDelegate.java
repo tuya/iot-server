@@ -36,7 +36,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
- * <p> TODO
+ * 这个类是connector-api包中的。
+ * 里面有设置请求内容json字段名风格的代码（驼峰转下划线）。
+ * gsonBuilder.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
+ * 把它拿出来，是因为联调时发现对方需要驼峰风格。
+ * 所以我们拷贝出来，将上面那行代码注释调，这样就不会转下划线了。
+ * 但是这样会影响以前的api。
+ * 解决办法是在新的api的model字段上使用@SerializeName，指定序列化的字段名。
  *
  * @author qiufeng.yu@tuya.com
  * @since 2021/1/21 10:22 上午
@@ -272,7 +278,7 @@ public class RetrofitDelegate implements ProxyDelegate {
                     }
 
                     GsonBuilder gsonBuilder = new GsonBuilder();
-                    //gsonBuilder.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
+                    gsonBuilder.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
 
                     retrofitClient = new Retrofit.Builder()
                             .baseUrl(apiDataSource.getBaseUrl())

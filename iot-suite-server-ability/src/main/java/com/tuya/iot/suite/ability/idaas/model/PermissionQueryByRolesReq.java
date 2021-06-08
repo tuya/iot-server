@@ -1,5 +1,6 @@
 package com.tuya.iot.suite.ability.idaas.model;
 
+import com.google.gson.annotations.SerializedName;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +18,7 @@ import java.util.List;
 @Builder
 public class PermissionQueryByRolesReq {
 
+    @SerializedName("roleCodeList")
     List<String> roleCodeList;
 
 }

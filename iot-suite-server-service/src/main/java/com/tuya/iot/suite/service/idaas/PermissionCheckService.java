@@ -6,8 +6,8 @@ package com.tuya.iot.suite.service.idaas;
  * @date 2021/05/31
  */
 public interface PermissionCheckService {
-    Boolean checkPermissionForRole(Long spaceIde,String permissionCode,String roleCod);
+    Boolean checkPermissionForRole(String spaceIde,String permissionCode,String roleCod);
 
-    Boolean checkRoleForUser(Long spaceId,String roleCode,String uid);
+    Boolean checkRoleForUser(String spaceId,String roleCode,String uid);
 
-    Boolean checkPermissionForUser(Long spaceId,String permissionCode,String uid);}
+    Boolean checkPermissionForUser(String spaceId,String permissionCode,String uid);}

@@ -18,27 +18,27 @@ public interface IdaasUserConnector extends IdaasUserAbility {
 
     @POST("/v1.0/iot-03/idaas/spaces/{space_id}/users")
     @Override
-    Boolean createUser(@Path("space_id")Long spaceId, @Body IdaasUserCreateReq request);
+    Boolean createUser(@Path("space_id")String spaceId, @Body IdaasUserCreateReq request);
 
     @PUT("/v1.0/iot-03/idaas/spaces/{space_id}/users/{uid}")
     @Override
-    Boolean updateUser(@Path("space_id")Long spaceId,
+    Boolean updateUser(@Path("space_id")String spaceId,
                        @Path("uid")String uid,
                        @Body IdaasUserUpdateReq req);
 
     @DELETE("/v1.0/iot-03/idaas/spaces/{space_id}/users/{uid}")
     @Override
-    Boolean deleteUser(@Path("space_id")Long spaceId,
+    Boolean deleteUser(@Path("space_id")String spaceId,
                        @Path("uid")String uid);
 
     @GET("/v1.0/iot-03/idaas/spaces/{space_id}/users/{uid}")
     @Override
-    IdaasUser getUserByUid(@Path("space_id")Long spaceId,
+    IdaasUser getUserByUid(@Path("space_id")String spaceId,
                            @Path("uid")String uid);
 
     @POST("/v1.0/iot-03/idaas/spaces/{space_id}/page-user")
     @Override
-    IdaasPageResult<IdaasUser> queryUserPage(@Path("space_id")Long spaceId,
+    IdaasPageResult<IdaasUser> queryUserPage(@Path("space_id")String spaceId,
                                              @Body IdaasUserPageReq req);
 
 

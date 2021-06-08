@@ -48,5 +48,5 @@ public class IdaasPermission {
     /**
      * 权限空间id
      * */
-    Long spaceId;
+    String spaceId;
 }

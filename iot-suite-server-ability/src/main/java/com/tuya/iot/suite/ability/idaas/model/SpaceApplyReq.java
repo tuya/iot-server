@@ -1,5 +1,6 @@
 package com.tuya.iot.suite.ability.idaas.model;
 
+import com.google.gson.annotations.SerializedName;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
@@ -18,11 +19,13 @@ public class SpaceApplyReq {
     /**
      * 空间分组
      */
+    @SerializedName("spaceGroup")
     String spaceGroup;
 
     /**
      * 空间隔离标识
      */
+    @SerializedName("spaceCode")
     String spaceCode;
 
     /**

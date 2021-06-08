@@ -94,8 +94,8 @@ public class GrantServiceImpl implements GrantService {
     }
 
     @Override
-    public Boolean revokePermissionFromRole(Long spaceId, String operatorUid, String roleCode, String permissionCode) {
-        checkForModifyPermissionToRole(spaceId.toString(), operatorUid, roleCode, permissionCode);
+    public Boolean revokePermissionFromRole(String spaceId, String operatorUid, String roleCode, String permissionCode) {
+        checkForModifyPermissionToRole(spaceId, operatorUid, roleCode, permissionCode);
         return grantAbility.revokePermissionFromRole(spaceId, permissionCode, roleCode);
     }
 
@@ -145,8 +145,8 @@ public class GrantServiceImpl implements GrantService {
     }
 
     @Override
-    public Boolean revokeRoleFromUser(Long spaceId, String operatorUid, String roleCode, String uid) {
-        checkForModifyRoleToUser(spaceId.toString(), operatorUid, roleCode, uid);
+    public Boolean revokeRoleFromUser(String spaceId, String operatorUid, String roleCode, String uid) {
+        checkForModifyRoleToUser(spaceId, operatorUid, roleCode, uid);
         return grantAbility.revokeRoleFromUser(spaceId, roleCode, uid);
     }
 
@@ -157,7 +157,7 @@ public class GrantServiceImpl implements GrantService {
     }
 
     @Override
-    public Boolean setRoleToUsers(Long spaceId, String operatorUid, String roleCode, List<String> uidList) {
+    public Boolean setRoleToUsers(String spaceId, String operatorUid, String roleCode, List<String> uidList) {
         // 0. 不能把系统管理员角色设置给用户
         Assert.isTrue(!RoleTypeEnum.fromRoleCode(roleCode).isAdmin(), "can not set 'admin' role to any users!");
         // 1. 操作者有更高级的角色（或相同的角色），才可以把这个角色设置给用户
@@ -180,7 +180,7 @@ public class GrantServiceImpl implements GrantService {
         boolean success;
         for (String uid : uidList) {
             success = grantAbility.grantRoleToUser(UserGrantRoleReq.builder()
-                    .spaceId(spaceId.toString())
+                    .spaceId(spaceId)
                     .uid(uid)
                     .roleCode(roleCode).build());
             if (!success) {

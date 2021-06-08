@@ -19,21 +19,21 @@ public interface PermissionService {
     /**
      * 新增权限
      * */
-    Boolean createPermission(Long spaceId, PermissionCreateReq permissionCreateRequest);
+    Boolean createPermission(String spaceId, PermissionCreateReq permissionCreateRequest);
 
-    Boolean batchCreatePermission(Long spaceId,List<PermissionCreateReq> permissionCreateRequestList);
+    Boolean batchCreatePermission(String spaceId,List<PermissionCreateReq> permissionCreateRequestList);
 
-    Boolean updatePermission(Long spaceId, String permissionCode, PermissionUpdateReq permissionUpdateRequest);
+    Boolean updatePermission(String spaceId, String permissionCode, PermissionUpdateReq permissionUpdateRequest);
 
-    Boolean deletePermission(Long spaceId,String permissionCode);
+    Boolean deletePermission(String spaceId,String permissionCode);
 
-    IdaasPermission getPermissionByCode(Long spaceId, String permissionCode);
+    IdaasPermission getPermissionByCode(String spaceId, String permissionCode);
 
-    List<IdaasPermission> queryPermissionsByCodes(Long spaceId,List<String> permCodes);
+    List<IdaasPermission> queryPermissionsByCodes(String spaceId,List<String> permCodes);
 
-    List<PermissionQueryByRolesRespItem> queryPermissionsByRoleCodes(Long spaceId, PermissionQueryByRolesReq request);
+    List<PermissionQueryByRolesRespItem> queryPermissionsByRoleCodes(String spaceId, PermissionQueryByRolesReq request);
 
-    List<IdaasPermission> queryPermissionsByUser(Long spaceId, String uid);
+    List<IdaasPermission> queryPermissionsByUser(String spaceId, String uid);
 
-    List<PermissionNodeDTO> queryPermissionTrees(Long permissionSpaceId, String uid);
+    List<PermissionNodeDTO> queryPermissionTrees(String permissionSpaceId, String uid);
 }
