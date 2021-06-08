@@ -19,7 +19,7 @@ public class UserRevokeRolesReq {
 
     String uid;
 
-    List<String> roleCodes;
+    List<String> roleCodeList;
 
     /**
      * 隔离空间id

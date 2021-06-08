@@ -167,7 +167,7 @@ public class RoleServiceImpl implements RoleService {
         checkRoleWritePermission(spaceId,operatorUid,roleCode);
 
         List<String> existPerms = permissionAbility.queryPermissionsByRoleCodes(spaceId,PermissionQueryByRolesReq.builder()
-                .roleCodes(Lists.newArrayList(roleCode))
+                .roleCodeList(Lists.newArrayList(roleCode))
                 .build()).stream().flatMap(it -> it.getPermissionList().stream()).map(it -> it.getPermissionCode())
                 .collect(Collectors.toList());
         RoleTypeEnum roleType = RoleTypeEnum.fromRoleCode(roleCode);
