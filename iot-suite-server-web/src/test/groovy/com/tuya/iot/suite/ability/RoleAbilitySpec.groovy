@@ -58,7 +58,7 @@ class RoleAbilitySpec extends BaseSpec {
         when:
         IdaasRole role = roleAbility.getRole(spaceId,'admin')
         then:
-        role.roleCode == 'amdin'
+        role.roleCode == 'admin'
     }
 
     void "测试查询角色byUser"() {

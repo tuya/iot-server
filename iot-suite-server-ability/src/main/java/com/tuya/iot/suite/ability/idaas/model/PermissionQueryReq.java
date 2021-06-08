@@ -1,5 +1,6 @@
 package com.tuya.iot.suite.ability.idaas.model;
 
+import com.google.gson.annotations.SerializedName;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
@@ -20,6 +21,7 @@ public class PermissionQueryReq {
     /**
      * 权限标识
      */
+    @SerializedName("permissionCodeList")
     List<String> permissionCodeList;
 
 }

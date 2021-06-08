@@ -1,5 +1,6 @@
 package com.tuya.iot.suite.ability.idaas.model;
 
+import com.google.gson.annotations.SerializedName;
 import com.tuya.iot.suite.ability.model.PageRequestInfo;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -20,10 +21,13 @@ public class RolesPaginationQueryReq extends PageRequestInfo {
     /**
     角色code集合	否
      */
+    @SerializedName("roleCodes")
     List<String> roleCodes;
     /**String	角色code	否*/
+    @SerializedName("roleCode")
     String roleCode;
     /**	String	角色名称	否*/
+    @SerializedName("roleName")
     String roleName;
 
 }
