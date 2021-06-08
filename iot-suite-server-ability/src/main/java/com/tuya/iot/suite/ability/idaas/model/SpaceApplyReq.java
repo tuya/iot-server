@@ -35,6 +35,9 @@ public class SpaceApplyReq {
      */
     String authentication;
 
+    /**
+     * 拥有者
+     */
     String owner;
 
 }

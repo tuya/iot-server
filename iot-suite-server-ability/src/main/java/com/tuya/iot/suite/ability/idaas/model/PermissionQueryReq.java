@@ -21,5 +21,10 @@ public class PermissionQueryReq {
      * 权限标识
      */
     List<String> permissionCodeList;
+
+    /**
+     * 权限空间id
+     * 没用上
+     * */
     Long spaceId;
 }

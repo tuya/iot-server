@@ -1,14 +1,6 @@
 package com.tuya.iot.suite.ability.idaas.ability;
 
-import com.tuya.connector.api.annotations.Body;
-import com.tuya.connector.api.annotations.Path;
-import com.tuya.iot.suite.ability.idaas.model.IdaasPermission;
-import com.tuya.iot.suite.ability.idaas.model.PermissionBatchCreateReq;
-import com.tuya.iot.suite.ability.idaas.model.PermissionCreateReq;
-import com.tuya.iot.suite.ability.idaas.model.PermissionQueryByRolesReq;
-import com.tuya.iot.suite.ability.idaas.model.PermissionQueryByRolesRespItem;
-import com.tuya.iot.suite.ability.idaas.model.PermissionQueryReq;
-import com.tuya.iot.suite.ability.idaas.model.PermissionUpdateReq;
+import com.tuya.iot.suite.ability.idaas.model.*;
 
 import java.util.Collection;
 import java.util.List;

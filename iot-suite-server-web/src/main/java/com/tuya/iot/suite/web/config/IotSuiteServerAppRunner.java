@@ -6,19 +6,7 @@ import com.tuya.iot.suite.ability.idaas.ability.IdaasUserAbility;
 import com.tuya.iot.suite.ability.idaas.ability.PermissionAbility;
 import com.tuya.iot.suite.ability.idaas.ability.RoleAbility;
 import com.tuya.iot.suite.ability.idaas.ability.SpaceAbility;
-import com.tuya.iot.suite.ability.idaas.model.IdaasRole;
-import com.tuya.iot.suite.ability.idaas.model.IdaasRoleCreateReq;
-import com.tuya.iot.suite.ability.idaas.model.IdaasSpace;
-import com.tuya.iot.suite.ability.idaas.model.IdaasUser;
-import com.tuya.iot.suite.ability.idaas.model.IdaasUserCreateReq;
-import com.tuya.iot.suite.ability.idaas.model.PermissionBatchCreateReq;
-import com.tuya.iot.suite.ability.idaas.model.PermissionCreateReq;
-import com.tuya.iot.suite.ability.idaas.model.PermissionQueryByRolesReq;
-import com.tuya.iot.suite.ability.idaas.model.PermissionQueryByRolesRespItem;
-import com.tuya.iot.suite.ability.idaas.model.RoleGrantPermissionsReq;
-import com.tuya.iot.suite.ability.idaas.model.RoleRevokePermissionsReq;
-import com.tuya.iot.suite.ability.idaas.model.SpaceApplyReq;
-import com.tuya.iot.suite.ability.idaas.model.UserGrantRoleReq;
+import com.tuya.iot.suite.ability.idaas.model.*;
 import com.tuya.iot.suite.service.model.RoleTypeEnum;
 import com.tuya.iot.suite.service.util.PermTemplateUtil;
 import lombok.AccessLevel;
@@ -28,12 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import org.springframework.util.CollectionUtils;
+
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -74,8 +59,8 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
      */
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        log.info("permission-auto-init==>{}",projectProperties.permissionAutoInit);
-        if(!projectProperties.permissionAutoInit){
+        log.info("permission-auto-init==>{}", projectProperties.permissionAutoInit);
+        if (!projectProperties.permissionAutoInit) {
             return;
         }
 
@@ -85,7 +70,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
             return;
         }
         //permissions
-        List<PermissionCreateReq> adminPermissions = PermTemplateUtil.loadAsPermissionCreateReqList("classpath:template/permissions.json",it->it.getAuthRoleTypes().contains("admin"));
+        List<PermissionCreateReq> adminPermissions = PermTemplateUtil.loadAsPermissionCreateReqList("classpath:template/permissions.json", it -> it.getAuthRoleTypes().contains("admin"));
 
         if (!initPermissions(adminPermissions)) {
             log.error("init permissions failure!");
@@ -93,97 +78,94 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
         }
 
         //admin
-        initFromTemplate(adminRoleCode,adminUid);
-        initFromTemplate(manageRoleCode,manageUid);
-        initFromTemplate(normalRoleCode,normalUid);
+        initFromTemplate(adminRoleCode, adminUid);
+        initFromTemplate(manageRoleCode, manageUid);
+        initFromTemplate(normalRoleCode, normalUid);
 
         log.info("permission data has been initialized successful!");
     }
 
-    private void initFromTemplate(String roleCode, String uid){
+    private void initFromTemplate(String roleCode, String uid) {
         if (!initRole(roleCode)) {
-            log.error("init role({}) failure!",roleCode);
+            log.error("init role({}) failure!", roleCode);
             return;
         }
 
-        if (!initUser(uid,roleCode)) {
-            log.error("init user({}) failure!",roleCode);
+        if (!initUser(uid, roleCode)) {
+            log.error("init user({}) failure!", roleCode);
             return;
         }
 
-        if (!grantRoleToUser(roleCode,uid)) {
-            log.error("grant role({}) to user({}) failure!",roleCode,roleCode);
+        if (!grantRoleToUser(roleCode, uid)) {
+            log.error("grant role({}) to user({}) failure!", roleCode, roleCode);
             return;
         }
         String roleType = RoleTypeEnum.fromRoleCode(roleCode).name();
-        List<PermissionCreateReq> perms = PermTemplateUtil.loadAsPermissionCreateReqList("classpath:template/permissions.json",it->it.getAuthRoleTypes().contains(roleType));
+        List<PermissionCreateReq> perms = PermTemplateUtil.loadAsPermissionCreateReqList("classpath:template/permissions.json", it -> it.getAuthRoleTypes().contains(roleType));
 
-        if(!grantPermissionsToRole(roleCode, perms)){
-            log.error("grant permissions to role({}) failure!",roleCode);
+        if (!grantPermissionsToRole(roleCode, perms)) {
+            log.error("grant permissions to role({}) failure!", roleCode);
             return;
         }
     }
 
     private boolean initPermissions(List<PermissionCreateReq> perms) {
         Long spaceId = projectProperties.getPermissionSpaceId();
-        Map<String,PermissionCreateReq> allPerms = perms.stream().collect(Collectors.toMap(it->it.getPermissionCode(),it->it));
-        Map<String,PermissionCreateReq> ownedPerms = permissionAbility.queryPermissionsByUser(spaceId,adminUid).stream()
-                .map(it->
-                        PermissionCreateReq.builder()
-                                .name(it.getName())
-                                .permissionCode(it.getPermissionCode())
-                                .type(it.getType().getCode())
-                                .order(it.getOrder())
-                                .remark(it.getRemark())
-                                .parentCode(it.getParentCode())
-                                .build())
-                .collect(Collectors.toMap(it->it.getPermissionCode(),it->it));
-        Map<String,PermissionCreateReq> toAdd = new HashMap<>(16);
-        Map<String,PermissionCreateReq> toDelete = new HashMap<>(16);
-
-        toAdd.putAll(allPerms);
-        ownedPerms.forEach((code,it)->toAdd.remove(code));
-        if(!toAdd.isEmpty()){
-            boolean addResult = permissionAbility.batchCreatePermission(spaceId, PermissionBatchCreateReq.builder()
-                    .permissionList(toAdd.values()).build()
-            );
-            if(!addResult){
+        Map<String, PermissionCreateReq> allPerms = perms.stream().collect(Collectors.toMap(it -> it.getPermissionCode(), it -> it));
+        List<String> permissionCodes = perms.stream().map(e -> e.getPermissionCode()).collect(Collectors.toList());
+        List<IdaasPermission> permissionQueryReq = permissionAbility.queryPermissionsByCodes(spaceId, PermissionQueryReq.builder().permissionCodeList(permissionCodes).spaceId(spaceId).build());
+        Map<String, PermissionCreateReq> toAdd = new HashMap<>(16);
+        Map<String, IdaasPermission> existCodes = new HashMap<>(16);
+        if (!CollectionUtils.isEmpty(permissionQueryReq)) {
+            permissionQueryReq.stream().forEach(e -> existCodes.put(e.getPermissionCode(), e));
+        }
+        permissionCodes.stream().forEach(e -> {
+            if (!existCodes.containsKey(e)) {
+                toAdd.put(e, allPerms.get(e));
+            }
+        });
+        if (!toAdd.isEmpty()) {
+            //分级处理-父级
+            List<PermissionCreateReq> fathers = new ArrayList<>();
+            List<PermissionCreateReq> sons = new ArrayList<>();
+            toAdd.values().stream().forEach(e->{
+                if ("0".equalsIgnoreCase(e.getParentCode())) {
+                    e.setParentCode(null);
+                    fathers.add(e);
+                }else{
+                    sons.add(e);
+                }
+                e.setSpaceId(spaceId.toString());
+            });
+            boolean addResult = permissionAbility.batchCreatePermission(spaceId, PermissionBatchCreateReq.builder() .permissionList(fathers).build());
+            if (addResult) {
+                addResult = addResult &&  permissionAbility.batchCreatePermission(spaceId, PermissionBatchCreateReq.builder() .permissionList(sons).build());
+            }
+            if (!addResult) {
                 log.error("add permission error!");
                 return false;
-            }
-        }
-
-        toDelete.putAll(ownedPerms);
-        allPerms.forEach((code,it)->toDelete.remove(code));
-        if(!toDelete.isEmpty()){
-            for(PermissionCreateReq p : toDelete.values()){
-                boolean deleteResult = permissionAbility.deletePermission(spaceId,p.getPermissionCode());
-                if(!deleteResult){
-                    log.error("delete permission error, permissionCode="+p.getPermissionCode());
-                    return false;
-                }
             }
         }
         return true;
     }
 
-    private boolean grantPermissionsToRole(String roleCode,List<PermissionCreateReq> perms) {
+    private boolean grantPermissionsToRole(String roleCode, List<PermissionCreateReq> perms) {
         Long spaceId = projectProperties.getPermissionSpaceId();
         List<PermissionQueryByRolesRespItem> existsPermList = permissionAbility.queryPermissionsByRoleCodes(spaceId,PermissionQueryByRolesReq.builder()
                 .roleCodeList(Lists.newArrayList(roleCode)).build());
-        Set<String> allPerms = perms.stream().map(it->it.getPermissionCode()).collect(Collectors.toSet());
-        Set<String> existsPerms = existsPermList.stream().flatMap(it->it.getPermissionList().stream().map(p->p.getPermissionCode())).collect(
+        Set<String> allPerms = perms.stream().map(it -> it.getPermissionCode()).collect(Collectors.toSet());
+        Set<String> existsPerms = existsPermList.stream().flatMap(it -> it.getPermissionList().stream().map(p -> p.getPermissionCode())).collect(
                 Collectors.toSet());
         Set<String> toAdd = new HashSet<>();
         toAdd.addAll(allPerms);
         toAdd.removeAll(existsPerms);
-        if(!toAdd.isEmpty()){
+        if (!toAdd.isEmpty()) {
             boolean addResult = grantAbility.grantPermissionsToRole(RoleGrantPermissionsReq.builder()
                     .spaceId(spaceId)
                     .roleCode(roleCode)
                     .permissionCodes(Lists.newArrayList(toAdd))
                     .build());
-            if(!addResult){
+            if (!addResult) {
                 log.error("add permissions to role error!");
                 return false;
             }
@@ -192,13 +174,13 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
         Set<String> toDelete = new HashSet<>();
         toDelete.addAll(existsPerms);
         toDelete.removeAll(allPerms);
-        if(!toDelete.isEmpty()){
+        if (!toDelete.isEmpty()) {
             boolean revokeResult = grantAbility.revokePermissionsFromRole(RoleRevokePermissionsReq.builder()
                     .spaceId(spaceId)
                     .roleCode(roleCode)
                     .permissionCodes(Lists.newArrayList(toDelete))
                     .build());
-            if(!revokeResult){
+            if (!revokeResult) {
                 log.error("revoke permissions from role error!");
                 return false;
             }
@@ -206,11 +188,11 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
         return true;
     }
 
-    private boolean grantRoleToUser(String roleCode,String uid) {
+    private boolean grantRoleToUser(String roleCode, String uid) {
         Long spaceId = projectProperties.getPermissionSpaceId();
-        List<IdaasRole> roles = roleAbility.queryRolesByUser(spaceId,uid);
-        Optional<IdaasRole> op = roles.stream().filter(it->it.getRoleCode().equals(roleCode)).findAny();
-        if(op.isPresent()){
+        List<IdaasRole> roles = roleAbility.queryRolesByUser(spaceId, uid);
+        Optional<IdaasRole> op = roles.stream().filter(it -> it.getRoleCode().equals(roleCode)).findAny();
+        if (op.isPresent()) {
             return true;
         }
         return grantAbility.grantRoleToUser(UserGrantRoleReq.builder()
@@ -220,10 +202,10 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
                 .build());
     }
 
-    private boolean initUser(String uid,String username) {
+    private boolean initUser(String uid, String username) {
         Long spaceId = projectProperties.getPermissionSpaceId();
-        IdaasUser adminUser = idaasUserAbility.getUserByUid(spaceId,uid);
-        if(adminUser!=null){
+        IdaasUser adminUser = idaasUserAbility.getUserByUid(spaceId, uid);
+        if (adminUser != null) {
             return true;
         }
         return idaasUserAbility.createUser(spaceId, IdaasUserCreateReq.builder()
@@ -235,8 +217,8 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
 
     private boolean initRole(String roleCode) {
         Long spaceId = projectProperties.getPermissionSpaceId();
-        IdaasRole adminRole = roleAbility.getRole(spaceId,roleCode);
-        if(adminRole!=null){
+        IdaasRole adminRole = roleAbility.getRole(spaceId, roleCode);
+        if (adminRole != null) {
             return true;
         }
         return roleAbility.createRole(spaceId, IdaasRoleCreateReq.builder()
@@ -255,9 +237,9 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
             return true;
         }
         // else query spaceId.
-        IdaasSpace space = spaceAbility.querySpace(projectProperties.getPermissionGroup(), projectProperties.getPermissionSpaceCode());
-        if (space != null) {
-            spaceId = space.getSpaceId();
+        IdaasSpace idaasSpace = spaceAbility.querySpace(projectProperties.getPermissionGroup(), projectProperties.getPermissionSpaceCode());
+        if (idaasSpace != null) {
+            spaceId = idaasSpace.getSpaceId();
             projectProperties.setPermissionSpaceId(spaceId);
             log.info("exists spaceId {} at iot-cloud", spaceId);
             return true;
@@ -266,7 +248,10 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
         spaceId = spaceAbility.applySpace(SpaceApplyReq.builder()
                 .spaceGroup(projectProperties.getPermissionGroup())
                 .spaceCode(projectProperties.getPermissionSpaceCode())
-                .authentication(authentication).build());
+                .authentication(projectProperties.getCode())
+                .remark(projectProperties.getName())
+                .owner(projectProperties.getName()).build()
+        );
         if (spaceId != null) {
             projectProperties.setPermissionSpaceId(spaceId);
             log.info("applied spaceId: {}", spaceId);
