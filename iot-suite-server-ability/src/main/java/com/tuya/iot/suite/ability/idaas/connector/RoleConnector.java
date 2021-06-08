@@ -24,22 +24,22 @@ public interface RoleConnector extends RoleAbility {
 
     @POST("/v1.0/iot-03/idaas/spaces/{space_id}/roles")
     @Override
-    Boolean createRole(@Path("space_id") Long spaceId, @Body IdaasRoleCreateReq request);
+    Boolean createRole(@Path("space_id") String spaceId, @Body IdaasRoleCreateReq request);
 
     @PUT("/v1.0/iot-03/idaas/spaces/{space_id}/roles/{role_code}")
     @Override
-    Boolean updateRole(@Path("space_id") Long spaceId,
+    Boolean updateRole(@Path("space_id") String spaceId,
                        @Path("role_code")String roleCode,
                        @Body RoleUpdateReq request);
 
     @DELETE("/v1.0/iot-03/idaas/spaces/{space_id}/roles/{role_code}")
     @Override
-    Boolean deleteRole(@Path("space_id") Long spaceId,
+    Boolean deleteRole(@Path("space_id") String spaceId,
                        @Path("role_code")String roleCode);
 
     @GET("/v1.0/iot-03/idaas/spaces/{space_id}/roles/{role_code}")
     @Override
-    IdaasRole getRole(@Path("space_id")Long spaceId, @Path("role_code")String roleCode);
+    IdaasRole getRole(@Path("space_id")String spaceId, @Path("role_code")String roleCode);
 
 /*    @POST("/v1.0/iot-03/idaas/get-batch-role")
     @Override
@@ -47,11 +47,11 @@ public interface RoleConnector extends RoleAbility {
 
     @GET("/v1.0/iot-03/idaas/spaces/{space_id}/users/{uid}/roles")
     @Override
-    List<IdaasRole> queryRolesByUser(@Path("space_id")Long spaceId,
+    List<IdaasRole> queryRolesByUser(@Path("space_id")String spaceId,
                                      @Path("uid")String uid);
 
     @POST("/v1.0/iot-03/idaas/spaces/{space_id}/page-role")
     @Override
-    IdaasPageResult<IdaasRole> queryRolesPagination(@Path("space_id")Long spaceId,
+    IdaasPageResult<IdaasRole> queryRolesPagination(@Path("space_id")String spaceId,
                                                     @Body RolesPaginationQueryReq req);
 }

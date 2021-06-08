@@ -16,17 +16,17 @@ import java.util.List;
  */
 public interface RoleAbility {
 
-    Boolean createRole(Long spaceId, IdaasRoleCreateReq request);
+    Boolean createRole(String spaceId, IdaasRoleCreateReq request);
 
-    Boolean updateRole(Long spaceId, String roleCode, RoleUpdateReq request);
+    Boolean updateRole(String spaceId, String roleCode, RoleUpdateReq request);
 
-    Boolean deleteRole(Long spaceId, String roleCode);
+    Boolean deleteRole(String spaceId, String roleCode);
 
-    IdaasRole getRole(Long spaceId, String roleCode);
+    IdaasRole getRole(String spaceId, String roleCode);
 
     //List<IdaasRole> queryRolesByCodes(RoleQueryReq request);
 
-    List<IdaasRole> queryRolesByUser(Long spaceId,String uid);
+    List<IdaasRole> queryRolesByUser(String spaceId,String uid);
 
-    IdaasPageResult<IdaasRole> queryRolesPagination(Long spaceId, RolesPaginationQueryReq req);
+    IdaasPageResult<IdaasRole> queryRolesPagination(String spaceId, RolesPaginationQueryReq req);
 }

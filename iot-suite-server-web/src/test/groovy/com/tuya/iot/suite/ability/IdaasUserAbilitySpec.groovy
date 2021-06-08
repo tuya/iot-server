@@ -27,7 +27,7 @@ class IdaasUserAbilitySpec extends BaseSpec {
     IdaasUserAbility idaasUserAbility
     @Autowired
     ProjectProperties projectProperties
-    long spaceId
+    String spaceId
 
     void setup() {
         spaceId = projectProperties.getPermissionSpaceId()
@@ -44,19 +44,19 @@ class IdaasUserAbilitySpec extends BaseSpec {
 
     void "测试修改用户"() {
         expect:
-        idaasUserAbility.updateUser(spaceId, 'todo', IdaasUserUpdateReq.builder()
+        idaasUserAbility.updateUser(spaceId, 'bsh1623052900346u8pQ', IdaasUserUpdateReq.builder()
                 .username('benguan.zhou')
                 .build())
     }
 
     void "测试删除用户"() {
         expect:
-        idaasUserAbility.deleteUser(spaceId, 'todo')
+        idaasUserAbility.deleteUser(spaceId, 'bsh1623052900346u8pQ')
     }
 
     void "测试查询用户byUid"() {
         expect:
-        idaasUserAbility.getUserByUid(spaceId, 'todo').username == 'benguan.zhou'
+        idaasUserAbility.getUserByUid(spaceId, 'bsh1623052900346u8pQ').username == 'benguan.zhou'
     }
 
     void "测试查询用户分页"() {

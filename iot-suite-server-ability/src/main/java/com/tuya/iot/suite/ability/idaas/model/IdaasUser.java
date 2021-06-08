@@ -30,7 +30,7 @@ public class IdaasUser {
      */
     String remark;
 
-    Long spaceId;
+    String spaceId;
 
     String roleCode;
 

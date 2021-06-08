@@ -12,7 +12,7 @@ import lombok.Data;
 @Builder
 public class IdaasSpace {
     String spaceGroup;
-    Long spaceId;
+    String spaceId;
     String owner;
     String spaceCode;
 }

@@ -24,6 +24,6 @@ public class UserGrantRolesReq {
     /**
      * 隔离空间id
      */
-    Long spaceId;
+    String spaceId;
 
 }

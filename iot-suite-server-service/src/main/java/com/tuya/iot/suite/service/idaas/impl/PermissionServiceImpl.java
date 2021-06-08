@@ -23,49 +23,49 @@ public class PermissionServiceImpl implements PermissionService {
     private PermissionAbility permissionAbility;
 
     @Override
-    public Boolean createPermission(Long spaceId, PermissionCreateReq permissionCreateRequest) {
+    public Boolean createPermission(String spaceId, PermissionCreateReq permissionCreateRequest) {
         return permissionAbility.createPermission(spaceId, permissionCreateRequest);
     }
 
     @Override
-    public Boolean batchCreatePermission(Long spaceId, List<PermissionCreateReq> permissionCreateRequestList) {
+    public Boolean batchCreatePermission(String spaceId, List<PermissionCreateReq> permissionCreateRequestList) {
         return permissionAbility.batchCreatePermission(spaceId,
                 PermissionBatchCreateReq.builder().permissionList(permissionCreateRequestList).build()
         );
     }
 
     @Override
-    public Boolean updatePermission(Long spaceId, String permissionCode, PermissionUpdateReq permissionUpdateRequest) {
+    public Boolean updatePermission(String spaceId, String permissionCode, PermissionUpdateReq permissionUpdateRequest) {
         return permissionAbility.updatePermission(spaceId, permissionCode, permissionUpdateRequest);
     }
 
     @Override
-    public Boolean deletePermission(Long spaceId, String permissionCode) {
+    public Boolean deletePermission(String spaceId, String permissionCode) {
         return permissionAbility.deletePermission(spaceId, permissionCode);
     }
 
     @Override
-    public IdaasPermission getPermissionByCode(Long spaceId, String permissionCode) {
+    public IdaasPermission getPermissionByCode(String spaceId, String permissionCode) {
         return permissionAbility.getPermissionByCode(spaceId, permissionCode);
     }
 
     @Override
-    public List<IdaasPermission> queryPermissionsByCodes(Long spaceId,List<String> permCodes) {
+    public List<IdaasPermission> queryPermissionsByCodes(String spaceId,List<String> permCodes) {
         return permissionAbility.queryPermissionsByCodes(spaceId,PermissionQueryReq.builder().permissionCodeList(permCodes).build());
     }
 
     @Override
-    public List<PermissionQueryByRolesRespItem> queryPermissionsByRoleCodes(Long spaceId,PermissionQueryByRolesReq request) {
+    public List<PermissionQueryByRolesRespItem> queryPermissionsByRoleCodes(String spaceId,PermissionQueryByRolesReq request) {
         return permissionAbility.queryPermissionsByRoleCodes(spaceId,request);
     }
 
     @Override
-    public List<IdaasPermission> queryPermissionsByUser(Long spaceId, String uid) {
+    public List<IdaasPermission> queryPermissionsByUser(String spaceId, String uid) {
         return permissionAbility.queryPermissionsByUser(spaceId, uid);
     }
 
     @Override
-    public List<PermissionNodeDTO> queryPermissionTrees(Long permissionSpaceId, String uid) {
+    public List<PermissionNodeDTO> queryPermissionTrees(String permissionSpaceId, String uid) {
         List<PermissionNodeDTO> perms = permissionAbility.queryPermissionsByUser(permissionSpaceId, uid)
                 .stream()
                 .map(it ->

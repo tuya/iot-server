@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 public class PermissionConnectorTest extends BaseTest {
 
     @Value("${project.permission-space-id}")
-    Long spaceId;
+    String spaceId;
     @Autowired
     private PermissionConnector permissionConnector;
 

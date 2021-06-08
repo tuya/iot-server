@@ -56,7 +56,7 @@ public class RoleServiceImpl implements RoleService {
     private PermissionTemplateService permissionTemplateService;
 
     @Override
-    public Boolean createRole(Long spaceId, RoleCreateReqDTO req) {
+    public Boolean createRole(String spaceId, RoleCreateReqDTO req) {
         // 0. check permission
         checkRoleWritePermission(spaceId, req.getUid(), req.getRoleCode());
         String roleType = RoleTypeEnum.fromRoleCode(req.getRoleCode()).name();
@@ -79,7 +79,7 @@ public class RoleServiceImpl implements RoleService {
                 ).build());
     }
 
-    private void checkRoleWritePermission(Long spaceId, String operatorUid, String targetRoleCode) {
+    private void checkRoleWritePermission(String spaceId, String operatorUid, String targetRoleCode) {
         Assert.isTrue(!RoleTypeEnum.fromRoleCode(targetRoleCode).isAdmin(), "can not write a 'admin' role!");
         //数据权限校验，校验操作者自己是否为更高的角色。
         //比如有从高到低低角色 a->b->c->d->e。当前用户有角色 a、e，修改角色c，由于当前用户存在比c高级低角色a，所以该操作是允许的。
@@ -88,7 +88,7 @@ public class RoleServiceImpl implements RoleService {
         ).findAny().orElseThrow(() -> new ServiceLogicException(ErrorCode.NO_DATA_PERMISSION));
     }
 
-    private void checkRoleWritePermission(Long spaceId, String operatorUid, Collection<String> targetRoleCodes) {
+    private void checkRoleWritePermission(String spaceId, String operatorUid, Collection<String> targetRoleCodes) {
         targetRoleCodes.forEach(targetRoleCode ->
                 Assert.isTrue(!RoleTypeEnum.fromRoleCode(targetRoleCode).isAdmin(), "can not write a 'admin' role!"));
         //数据权限校验，校验操作者自己是否为更高的角色。
@@ -104,7 +104,7 @@ public class RoleServiceImpl implements RoleService {
         }
     }
 
-    private void checkRoleReadPermission(Long spaceId, String operatorUid, String targetRoleCode) {
+    private void checkRoleReadPermission(String spaceId, String operatorUid, String targetRoleCode) {
         //数据权限校验，校验操作者自己是否为更高的角色。
         roleAbility.queryRolesByUser(spaceId, operatorUid).stream().filter(
                 it -> RoleTypeEnum.fromRoleCode(targetRoleCode).isOffspringOrSelfOf(RoleTypeEnum.fromRoleCode(it.getRoleCode()))
@@ -112,14 +112,14 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public Boolean updateRole(Long spaceId, String operatorUid, String roleCode, RoleUpdateReq req) {
+    public Boolean updateRole(String spaceId, String operatorUid, String roleCode, RoleUpdateReq req) {
         checkRoleWritePermission(spaceId, operatorUid, roleCode);
         return roleAbility.updateRole(spaceId, roleCode, RoleUpdateReq.builder()
                 .roleName(req.getRoleName()).build());
     }
 
     @Override
-    public Boolean deleteRole(Long spaceId, String operatorUid, String roleCode) {
+    public Boolean deleteRole(String spaceId, String operatorUid, String roleCode) {
         checkRoleWritePermission(spaceId, operatorUid, roleCode);
         //底层api没有判断删除角色时是否存在关联的用户，那么我们就需要实现这个逻辑
         IdaasPageResult<IdaasUser> pageResult = idaasUserAbility.queryUserPage(spaceId, IdaasUserPageReq.builder()
@@ -132,20 +132,20 @@ public class RoleServiceImpl implements RoleService {
 
 
     @Override
-    public IdaasRole getRole(Long spaceId, String operatorUid, String roleCode) {
+    public IdaasRole getRole(String spaceId, String operatorUid, String roleCode) {
         //checkRoleReadPermission(spaceId,operatorUid,roleCode);
         return roleAbility.getRole(spaceId, roleCode);
     }
 
 
     @Override
-    public List<IdaasRole> queryRolesByUser(Long spaceId, String uid) {
+    public List<IdaasRole> queryRolesByUser(String spaceId, String uid) {
         //need check read permission?
         return roleAbility.queryRolesByUser(spaceId, uid);
     }
 
     @Override
-    public PageVO<IdaasRole> queryRolesPagination(Long spaceId, RolesPaginationQueryReq req) {
+    public PageVO<IdaasRole> queryRolesPagination(String spaceId, RolesPaginationQueryReq req) {
         IdaasPageResult<IdaasRole> pageResult = roleAbility.queryRolesPagination(spaceId, req);
         List<IdaasRole> list = pageResult.getResults();
         return PageVO.builder().pageNo(pageResult.getPageNumber())
@@ -155,14 +155,14 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public boolean deleteRoles(Long permissionSpaceId, String uid, Collection<String> roleCodes) {
+    public boolean deleteRoles(String permissionSpaceId, String uid, Collection<String> roleCodes) {
         checkRoleWritePermission(permissionSpaceId, uid, roleCodes);
         long count = roleCodes.stream().map(roleCode -> roleAbility.deleteRole(permissionSpaceId, roleCode)).count();
         return count == roleCodes.size();
     }
 
     @Override
-    public Boolean resetRolePermissionsFromTemplate(Long spaceId, String operatorUid, String roleCode) {
+    public Boolean resetRolePermissionsFromTemplate(String spaceId, String operatorUid, String roleCode) {
         // 0. check permission
         checkRoleWritePermission(spaceId,operatorUid,roleCode);
 

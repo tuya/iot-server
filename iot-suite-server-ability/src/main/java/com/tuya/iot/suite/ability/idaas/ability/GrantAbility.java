@@ -20,7 +20,7 @@ public interface GrantAbility {
 
     Boolean setPermissionsToRole(RoleGrantPermissionsReq request);
 
-    Boolean revokePermissionFromRole(Long spaceId,String permissionCode,String roleCode);
+    Boolean revokePermissionFromRole(String spaceId,String permissionCode,String roleCode);
 
     Boolean revokePermissionsFromRole(RoleRevokePermissionsReq request);
 
@@ -28,7 +28,7 @@ public interface GrantAbility {
 
     Boolean setRolesToUser(UserGrantRolesReq req);
 
-    Boolean revokeRoleFromUser(Long spaceId,String roleCode,String uid);
+    Boolean revokeRoleFromUser(String spaceId,String roleCode,String uid);
 
     Boolean revokeRolesFromUser(UserRevokeRolesReq req);
 }
