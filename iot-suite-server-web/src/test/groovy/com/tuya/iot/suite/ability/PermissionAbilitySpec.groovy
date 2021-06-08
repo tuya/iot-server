@@ -12,7 +12,6 @@ import com.tuya.iot.suite.test.Env
 import com.tuya.iot.suite.web.config.ProjectProperties
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
-import spock.lang.FailsWith
 import spock.lang.Timeout
 
 /**
@@ -62,6 +61,16 @@ class PermissionAbilitySpec extends BaseSpec {
         permission.permissionCode == 'app'
     }
 
+    /**
+     * 踩坑记：
+     发现一个坑，调openapi接口的框架里面，
+     com.tuya.connector.api.core.delegate.RetrofitDelegate#getGlobalRetrofit有一行代码
+     gsonBuilder.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
+     将驼峰转下划线了。
+     有些名称不是很规范的时候，接口调用会失败。
+     比如对方定义字段名为permissionDTOList，我们这边就调不了了。
+     对方网关下划线转驼峰方式和我们的有点不兼容。
+     * */
     void "测试批量查询权限"() {
         given:
         when:
@@ -77,14 +86,14 @@ class PermissionAbilitySpec extends BaseSpec {
         given:
         when:
         def success = permissionAbility.batchCreatePermission(spaceId, PermissionBatchCreateReq.builder()
-                .permissionDTOList([PermissionCreateReq.builder()
+                .permissionList([PermissionCreateReq.builder()
                                             .permissionCode('role-menu')
                                             .type(PermissionTypeEnum.menu.code)
                                             .name('role-menu')
                                             .parentCode('app')
                                             .order(5)
                                             .build(),
-                                    PermissionCreateReq.builder()
+                                 PermissionCreateReq.builder()
                                             .permissionCode('user-menu')
                                             .type(PermissionTypeEnum.menu.code)
                                             .name('user-menu')
@@ -112,7 +121,8 @@ class PermissionAbilitySpec extends BaseSpec {
     void "测试删除权限"() {
         given:
         expect:
-        permissionAbility.deletePermission(spaceId, 'app')
+        permissionAbility.deletePermission(spaceId, 'role-menu')
+        permissionAbility.deletePermission(spaceId, 'user-menu')
     }
 
     @Timeout(1000)

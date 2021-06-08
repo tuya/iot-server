@@ -35,7 +35,7 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public Boolean batchCreatePermission(Long spaceId, List<PermissionCreateReq> permissionCreateRequestList) {
         return permissionAbility.batchCreatePermission(spaceId,
-                PermissionBatchCreateReq.builder().permissionDTOList(permissionCreateRequestList).build()
+                PermissionBatchCreateReq.builder().permissionList(permissionCreateRequestList).build()
         );
     }
 

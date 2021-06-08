@@ -17,5 +17,5 @@ import java.util.Collection;
 @Builder
 public class PermissionBatchCreateReq {
 
-    Collection<PermissionCreateReq> permissionDTOList;
+    Collection<PermissionCreateReq> permissionList;
 }

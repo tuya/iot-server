@@ -145,7 +145,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
         ownedPerms.forEach((code,it)->toAdd.remove(code));
         if(!toAdd.isEmpty()){
             boolean addResult = permissionAbility.batchCreatePermission(spaceId, PermissionBatchCreateReq.builder()
-                    .permissionDTOList(toAdd.values()).build()
+                    .permissionList(toAdd.values()).build()
             );
             if(!addResult){
                 log.error("add permission error!");
