@@ -170,7 +170,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
     private boolean grantPermissionsToRole(String roleCode,List<PermissionCreateReq> perms) {
         Long spaceId = projectProperties.getPermissionSpaceId();
         List<PermissionQueryByRolesRespItem> existsPermList = permissionAbility.queryPermissionsByRoleCodes(spaceId,PermissionQueryByRolesReq.builder()
-                .roleCodes(Lists.newArrayList(roleCode)).build());
+                .roleCodeList(Lists.newArrayList(roleCode)).build());
         Set<String> allPerms = perms.stream().map(it->it.getPermissionCode()).collect(Collectors.toSet());
         Set<String> existsPerms = existsPermList.stream().flatMap(it->it.getPermissionList().stream().map(p->p.getPermissionCode())).collect(
                 Collectors.toSet());

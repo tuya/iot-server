@@ -176,7 +176,7 @@ public class RoleController {
         List<PermissionDto> list = permissionService.queryPermissionsByRoleCodes(
                 projectProperties.getPermissionSpaceId(),
                 PermissionQueryByRolesReq.builder()
-                        .roleCodes(Lists.newArrayList(roleCode))
+                        .roleCodeList(Lists.newArrayList(roleCode))
                         .build())
                 .stream().flatMap(it ->
                         it.getPermissionList().stream()

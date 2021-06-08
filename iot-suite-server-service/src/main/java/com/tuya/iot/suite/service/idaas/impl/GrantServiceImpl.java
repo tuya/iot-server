@@ -150,7 +150,7 @@ public class GrantServiceImpl implements GrantService {
 
     @Override
     public Boolean revokeRolesFromUser(String operatorUid, UserRevokeRolesReq req) {
-        checkForModifyRoleToUser(req.getSpaceId(), operatorUid, req.getRoleCodes(), req.getUid());
+        checkForModifyRoleToUser(req.getSpaceId(), operatorUid, req.getRoleCodeList(), req.getUid());
         return grantAbility.revokeRolesFromUser(req);
     }
 

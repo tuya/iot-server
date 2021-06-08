@@ -17,6 +17,6 @@ import java.util.List;
 @Builder
 public class PermissionQueryByRolesReq {
 
-    List<String> roleCodes;
+    List<String> roleCodeList;
 
 }
