@@ -1,5 +1,6 @@
 package com.tuya.iot.suite.ability.idaas.model;
 
+import com.google.gson.annotations.SerializedName;
 import com.tuya.iot.suite.ability.model.PageRequestInfo;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -19,6 +20,7 @@ public class IdaasUserPageReq extends PageRequestInfo {
     /**
      * 角色名
      */
+    @SerializedName("roleName")
     String roleName;
 
     /**
@@ -29,6 +31,7 @@ public class IdaasUserPageReq extends PageRequestInfo {
     /**
      * 角色code
      */
+    @SerializedName("roleCode")
     String roleCode;
 
 }

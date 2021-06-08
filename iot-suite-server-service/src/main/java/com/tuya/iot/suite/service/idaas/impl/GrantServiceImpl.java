@@ -138,7 +138,7 @@ public class GrantServiceImpl implements GrantService {
 
     @Override
     public Boolean setRolesToUser(String operatorUid, UserGrantRolesReq req) {
-        checkForModifyRoleToUser(req.getSpaceId(), operatorUid, req.getRoleCodes(), req.getUid());
+        checkForModifyRoleToUser(req.getSpaceId(), operatorUid, req.getRoleCodeList(), req.getUid());
         return grantAbility.setRolesToUser(req);
     }
 

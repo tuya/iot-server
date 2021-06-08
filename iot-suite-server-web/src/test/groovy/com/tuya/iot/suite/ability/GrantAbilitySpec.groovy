@@ -5,13 +5,13 @@ import com.tuya.iot.suite.ability.idaas.model.RoleGrantPermissionReq
 import com.tuya.iot.suite.ability.idaas.model.RoleGrantPermissionsReq
 import com.tuya.iot.suite.ability.idaas.model.RoleRevokePermissionsReq
 import com.tuya.iot.suite.ability.idaas.model.UserGrantRoleReq
+import com.tuya.iot.suite.ability.idaas.model.UserGrantRolesReq
 import com.tuya.iot.suite.ability.idaas.model.UserRevokeRolesReq
 import com.tuya.iot.suite.service.BaseSpec
 import com.tuya.iot.suite.test.Env
 import com.tuya.iot.suite.web.config.ProjectProperties
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
-import spock.lang.Ignore
 
 /**
  * @description 该测试用例依赖日常环境* @author benguan.zhou@tuya.com
@@ -44,20 +44,22 @@ class GrantAbilitySpec extends BaseSpec {
     }
 
     void "测试角色批量授权"() {
-        expect:
-        grantAbility.grantPermissionToRole(RoleGrantPermissionsReq.builder()
+        when:
+        def success = grantAbility.grantPermissionsToRole(RoleGrantPermissionsReq.builder()
                 .spaceId(spaceId)
                 .roleCode('admin')
                 .permissionCodes(['app'])
                 .build())
+        then:
+        success
     }
 
     void "测试设置角色权限"() {
         expect:
-        grantAbility.setPermissionsToRole(RoleGrantPermissionReq.builder()
+        grantAbility.setPermissionsToRole(RoleGrantPermissionsReq.builder()
                 .spaceId(spaceId)
                 .roleCode('admin')
-                .permissionCode('app')
+                .permissionCodes(['app'])
                 .build())
     }
 
@@ -88,9 +90,9 @@ class GrantAbilitySpec extends BaseSpec {
 
     void "测试设置用户角色"() {
         expect:
-        grantAbility.setRolesToUser(UserGrantRoleReq.builder()
+        grantAbility.setRolesToUser(UserGrantRolesReq.builder()
                 .spaceId(spaceId)
-                .roleCode('admin')
+                .roleCodeList(['admin'])
                 .uid('bsh1623052900346u8pQ')
                 .build())
     }
@@ -101,11 +103,13 @@ class GrantAbilitySpec extends BaseSpec {
     }
 
     void "测试批量回收用户角色"() {
-        expect:
-        grantAbility.revokeRolesFromUser(UserRevokeRolesReq.builder()
+        when:
+        def success = grantAbility.revokeRolesFromUser(UserRevokeRolesReq.builder()
                 .spaceId(spaceId)
                 .uid('bsh1623052900346u8pQ')
-                .roleCodeList(['app'])
+                .roleCodeList(['admin'])
                 .build())
+        then:
+        success
     }
 }

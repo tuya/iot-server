@@ -1,5 +1,6 @@
 package com.tuya.iot.suite.ability.idaas.model;
 
+import com.google.gson.annotations.SerializedName;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
@@ -18,6 +19,7 @@ public class UserGrantRoleReq {
     /**
      * 角色code
      */
+    @SerializedName("roleCode")
     String roleCode;
 
 
@@ -26,6 +28,7 @@ public class UserGrantRoleReq {
     /**
      * 隔离空间id
      */
+    @SerializedName("spaceId")
     String spaceId;
 
 }

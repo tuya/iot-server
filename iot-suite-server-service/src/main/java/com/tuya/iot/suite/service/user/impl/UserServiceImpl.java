@@ -1,6 +1,5 @@
 package com.tuya.iot.suite.service.user.impl;
 
-import com.tuya.connector.api.exceptions.ConnectorException;
 import com.tuya.iot.suite.ability.idaas.ability.GrantAbility;
 import com.tuya.iot.suite.ability.idaas.ability.IdaasUserAbility;
 import com.tuya.iot.suite.ability.idaas.model.*;
@@ -8,7 +7,6 @@ import com.tuya.iot.suite.ability.notice.model.ResetPasswordReq;
 import com.tuya.iot.suite.ability.user.ability.UserAbility;
 import com.tuya.iot.suite.ability.user.model.*;
 import com.tuya.iot.suite.core.constant.CaptchaType;
-import com.tuya.iot.suite.core.constant.ErrorCode;
 import com.tuya.iot.suite.core.constant.NoticeType;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
 import com.tuya.iot.suite.core.model.PageVO;
@@ -169,7 +167,7 @@ public class UserServiceImpl implements UserService {
         //3、给用户授权
         Boolean auth = grantAbility.setRolesToUser(UserGrantRolesReq.builder()
                 .spaceId(spaceId)
-                .roleCodes(roleCodes)
+                .roleCodeList(roleCodes)
                 .uid(user.getUser_id()).build());
         if (!auth) {
             throw new ServiceLogicException(USER_CREATE_FAIL);
@@ -187,7 +185,7 @@ public class UserServiceImpl implements UserService {
         if (!CollectionUtils.isEmpty(roleCodes)) {
             Boolean auth = grantAbility.setRolesToUser(UserGrantRolesReq.builder()
                     .spaceId(spaceId)
-                    .roleCodes(roleCodes)
+                    .roleCodeList(roleCodes)
                     .uid(uid).build());
             if (!auth) {
                 throw new ServiceLogicException(USER_CREATE_FAIL);
