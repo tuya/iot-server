@@ -13,6 +13,7 @@ import com.tuya.iot.suite.test.Env
 import com.tuya.iot.suite.web.config.ProjectProperties
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
+import spock.lang.Stepwise
 import spock.lang.Timeout
 
 /**
@@ -22,6 +23,7 @@ import spock.lang.Timeout
  * @date 2021/06/07
  */
 @Slf4j
+//@Stepwise
 class PermissionAbilitySpec extends BaseSpec {
     static {
         Env.useDailyCn()
@@ -117,27 +119,30 @@ class PermissionAbilitySpec extends BaseSpec {
     }
 
     @Timeout(1000)
-    void "测试删除权限"() {
-        given:
-        expect:
-        permissionAbility.deletePermission(spaceId, 'role-menu')
-        permissionAbility.deletePermission(spaceId, 'user-menu')
-    }
-
-    @Timeout(1000)
     void "根据用户查询权限"() {
-        given:
-        expect:
-        permissionAbility.queryPermissionsByUser(spaceId, 'bsh1623052900346u8pQ')
+        when:
+        def perms = permissionAbility.queryPermissionsByUser(spaceId, 'bsh1623052900346u8pQ')
+        then:
+        perms.size() == 0
     }
 
     @Timeout(1000)
     void "根据角色查询权限"() {
-        given:
-        expect:
-        permissionAbility.queryPermissionsByRoleCodes(spaceId, PermissionQueryByRolesReq.builder()
+        when:
+        def perms = permissionAbility.queryPermissionsByRoleCodes(spaceId, PermissionQueryByRolesReq.builder()
                .roleCodeList(['admin'])
                 .build()
         )
+        then:
+        perms.size() == 0
+    }
+
+    @Timeout(1000)
+    void "测试删除权限"() {
+        given:
+        expect:
+        permissionAbility.deletePermission(spaceId, 'app')
+        permissionAbility.deletePermission(spaceId, 'role-menu')
+        permissionAbility.deletePermission(spaceId, 'user-menu')
     }
 }

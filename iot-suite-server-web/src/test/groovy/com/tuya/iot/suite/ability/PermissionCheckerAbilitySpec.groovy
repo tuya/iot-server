@@ -7,6 +7,7 @@ import com.tuya.iot.suite.web.config.ProjectProperties
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Ignore
+import spock.lang.Stepwise
 
 /**
  * @description 该测试用例依赖日常环境
@@ -14,6 +15,7 @@ import spock.lang.Ignore
  * @date 2021/06/07
  */
 @Slf4j
+@Stepwise
 class PermissionCheckerAbilitySpec extends BaseSpec{
     static{
         Env.useDailyCn()
@@ -30,18 +32,23 @@ class PermissionCheckerAbilitySpec extends BaseSpec{
     }
 
     void "测试校验角色权限"(){
-        given:
-        expect:
+        when:
         permissionCheckAbility.checkPermissionForRole(spaceId,'app','admin')
+        then:
+        noExceptionThrown()
     }
 
     void "测试校验用户角色"(){
-        expect:
+        when:
         permissionCheckAbility.checkRoleForUser(spaceId,'admin','bsh1623052900346u8pQ')
+        then:
+        noExceptionThrown()
     }
     void "测试校验用户权限"(){
-        expect:
+        when:
         permissionCheckAbility.checkPermissionForUser(spaceId,'app','bsh1623052900346u8pQ')
+        then:
+        noExceptionThrown()
     }
 
 }
