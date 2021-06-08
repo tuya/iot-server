@@ -39,7 +39,7 @@ public interface RoleConnector extends RoleAbility {
 
     @GET("/v1.0/iot-03/idaas/spaces/{space_id}/roles/{role_code}")
     @Override
-    IdaasRole getRole(Long spaceId, String roleCode);
+    IdaasRole getRole(@Path("space_id")Long spaceId, @Path("role_code")String roleCode);
 
 /*    @POST("/v1.0/iot-03/idaas/get-batch-role")
     @Override
