@@ -51,9 +51,9 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
     String adminUserId = "superAdmin";
 
     String adminRoleCode = "admin";
-    String manageUid = "";
+
     String manageRoleCode = "manage-1000";
-    String normalUid = "";
+
     String normalRoleCode = "normal-1000";
 
     /**
@@ -86,8 +86,8 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
 
         //admin
         initFromTemplate(adminRoleCode, adminUserId, adminUserName);
-        initFromTemplate(manageRoleCode, "", manageUid);
-        initFromTemplate(normalRoleCode, "", normalUid);
+        initFromTemplate(manageRoleCode, null, null);
+        initFromTemplate(normalRoleCode, null, null);
 
         log.info("permission data has been initialized successful!");
     }
@@ -140,7 +140,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
                 } else {
                     sons.add(e);
                 }
-                e.setSpaceId(spaceId.toString());
+                e.setSpaceId(spaceId);
             });
             boolean addResult = permissionAbility.batchCreatePermission(spaceId, PermissionBatchCreateReq.builder().permissionList(fathers).build());
             if (addResult) {
@@ -209,7 +209,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
         if (userCreated) {
             //授权
             grantAbility.grantRoleToUser(UserGrantRoleReq.builder()
-                    .spaceId(spaceId.toString())
+                    .spaceId(spaceId)
                     .roleCode(roleCode)
                     .uid(userId)
                     .build());
