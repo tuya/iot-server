@@ -5,6 +5,7 @@ import com.tuya.connector.api.annotations.GET;
 import com.tuya.connector.api.annotations.POST;
 import com.tuya.connector.api.annotations.Query;
 import com.tuya.iot.suite.ability.idaas.ability.SpaceAbility;
+import com.tuya.iot.suite.ability.idaas.model.IdaasSpace;
 import com.tuya.iot.suite.ability.idaas.model.SpaceApplyReq;
 
 /**
@@ -20,6 +21,6 @@ public interface SpaceConnector extends SpaceAbility {
 
     @GET("/v1.0/iot-03/idaas/spaces")
     @Override
-    Long querySpace(@Query("spaceGroup") String spaceGroup,
-                    @Query("spaceCode") String spaceCode);
+    IdaasSpace querySpace(@Query("spaceGroup") String spaceGroup,
+                          @Query("spaceCode") String spaceCode);
 }

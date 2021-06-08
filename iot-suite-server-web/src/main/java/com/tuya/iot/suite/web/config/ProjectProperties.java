@@ -16,6 +16,7 @@ public class ProjectProperties {
     Long permissionSpaceId;
     String permissionGroup;
     String permissionSpaceCode;
+    String permissionSpaceOwner;
     Boolean permissionAutoInit;
     String code;
     String name;

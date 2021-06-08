@@ -29,9 +29,9 @@ public interface PermissionService {
 
     IdaasPermission getPermissionByCode(Long spaceId, String permissionCode);
 
-    List<IdaasPermission> queryPermissionsByCodes(PermissionQueryReq request);
+    List<IdaasPermission> queryPermissionsByCodes(Long spaceId,List<String> permCodes);
 
-    List<PermissionQueryByRolesRespItem> queryPermissionsByRoleCodes(PermissionQueryByRolesReq request);
+    List<PermissionQueryByRolesRespItem> queryPermissionsByRoleCodes(Long spaceId, PermissionQueryByRolesReq request);
 
     List<IdaasPermission> queryPermissionsByUser(Long spaceId, String uid);
 

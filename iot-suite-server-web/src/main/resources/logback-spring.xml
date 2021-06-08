@@ -138,6 +138,7 @@
         <appender-ref ref="ERROR_FILE"/>
     </appender>
 
+    <logger name="com.tuya.connector" level="DEBUG"></logger>
 
     <root level="INFO">
         <!-- CONSOLE 和  ASYNC_DEBUG_FILE 仅限开发环境打开-->

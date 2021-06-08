@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.FieldDefaults;
 
-import java.util.List;
+import java.util.Collection;
 
 /**
  * @author benguan.zhou@tuya.com
@@ -15,8 +15,7 @@ import java.util.List;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
-public class PermissionQueryByRolesReq {
+public class PermissionBatchCreateReq {
 
-    List<String> roleCodes;
-
+    Collection<PermissionCreateReq> permissionDTOList;
 }

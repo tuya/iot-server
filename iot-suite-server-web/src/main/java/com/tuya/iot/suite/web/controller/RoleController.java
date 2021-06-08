@@ -155,8 +155,8 @@ public class RoleController {
     @RequiresPermissions("3006")
     public Response<List<PermissionDto>> getRolePermissions(@RequestParam String roleCode) {
         List<PermissionDto> list = permissionService.queryPermissionsByRoleCodes(
+                projectProperties.getPermissionSpaceId(),
                 PermissionQueryByRolesReq.builder()
-                        .spaceId(projectProperties.getPermissionSpaceId())
                         .roleCodes(Lists.newArrayList(roleCode))
                         .build())
                 .stream().flatMap(it ->

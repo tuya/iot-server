@@ -1,5 +1,6 @@
 package com.tuya.iot.suite.ability.idaas.ability;
 
+import com.tuya.iot.suite.ability.idaas.model.IdaasSpace;
 import com.tuya.iot.suite.ability.idaas.model.SpaceApplyReq;
 import com.tuya.iot.suite.ability.idaas.model.SpaceApplyResp;
 
@@ -16,5 +17,5 @@ public interface SpaceAbility {
      * */
     Long applySpace(SpaceApplyReq spaceApplyRequest);
 
-    Long querySpace(String spaceGroup,String spaceCode);
+    IdaasSpace querySpace(String spaceGroup, String spaceCode);
 }
