@@ -1,6 +1,5 @@
 package com.tuya.iot.suite.ability
 
-import com.tuya.iot.suite.ability.idaas.ability.PermissionCheckAbility
 import com.tuya.iot.suite.ability.idaas.ability.RoleAbility
 import com.tuya.iot.suite.ability.idaas.model.IdaasRole
 import com.tuya.iot.suite.ability.idaas.model.IdaasRoleCreateReq
@@ -11,13 +10,14 @@ import com.tuya.iot.suite.test.Env
 import com.tuya.iot.suite.web.config.ProjectProperties
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
-import spock.lang.Ignore
+import spock.lang.Stepwise
 
 /**
  * @description 该测试用例依赖日常环境* @author benguan.zhou@tuya.com
  * @date 2021/06/07
  */
 @Slf4j
+//@Stepwise
 class RoleAbilitySpec extends BaseSpec {
     static {
         Env.useDailyCn()
@@ -49,11 +49,6 @@ class RoleAbilitySpec extends BaseSpec {
                 .build())
     }
 
-    void "测试删除角色"() {
-        expect:
-        roleAbility.deleteRole(spaceId,'admin')
-    }
-
     void "测试查询角色byCode"() {
         when:
         IdaasRole role = roleAbility.getRole(spaceId,'admin')
@@ -76,5 +71,10 @@ class RoleAbilitySpec extends BaseSpec {
         then:
         page.totalCount == 1
 
+    }
+
+    void "测试删除角色"() {
+        expect:
+        roleAbility.deleteRole(spaceId,'admin')
     }
 }
