@@ -1,5 +1,6 @@
 package com.tuya.iot.suite.ability.idaas.model;
 
+import com.google.gson.annotations.SerializedName;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
@@ -17,5 +18,6 @@ import java.util.Collection;
 @Builder
 public class PermissionBatchCreateReq {
 
+    @SerializedName("permissionList")
     Collection<PermissionCreateReq> permissionList;
 }
