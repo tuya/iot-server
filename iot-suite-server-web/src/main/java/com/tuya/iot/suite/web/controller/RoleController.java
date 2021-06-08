@@ -135,7 +135,7 @@ public class RoleController {
     @RequiresPermissions("3005")
     public Response<Boolean> rolePermissions(@RequestBody RolePermissionReq req) {
         Boolean success = grantService.grantPermissionsToRole(ContextUtil.getUserId(), RoleGrantPermissionsReq.builder()
-                .spaceId(projectProperties.getPermissionSpaceId())
+                .spaceId(projectProperties.getPermissionSpaceId().toString())
                 .roleCode(req.getRoleCode())
                 .permissionCodes(req.getPermissionCodes())
                 .build());

@@ -72,7 +72,7 @@ public class RoleServiceImpl implements RoleService {
         // 2. grant permissions from template
         // if grant failure, need not rollback
         return grantAbility.grantPermissionsToRole(RoleGrantPermissionsReq.builder()
-                .spaceId(spaceId)
+                .spaceId(spaceId.toString())
                 .roleCode(req.getRoleCode())
                 .permissionCodes(perms.stream().map(it ->
                         it.getPermissionCode()).collect(Collectors.toList())
@@ -185,7 +185,7 @@ public class RoleServiceImpl implements RoleService {
         // 2. add permissions if need
         if (!permsToAdd.isEmpty()) {
             boolean addRes = grantAbility.grantPermissionsToRole(RoleGrantPermissionsReq.builder()
-                    .spaceId(spaceId)
+                    .spaceId(spaceId.toString())
                     .permissionCodes(permsToAdd)
                     .roleCode(roleCode)
                     .build());

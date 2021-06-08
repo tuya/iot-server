@@ -17,6 +17,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -46,8 +47,9 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
     PermissionAbility permissionAbility;
 
 
-    String authentication = "";
-    String adminUid = "";
+    String adminUserName = "admin@tuya.com";
+    String adminUserId = "superAdmin";
+
     String adminRoleCode = "admin";
     String manageUid = "";
     String manageRoleCode = "manage-1000";
@@ -60,10 +62,15 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         log.info("permission-auto-init==>{}", projectProperties.permissionAutoInit);
+        if (!StringUtils.isEmpty(projectProperties.getAdminUserName())) {
+            adminUserName = projectProperties.getAdminUserName();
+        }
+        if (!StringUtils.isEmpty(projectProperties.getAdminUserId())) {
+            adminUserId = projectProperties.getAdminUserId();
+        }
         if (!projectProperties.permissionAutoInit) {
             return;
         }
-
         //space
         if (!initPermissionSpace()) {
             log.error("apply space failure!");
@@ -78,31 +85,29 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
         }
 
         //admin
-        initFromTemplate(adminRoleCode, adminUid);
-        initFromTemplate(manageRoleCode, manageUid);
-        initFromTemplate(normalRoleCode, normalUid);
+        initFromTemplate(adminRoleCode, adminUserId, adminUserName);
+        initFromTemplate(manageRoleCode, "", manageUid);
+        initFromTemplate(normalRoleCode, "", normalUid);
 
         log.info("permission data has been initialized successful!");
     }
 
-    private void initFromTemplate(String roleCode, String uid) {
+    private void initFromTemplate(String roleCode, String userId, String userName) {
         if (!initRole(roleCode)) {
             log.error("init role({}) failure!", roleCode);
             return;
         }
+        if (!StringUtils.isEmpty(userId)) {
+            userId = initUserByRole(roleCode, userId, userName);
+            if (StringUtils.isEmpty(userId)) {
+                log.error("init user({}) failure!", roleCode);
+                return;
+            }
 
-        if (!initUser(uid, roleCode)) {
-            log.error("init user({}) failure!", roleCode);
-            return;
         }
 
-        if (!grantRoleToUser(roleCode, uid)) {
-            log.error("grant role({}) to user({}) failure!", roleCode, roleCode);
-            return;
-        }
         String roleType = RoleTypeEnum.fromRoleCode(roleCode).name();
         List<PermissionCreateReq> perms = PermTemplateUtil.loadAsPermissionCreateReqList("classpath:template/permissions.json", it -> it.getAuthRoleTypes().contains(roleType));
-
         if (!grantPermissionsToRole(roleCode, perms)) {
             log.error("grant permissions to role({}) failure!", roleCode);
             return;
@@ -128,18 +133,18 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
             //分级处理-父级
             List<PermissionCreateReq> fathers = new ArrayList<>();
             List<PermissionCreateReq> sons = new ArrayList<>();
-            toAdd.values().stream().forEach(e->{
+            toAdd.values().stream().forEach(e -> {
                 if ("0".equalsIgnoreCase(e.getParentCode())) {
                     e.setParentCode(null);
                     fathers.add(e);
-                }else{
+                } else {
                     sons.add(e);
                 }
                 e.setSpaceId(spaceId.toString());
             });
-            boolean addResult = permissionAbility.batchCreatePermission(spaceId, PermissionBatchCreateReq.builder() .permissionList(fathers).build());
+            boolean addResult = permissionAbility.batchCreatePermission(spaceId, PermissionBatchCreateReq.builder().permissionList(fathers).build());
             if (addResult) {
-                addResult = addResult &&  permissionAbility.batchCreatePermission(spaceId, PermissionBatchCreateReq.builder() .permissionList(sons).build());
+                addResult = addResult && permissionAbility.batchCreatePermission(spaceId, PermissionBatchCreateReq.builder().permissionList(sons).build());
             }
             if (!addResult) {
                 log.error("add permission error!");
@@ -151,7 +156,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
 
     private boolean grantPermissionsToRole(String roleCode, List<PermissionCreateReq> perms) {
         Long spaceId = projectProperties.getPermissionSpaceId();
-        List<PermissionQueryByRolesRespItem> existsPermList = permissionAbility.queryPermissionsByRoleCodes(spaceId,PermissionQueryByRolesReq.builder()
+        List<PermissionQueryByRolesRespItem> existsPermList = permissionAbility.queryPermissionsByRoleCodes(spaceId, PermissionQueryByRolesReq.builder()
                 .roleCodeList(Lists.newArrayList(roleCode)).build());
         Set<String> allPerms = perms.stream().map(it -> it.getPermissionCode()).collect(Collectors.toSet());
         Set<String> existsPerms = existsPermList.stream().flatMap(it -> it.getPermissionList().stream().map(p -> p.getPermissionCode())).collect(
@@ -161,7 +166,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
         toAdd.removeAll(existsPerms);
         if (!toAdd.isEmpty()) {
             boolean addResult = grantAbility.grantPermissionsToRole(RoleGrantPermissionsReq.builder()
-                    .spaceId(spaceId)
+                    .spaceId(spaceId.toString())
                     .roleCode(roleCode)
                     .permissionCodes(Lists.newArrayList(toAdd))
                     .build());
@@ -188,31 +193,29 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
         return true;
     }
 
-    private boolean grantRoleToUser(String roleCode, String uid) {
-        Long spaceId = projectProperties.getPermissionSpaceId();
-        List<IdaasRole> roles = roleAbility.queryRolesByUser(spaceId, uid);
-        Optional<IdaasRole> op = roles.stream().filter(it -> it.getRoleCode().equals(roleCode)).findAny();
-        if (op.isPresent()) {
-            return true;
-        }
-        return grantAbility.grantRoleToUser(UserGrantRoleReq.builder()
-                .spaceId(spaceId)
-                .roleCode(roleCode)
-                .uid(uid)
-                .build());
-    }
 
-    private boolean initUser(String uid, String username) {
+    private String initUserByRole(String roleCode, String userId, String userName) {
         Long spaceId = projectProperties.getPermissionSpaceId();
-        IdaasUser adminUser = idaasUserAbility.getUserByUid(spaceId, uid);
-        if (adminUser != null) {
-            return true;
+        IdaasPageResult<IdaasUser> pageResult = idaasUserAbility.queryUserPage(spaceId, IdaasUserPageReq.builder().roleCode(roleCode).pageNum(1).pageSize(2).build());
+        if (pageResult.getTotalCount() > 0) {
+            IdaasUser idaasUser = pageResult.getResults().get(0);
+            return idaasUser.getUid();
         }
-        return idaasUserAbility.createUser(spaceId, IdaasUserCreateReq.builder()
-                .username(username)
-                .uid(uid)
-                .remark(username)
+        Boolean userCreated = idaasUserAbility.createUser(spaceId, IdaasUserCreateReq.builder()
+                .username(userName)
+                .uid(userId)
+                .remark(userName)
                 .build());
+        if (userCreated) {
+            //授权
+            grantAbility.grantRoleToUser(UserGrantRoleReq.builder()
+                    .spaceId(spaceId.toString())
+                    .roleCode(roleCode)
+                    .uid(userId)
+                    .build());
+            return userId;
+        }
+        return null;
     }
 
     private boolean initRole(String roleCode) {

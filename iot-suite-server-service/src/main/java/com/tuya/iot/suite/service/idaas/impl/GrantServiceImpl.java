@@ -50,16 +50,17 @@ public class GrantServiceImpl implements GrantService {
 
     @Override
     public Boolean grantPermissionToRole(String operatorUid, RoleGrantPermissionReq req) {
-        checkForModifyPermissionToRole(req.getSpaceId(), operatorUid, req.getPermissionCode(), req.getRoleCode());
+        checkForModifyPermissionToRole(req.getSpaceId().toString(), operatorUid, req.getPermissionCode(), req.getRoleCode());
         return grantAbility.grantPermissionToRole(req);
     }
 
-    private void checkForModifyPermissionToRole(Long spaceId, String operatorUid, String permissionCode, String roleCode) {
+    private void checkForModifyPermissionToRole(String spaceId, String operatorUid, String permissionCode, String roleCode) {
         checkForModifyPermissionToRole(spaceId, operatorUid, Lists.newArrayList(permissionCode), roleCode);
     }
 
-    private void checkForModifyPermissionToRole(Long spaceId, String operatorUid, List<String> permissionCodes, String roleCode) {
+    private void checkForModifyPermissionToRole(String spaceIdStr, String operatorUid, List<String> permissionCodes, String roleCode) {
         // 0. target role cannot be admin
+        Long spaceId = Long.parseLong(spaceIdStr);
         Assert.isTrue(!RoleTypeEnum.fromRoleCode(roleCode).isAdmin(), "can not grant permission to a admin role!");
         List<IdaasPermission> perms = permissionAbility.queryPermissionsByUser(spaceId, operatorUid);
         List<IdaasRole> roles = roleAbility.queryRolesByUser(spaceId, operatorUid);
@@ -94,13 +95,13 @@ public class GrantServiceImpl implements GrantService {
 
     @Override
     public Boolean revokePermissionFromRole(Long spaceId, String operatorUid, String roleCode, String permissionCode) {
-        checkForModifyPermissionToRole(spaceId, operatorUid, roleCode, permissionCode);
+        checkForModifyPermissionToRole(spaceId.toString(), operatorUid, roleCode, permissionCode);
         return grantAbility.revokePermissionFromRole(spaceId, permissionCode, roleCode);
     }
 
     @Override
     public Boolean revokePermissionsFromRole(String operatorUid, RoleRevokePermissionsReq req) {
-        checkForModifyPermissionToRole(req.getSpaceId(), operatorUid, req.getPermissionCodes(), req.getRoleCode());
+        checkForModifyPermissionToRole(req.getSpaceId().toString(), operatorUid, req.getPermissionCodes(), req.getRoleCode());
         return grantAbility.revokePermissionsFromRole(req);
     }
 
@@ -110,11 +111,12 @@ public class GrantServiceImpl implements GrantService {
         return grantAbility.grantRoleToUser(req);
     }
 
-    private void checkForModifyRoleToUser(Long spaceId, String operatorUid, String roleCode, String uid) {
+    private void checkForModifyRoleToUser(String spaceId, String operatorUid, String roleCode, String uid) {
         checkForModifyRoleToUser(spaceId, operatorUid, Lists.newArrayList(roleCode), uid);
     }
 
-    private void checkForModifyRoleToUser(Long spaceId, String operatorUid, List<String> roleCodes, String uid) {
+    private void checkForModifyRoleToUser(String spaceIdStr, String operatorUid, List<String> roleCodes, String uid) {
+        Long spaceId = Long.parseLong(spaceIdStr);
         roleCodes.forEach(roleCode ->
                 Assert.isTrue(!RoleTypeEnum.fromRoleCode(roleCode).isAdmin(), "can not grant permission to a admin role!")
         );
@@ -138,19 +140,19 @@ public class GrantServiceImpl implements GrantService {
 
     @Override
     public Boolean setRolesToUser(String operatorUid, UserGrantRolesReq req) {
-        checkForModifyRoleToUser(req.getSpaceId(), operatorUid, req.getRoleCodes(), req.getUid());
+        checkForModifyRoleToUser(req.getSpaceId().toString(), operatorUid, req.getRoleCodes(), req.getUid());
         return grantAbility.setRolesToUser(req);
     }
 
     @Override
     public Boolean revokeRoleFromUser(Long spaceId, String operatorUid, String roleCode, String uid) {
-        checkForModifyRoleToUser(spaceId, operatorUid, roleCode, uid);
+        checkForModifyRoleToUser(spaceId.toString(), operatorUid, roleCode, uid);
         return grantAbility.revokeRoleFromUser(spaceId, roleCode, uid);
     }
 
     @Override
     public Boolean revokeRolesFromUser(String operatorUid, UserRevokeRolesReq req) {
-        checkForModifyRoleToUser(req.getSpaceId(), operatorUid, req.getRoleCodeList(), req.getUid());
+        checkForModifyRoleToUser(req.getSpaceId().toString(), operatorUid, req.getRoleCodeList(), req.getUid());
         return grantAbility.revokeRolesFromUser(req);
     }
 
@@ -178,7 +180,7 @@ public class GrantServiceImpl implements GrantService {
         boolean success;
         for (String uid : uidList) {
             success = grantAbility.grantRoleToUser(UserGrantRoleReq.builder()
-                    .spaceId(spaceId)
+                    .spaceId(spaceId.toString())
                     .uid(uid)
                     .roleCode(roleCode).build());
             if (!success) {

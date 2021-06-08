@@ -1,6 +1,9 @@
 package com.tuya.iot.suite.web.config;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -9,7 +12,9 @@ import org.springframework.stereotype.Component;
  * @description
  * @date 2021/05/31
  */
-@Data
+@Getter
+@Setter
+@ToString
 @ConfigurationProperties(prefix = "project")
 @Component
 public class ProjectProperties {
@@ -20,6 +25,8 @@ public class ProjectProperties {
     Boolean permissionAutoInit;
     String code;
     String name;
+    String adminUserName;
+    String adminUserId;
 }
 
 
