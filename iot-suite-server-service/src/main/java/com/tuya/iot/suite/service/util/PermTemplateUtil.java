@@ -34,7 +34,7 @@ public abstract class PermTemplateUtil {
                 .name(it.getPermissionName())
                 .parentCode(it.getParentCode())
                 .remark(it.getRemark())
-                .type(PermissionTypeEnum.valueOf(it.getPermissionType()))
+                .type(PermissionTypeEnum.valueOf(it.getPermissionType()).getCode())
                 .order(it.getOrder())
                 .build();
     }

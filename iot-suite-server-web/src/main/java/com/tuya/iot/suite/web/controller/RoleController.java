@@ -174,8 +174,8 @@ public class RoleController {
     public Response<List<PermissionDto>> getRolePermissions(@RequestParam String roleCode) {
         log.info("查角色拥有的授权入参:roleCode={}",roleCode);
         List<PermissionDto> list = permissionService.queryPermissionsByRoleCodes(
+                projectProperties.getPermissionSpaceId(),
                 PermissionQueryByRolesReq.builder()
-                        .spaceId(projectProperties.getPermissionSpaceId())
                         .roleCodes(Lists.newArrayList(roleCode))
                         .build())
                 .stream().flatMap(it ->

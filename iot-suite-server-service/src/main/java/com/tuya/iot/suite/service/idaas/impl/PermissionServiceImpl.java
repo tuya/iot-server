@@ -2,12 +2,12 @@ package com.tuya.iot.suite.service.idaas.impl;
 
 import com.tuya.iot.suite.ability.idaas.ability.PermissionAbility;
 import com.tuya.iot.suite.ability.idaas.model.IdaasPermission;
+import com.tuya.iot.suite.ability.idaas.model.PermissionBatchCreateReq;
 import com.tuya.iot.suite.ability.idaas.model.PermissionCreateReq;
 import com.tuya.iot.suite.ability.idaas.model.PermissionQueryByRolesReq;
 import com.tuya.iot.suite.ability.idaas.model.PermissionQueryByRolesRespItem;
 import com.tuya.iot.suite.ability.idaas.model.PermissionQueryReq;
 import com.tuya.iot.suite.ability.idaas.model.PermissionUpdateReq;
-import com.tuya.iot.suite.core.constant.Response;
 import com.tuya.iot.suite.service.dto.PermissionNodeDTO;
 import com.tuya.iot.suite.service.idaas.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,9 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public Boolean batchCreatePermission(Long spaceId, List<PermissionCreateReq> permissionCreateRequestList) {
-        return permissionAbility.batchCreatePermission(spaceId, permissionCreateRequestList);
+        return permissionAbility.batchCreatePermission(spaceId,
+                PermissionBatchCreateReq.builder().permissionDTOList(permissionCreateRequestList).build()
+        );
     }
 
     @Override
@@ -53,13 +55,13 @@ public class PermissionServiceImpl implements PermissionService {
     }
 
     @Override
-    public List<IdaasPermission> queryPermissionsByCodes(PermissionQueryReq request) {
-        return permissionAbility.queryPermissionsByCodes(request);
+    public List<IdaasPermission> queryPermissionsByCodes(Long spaceId,List<String> permCodes) {
+        return permissionAbility.queryPermissionsByCodes(spaceId,PermissionQueryReq.builder().permissionCodeList(permCodes).build());
     }
 
     @Override
-    public List<PermissionQueryByRolesRespItem> queryPermissionsByRoleCodes(PermissionQueryByRolesReq request) {
-        return permissionAbility.queryPermissionsByRoleCodes(request);
+    public List<PermissionQueryByRolesRespItem> queryPermissionsByRoleCodes(Long spaceId,PermissionQueryByRolesReq request) {
+        return permissionAbility.queryPermissionsByRoleCodes(spaceId,request);
     }
 
     @Override

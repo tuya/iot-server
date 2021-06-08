@@ -28,7 +28,7 @@ public class PermissionCreateReq {
     /**
      * 权限类型(api/menu/button/data)
      */
-    PermissionTypeEnum type;
+    Integer type;
 
     /**
      * 父级权限code

@@ -8,8 +8,10 @@ import com.tuya.iot.suite.ability.idaas.ability.RoleAbility;
 import com.tuya.iot.suite.ability.idaas.ability.SpaceAbility;
 import com.tuya.iot.suite.ability.idaas.model.IdaasRole;
 import com.tuya.iot.suite.ability.idaas.model.IdaasRoleCreateReq;
+import com.tuya.iot.suite.ability.idaas.model.IdaasSpace;
 import com.tuya.iot.suite.ability.idaas.model.IdaasUser;
 import com.tuya.iot.suite.ability.idaas.model.IdaasUserCreateReq;
+import com.tuya.iot.suite.ability.idaas.model.PermissionBatchCreateReq;
 import com.tuya.iot.suite.ability.idaas.model.PermissionCreateReq;
 import com.tuya.iot.suite.ability.idaas.model.PermissionQueryByRolesReq;
 import com.tuya.iot.suite.ability.idaas.model.PermissionQueryByRolesRespItem;
@@ -130,7 +132,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
                         PermissionCreateReq.builder()
                                 .name(it.getName())
                                 .permissionCode(it.getPermissionCode())
-                                .type(it.getType())
+                                .type(it.getType().getCode())
                                 .order(it.getOrder())
                                 .remark(it.getRemark())
                                 .parentCode(it.getParentCode())
@@ -142,7 +144,9 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
         toAdd.putAll(allPerms);
         ownedPerms.forEach((code,it)->toAdd.remove(code));
         if(!toAdd.isEmpty()){
-            boolean addResult = permissionAbility.batchCreatePermission(spaceId,toAdd.values());
+            boolean addResult = permissionAbility.batchCreatePermission(spaceId, PermissionBatchCreateReq.builder()
+                    .permissionDTOList(toAdd.values()).build()
+            );
             if(!addResult){
                 log.error("add permission error!");
                 return false;
@@ -165,8 +169,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
 
     private boolean grantPermissionsToRole(String roleCode,List<PermissionCreateReq> perms) {
         Long spaceId = projectProperties.getPermissionSpaceId();
-        List<PermissionQueryByRolesRespItem> existsPermList = permissionAbility.queryPermissionsByRoleCodes(PermissionQueryByRolesReq.builder()
-                .spaceId(spaceId)
+        List<PermissionQueryByRolesRespItem> existsPermList = permissionAbility.queryPermissionsByRoleCodes(spaceId,PermissionQueryByRolesReq.builder()
                 .roleCodes(Lists.newArrayList(roleCode)).build());
         Set<String> allPerms = perms.stream().map(it->it.getPermissionCode()).collect(Collectors.toSet());
         Set<String> existsPerms = existsPermList.stream().flatMap(it->it.getPermissionList().stream().map(p->p.getPermissionCode())).collect(
@@ -252,8 +255,9 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
             return true;
         }
         // else query spaceId.
-        spaceId = spaceAbility.querySpace(projectProperties.getPermissionGroup(), projectProperties.getPermissionSpaceCode());
-        if (spaceId != null) {
+        IdaasSpace space = spaceAbility.querySpace(projectProperties.getPermissionGroup(), projectProperties.getPermissionSpaceCode());
+        if (space != null) {
+            spaceId = space.getSpaceId();
             projectProperties.setPermissionSpaceId(spaceId);
             log.info("exists spaceId {} at iot-cloud", spaceId);
             return true;
