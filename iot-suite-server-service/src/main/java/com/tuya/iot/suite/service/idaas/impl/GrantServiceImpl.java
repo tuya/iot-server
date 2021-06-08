@@ -58,9 +58,8 @@ public class GrantServiceImpl implements GrantService {
         checkForModifyPermissionToRole(spaceId, operatorUid, Lists.newArrayList(permissionCode), roleCode);
     }
 
-    private void checkForModifyPermissionToRole(String spaceIdStr, String operatorUid, List<String> permissionCodes, String roleCode) {
+    private void checkForModifyPermissionToRole(String spaceId, String operatorUid, List<String> permissionCodes, String roleCode) {
         // 0. target role cannot be admin
-        Long spaceId = Long.parseLong(spaceIdStr);
         Assert.isTrue(!RoleTypeEnum.fromRoleCode(roleCode).isAdmin(), "can not grant permission to a admin role!");
         List<IdaasPermission> perms = permissionAbility.queryPermissionsByUser(spaceId, operatorUid);
         List<IdaasRole> roles = roleAbility.queryRolesByUser(spaceId, operatorUid);
@@ -115,8 +114,7 @@ public class GrantServiceImpl implements GrantService {
         checkForModifyRoleToUser(spaceId, operatorUid, Lists.newArrayList(roleCode), uid);
     }
 
-    private void checkForModifyRoleToUser(String spaceIdStr, String operatorUid, List<String> roleCodes, String uid) {
-        Long spaceId = Long.parseLong(spaceIdStr);
+    private void checkForModifyRoleToUser(String spaceId, String operatorUid, List<String> roleCodes, String uid) {
         roleCodes.forEach(roleCode ->
                 Assert.isTrue(!RoleTypeEnum.fromRoleCode(roleCode).isAdmin(), "can not grant permission to a admin role!")
         );
@@ -140,7 +138,7 @@ public class GrantServiceImpl implements GrantService {
 
     @Override
     public Boolean setRolesToUser(String operatorUid, UserGrantRolesReq req) {
-        checkForModifyRoleToUser(req.getSpaceId().toString(), operatorUid, req.getRoleCodes(), req.getUid());
+        checkForModifyRoleToUser(req.getSpaceId(), operatorUid, req.getRoleCodeList(), req.getUid());
         return grantAbility.setRolesToUser(req);
     }
 
