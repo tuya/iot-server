@@ -21,7 +21,7 @@ public interface GrantService {
 
     Boolean setPermissionsToRole(String operatorUid, RoleGrantPermissionsReq request);
 
-    Boolean revokePermissionFromRole(Long spaceId, String operatorUid, String roleCode,String permissionCode);
+    Boolean revokePermissionFromRole(String spaceId, String operatorUid, String roleCode,String permissionCode);
 
     Boolean revokePermissionsFromRole(String operatorUid, RoleRevokePermissionsReq request);
 
@@ -29,9 +29,9 @@ public interface GrantService {
 
     Boolean setRolesToUser(String operatorUid, UserGrantRolesReq req);
 
-    Boolean revokeRoleFromUser(Long spaceId,String operatorUid, String roleCode,String uid);
+    Boolean revokeRoleFromUser(String spaceId,String operatorUid, String roleCode,String uid);
 
     Boolean revokeRolesFromUser(String operatorUid, UserRevokeRolesReq req);
 
-    Boolean setRoleToUsers(Long spaceId,String operatorUid, String roleCode, List<String> uidList);
+    Boolean setRoleToUsers(String spaceId,String operatorUid, String roleCode, List<String> uidList);
 }

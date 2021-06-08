@@ -27,18 +27,19 @@ class RoleAbilitySpec extends BaseSpec {
     @Autowired
     ProjectProperties projectProperties
 
-    long spaceId
+    String spaceId
 
     void setup() {
         spaceId = projectProperties.getPermissionSpaceId()
     }
 
     void "测试创建角色"() {
-        expect:
-        roleAbility.createRole(spaceId, IdaasRoleCreateReq.builder()
+        def success = roleAbility.createRole(spaceId, IdaasRoleCreateReq.builder()
                 .roleCode('admin')
                 .roleName('administrator')
                 .build())
+        expect:
+        success
     }
 
     void "测试更新角色"() {
@@ -57,12 +58,12 @@ class RoleAbilitySpec extends BaseSpec {
         when:
         IdaasRole role = roleAbility.getRole(spaceId,'admin')
         then:
-        role.roleName == 'amdin'
+        role.roleCode == 'amdin'
     }
 
     void "测试查询角色byUser"() {
         when:
-        def perms = roleAbility.queryRolesByUser(spaceId,'')
+        def perms = roleAbility.queryRolesByUser(spaceId,'bsh1623052900346u8pQ')
         then:
         perms.size() == 0
     }

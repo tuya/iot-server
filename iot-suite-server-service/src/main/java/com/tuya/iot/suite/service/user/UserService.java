@@ -59,13 +59,13 @@ public interface UserService {
      */
     boolean resetPassword(ResetPasswordBo resetPasswordBo);
 
-    Boolean createUser(Long spaceId, UserRegisteredRequest req, List<String> roleCodes);
+    Boolean createUser(String spaceId, UserRegisteredRequest req, List<String> roleCodes);
 
-    Boolean updateUser(Long spaceId, String uid, String nickName,List<String> roleCodes);
+    Boolean updateUser(String spaceId, String uid, String nickName,List<String> roleCodes);
 
-    Boolean deleteUser(Long spaceId, String uid);
+    Boolean deleteUser(String spaceId, String uid);
 
-    IdaasUser getUserByUid(Long spaceId, String uid);
+    IdaasUser getUserByUid(String spaceId, String uid);
 
     /**
      *  修改用户密码
@@ -81,7 +81,7 @@ public interface UserService {
      * @param userIds
      * @return
      */
-    Boolean batchDeleteUser(Long spaceId, String... userIds);
+    Boolean batchDeleteUser(String spaceId, String... userIds);
 
-    PageVO<UserBaseInfo> queryUserByPage(Long spaceId, String searchKey, String roleCode);
+    PageVO<UserBaseInfo> queryUserByPage(String spaceId, String searchKey, String roleCode);
 }

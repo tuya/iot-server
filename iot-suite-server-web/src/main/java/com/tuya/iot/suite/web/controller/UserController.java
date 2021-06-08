@@ -141,7 +141,7 @@ public class UserController {
     @PostMapping("/users")
     @RequiresPermissions("4002")
     public Response<Boolean> createUser(@RequestBody UserAddReq req) {
-        Long spaceId = projectProperties.getPermissionSpaceId();
+        String spaceId = projectProperties.getPermissionSpaceId();
         if (CollectionUtils.isEmpty(req.getRoleCodes())) {
             throw new ServiceLogicException(PARAM_LOST);
         }
@@ -157,7 +157,7 @@ public class UserController {
     @PutMapping("/users")
     @RequiresPermissions("4003")
     public Response<Boolean> updateUserName(@RequestBody UserEditReq req) {
-        Long spaceId = projectProperties.getPermissionSpaceId();
+        String spaceId = projectProperties.getPermissionSpaceId();
         return Response.buildSuccess(userService.updateUser(spaceId, req.getUserId(), req.getNickName(), req.getRoleCodes()));
     }
 
@@ -172,7 +172,7 @@ public class UserController {
     @DeleteMapping("/users/{userId}")
     @RequiresPermissions("4004")
     public Response<Boolean> updateUserPwd(@PathVariable("userId") String userId) {
-        Long spaceId = projectProperties.getPermissionSpaceId();
+        String spaceId = projectProperties.getPermissionSpaceId();
         return Response.buildSuccess(userService.deleteUser(spaceId, userId));
     }
 
@@ -184,7 +184,7 @@ public class UserController {
     @RequiresPermissions("4009")
     public Response<Boolean> batchDeleteUser(@ApiParam(value = "uid列表，逗号分隔", required = true)
                                              @RequestParam String uidList) {
-        Long spaceId = projectProperties.getPermissionSpaceId();
+        String spaceId = projectProperties.getPermissionSpaceId();
         return Response.buildSuccess(userService.batchDeleteUser(spaceId, uidList.split(",")));
     }
 
@@ -193,7 +193,7 @@ public class UserController {
     @RequiresPermissions("4001")
     public Response<PageVO<UserDto>> listUsers(@ApiParam(value = "搜索关键字") @RequestParam String searchKey,
                                                @ApiParam(value = "角色编码") @RequestParam String roleCode) {
-        Long spaceId = projectProperties.getPermissionSpaceId();
+        String spaceId = projectProperties.getPermissionSpaceId();
         PageVO<UserBaseInfo> userBaseInfoPageVO = userService.queryUserByPage(spaceId, searchKey, roleCode);
         PageVO<UserDto> result = new PageVO<>();
         result.setPageNo(userBaseInfoPageVO.getPageNo());
@@ -236,7 +236,7 @@ public class UserController {
     @PutMapping("/users/roles")
     @RequiresPermissions("4009")
     public Response<Boolean> grantRole(@RequestBody BatchUserGrantRoleReq req){
-        Long spaceId = projectProperties.getPermissionSpaceId();
+        String spaceId = projectProperties.getPermissionSpaceId();
         String uid = ContextUtil.getUserId();
         return Response.buildSuccess(grantService.setRoleToUsers(spaceId,uid,req.getRoleCode(),req.getUserIds()));
     }

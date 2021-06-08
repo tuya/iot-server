@@ -29,7 +29,7 @@ public class IdaasRole {
     /**
      * 隔离空间id
      */
-    Long spaceId;
+    String spaceId;
 
     /**
      * 备注

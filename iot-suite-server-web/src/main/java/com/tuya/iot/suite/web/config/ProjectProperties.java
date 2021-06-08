@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "project")
 @Component
 public class ProjectProperties {
-    Long permissionSpaceId;
+    String permissionSpaceId;
     String permissionGroup;
     String permissionSpaceCode;
     String permissionSpaceOwner;

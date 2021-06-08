@@ -30,6 +30,6 @@ public class RoleGrantPermissionsReq {
     /**
      * 隔离空间id
      */
-    Long spaceId;
+    String spaceId;
 
 }

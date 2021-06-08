@@ -17,20 +17,20 @@ import java.util.Set;
  */
 public interface RoleService {
 
-    Boolean createRole(Long spaceId, RoleCreateReqDTO request);
+    Boolean createRole(String spaceId, RoleCreateReqDTO request);
 
-    Boolean updateRole(Long spaceId, String operatorUid, String roleCode, RoleUpdateReq request);
+    Boolean updateRole(String spaceId, String operatorUid, String roleCode, RoleUpdateReq request);
 
-    Boolean deleteRole(Long spaceId, String operatorUid, String roleCode);
+    Boolean deleteRole(String spaceId, String operatorUid, String roleCode);
 
-    IdaasRole getRole(Long spaceId, String operatorUid, String roleCode);
+    IdaasRole getRole(String spaceId, String operatorUid, String roleCode);
 
-    List<IdaasRole> queryRolesByUser(Long spaceId,String uid);
+    List<IdaasRole> queryRolesByUser(String spaceId,String uid);
 
-    PageVO<IdaasRole> queryRolesPagination(Long spaceId, RolesPaginationQueryReq req);
+    PageVO<IdaasRole> queryRolesPagination(String spaceId, RolesPaginationQueryReq req);
 
-    boolean deleteRoles(Long permissionSpaceId, String operatorUid, Collection<String> roleCodes);
+    boolean deleteRoles(String permissionSpaceId, String operatorUid, Collection<String> roleCodes);
 
-    Boolean resetRolePermissionsFromTemplate(Long permissionSpaceId, String operatorUid, String roleCode);
+    Boolean resetRolePermissionsFromTemplate(String permissionSpaceId, String operatorUid, String roleCode);
 
 }

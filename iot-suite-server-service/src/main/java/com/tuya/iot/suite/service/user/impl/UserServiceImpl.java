@@ -155,7 +155,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Boolean createUser(Long spaceId, UserRegisteredRequest req, List<String> roleCodes) {
+    public Boolean createUser(String spaceId, UserRegisteredRequest req, List<String> roleCodes) {
         //1、向云端注册用户得到用户id
         User user = userAbility.registeredUser(req);
         //2、向基础服务注册用户
@@ -178,7 +178,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Boolean updateUser(Long spaceId, String uid, String nickName, List<String> roleCodes) {
+    public Boolean updateUser(String spaceId, String uid, String nickName, List<String> roleCodes) {
         if (!StringUtils.isEmpty(nickName)) {
             //修改昵称 TODO 等待云端开放
 
@@ -197,7 +197,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Boolean deleteUser(Long spaceId, String uid) {
+    public Boolean deleteUser(String spaceId, String uid) {
         //向云端删除用户
         Boolean del = userAbility.destroyUser(uid);
         if (!del) {
@@ -212,7 +212,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public IdaasUser getUserByUid(Long spaceId, String uid) {
+    public IdaasUser getUserByUid(String spaceId, String uid) {
         return null;
     }
 
@@ -222,7 +222,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Boolean batchDeleteUser(Long spaceId, String... userIds) {
+    public Boolean batchDeleteUser(String spaceId, String... userIds) {
         if (userIds == null || userIds.length < 1) {
             throw new ServiceLogicException(PARAM_LOST, "userId");
         }
@@ -236,7 +236,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public PageVO<UserBaseInfo> queryUserByPage(Long spaceId, String searchKey, String roleCode) {
+    public PageVO<UserBaseInfo> queryUserByPage(String spaceId, String searchKey, String roleCode) {
         IdaasPageResult<IdaasUser> pageResult = idaasUserAbility.queryUserPage(spaceId, IdaasUserPageReq.builder()
                 .roleCode(roleCode)
                 .username(searchKey)

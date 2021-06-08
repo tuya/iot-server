@@ -22,6 +22,6 @@ public class RoleQueryReq {
      */
     List<String> roleCodes;
 
-    Long spaceId;
+    String spaceId;
 
 }

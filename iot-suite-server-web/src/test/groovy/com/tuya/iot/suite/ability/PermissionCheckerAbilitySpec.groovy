@@ -23,7 +23,7 @@ class PermissionCheckerAbilitySpec extends BaseSpec{
     @Autowired
     ProjectProperties projectProperties
 
-    long spaceId
+    String spaceId
 
     void setup() {
         spaceId = projectProperties.getPermissionSpaceId()
@@ -36,9 +36,12 @@ class PermissionCheckerAbilitySpec extends BaseSpec{
     }
 
     void "测试校验用户角色"(){
-        permissionCheckAbility.checkRoleForUser(spaceId,'admin','todo')
+        expect:
+        permissionCheckAbility.checkRoleForUser(spaceId,'admin','bsh1623052900346u8pQ')
     }
     void "测试校验用户权限"(){
+        expect:
+        permissionCheckAbility.checkPermissionForUser(spaceId,'app','bsh1623052900346u8pQ')
     }
 
 }

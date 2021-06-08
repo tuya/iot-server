@@ -110,10 +110,10 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
     }
 
     private boolean initPermissions(List<PermissionCreateReq> perms) {
-        Long spaceId = projectProperties.getPermissionSpaceId();
+        String spaceId = projectProperties.getPermissionSpaceId();
         Map<String, PermissionCreateReq> allPerms = perms.stream().collect(Collectors.toMap(it -> it.getPermissionCode(), it -> it));
         List<String> permissionCodes = perms.stream().map(e -> e.getPermissionCode()).collect(Collectors.toList());
-        List<IdaasPermission> permissionQueryReq = permissionAbility.queryPermissionsByCodes(spaceId, PermissionQueryReq.builder().permissionCodeList(permissionCodes).spaceId(spaceId).build());
+        List<IdaasPermission> permissionQueryReq = permissionAbility.queryPermissionsByCodes(spaceId, PermissionQueryReq.builder().permissionCodeList(permissionCodes).build());
         Map<String, PermissionCreateReq> toAdd = new HashMap<>(16);
         Map<String, IdaasPermission> existCodes = new HashMap<>(16);
         if (!CollectionUtils.isEmpty(permissionQueryReq)) {
@@ -150,7 +150,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
     }
 
     private boolean grantPermissionsToRole(String roleCode, List<PermissionCreateReq> perms) {
-        Long spaceId = projectProperties.getPermissionSpaceId();
+        String spaceId = projectProperties.getPermissionSpaceId();
         List<PermissionQueryByRolesRespItem> existsPermList = permissionAbility.queryPermissionsByRoleCodes(spaceId,PermissionQueryByRolesReq.builder()
                 .roleCodeList(Lists.newArrayList(roleCode)).build());
         Set<String> allPerms = perms.stream().map(it -> it.getPermissionCode()).collect(Collectors.toSet());
@@ -189,7 +189,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
     }
 
     private boolean grantRoleToUser(String roleCode, String uid) {
-        Long spaceId = projectProperties.getPermissionSpaceId();
+        String spaceId = projectProperties.getPermissionSpaceId();
         List<IdaasRole> roles = roleAbility.queryRolesByUser(spaceId, uid);
         Optional<IdaasRole> op = roles.stream().filter(it -> it.getRoleCode().equals(roleCode)).findAny();
         if (op.isPresent()) {
@@ -203,7 +203,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
     }
 
     private boolean initUser(String uid, String username) {
-        Long spaceId = projectProperties.getPermissionSpaceId();
+        String spaceId = projectProperties.getPermissionSpaceId();
         IdaasUser adminUser = idaasUserAbility.getUserByUid(spaceId, uid);
         if (adminUser != null) {
             return true;
@@ -216,7 +216,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
     }
 
     private boolean initRole(String roleCode) {
-        Long spaceId = projectProperties.getPermissionSpaceId();
+        String spaceId = projectProperties.getPermissionSpaceId();
         IdaasRole adminRole = roleAbility.getRole(spaceId, roleCode);
         if (adminRole != null) {
             return true;
@@ -231,7 +231,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
 
     private boolean initPermissionSpace() {
         // if spaceId has config, use it.
-        Long spaceId = projectProperties.getPermissionSpaceId();
+        String spaceId = projectProperties.getPermissionSpaceId();
         if (spaceId != null) {
             log.info("project.permission-space-id={}", spaceId);
             return true;

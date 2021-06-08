@@ -15,7 +15,7 @@ public interface SpaceAbility {
      * @param spaceApplyRequest 权限空间申请参数
      * @return 申请是否成功
      * */
-    Long applySpace(SpaceApplyReq spaceApplyRequest);
+    String applySpace(SpaceApplyReq spaceApplyRequest);
 
     IdaasSpace querySpace(String spaceGroup, String spaceCode);
 }

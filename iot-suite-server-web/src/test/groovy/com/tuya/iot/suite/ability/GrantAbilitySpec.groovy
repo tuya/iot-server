@@ -26,19 +26,21 @@ class GrantAbilitySpec extends BaseSpec {
     GrantAbility grantAbility
     @Autowired
     ProjectProperties projectProperties
-    long spaceId
+    String spaceId
 
     void setup() {
         spaceId = projectProperties.getPermissionSpaceId()
     }
 
     void "测试角色授权"() {
-        expect:
-        grantAbility.grantPermissionToRole(RoleGrantPermissionReq.builder()
+        when:
+        def success = grantAbility.grantPermissionToRole(RoleGrantPermissionReq.builder()
                 .spaceId(spaceId)
                 .roleCode('admin')
                 .permissionCode('app')
                 .build())
+        then:
+        success
     }
 
     void "测试角色批量授权"() {
@@ -60,8 +62,10 @@ class GrantAbilitySpec extends BaseSpec {
     }
 
     void "测试回收角色权限"() {
-        expect:
-        grantAbility.revokePermissionFromRole(spaceId, 'app', 'admin')
+        when:
+        def success = grantAbility.revokePermissionFromRole(spaceId, 'app', 'admin')
+        then:
+        success
     }
 
     void "测试批量回收角色权限"() {
@@ -78,7 +82,7 @@ class GrantAbilitySpec extends BaseSpec {
         grantAbility.grantRoleToUser(UserGrantRoleReq.builder()
                 .spaceId(spaceId)
                 .roleCode('admin')
-                .uid('todo')
+                .uid('bsh1623052900346u8pQ')
                 .build())
     }
 
@@ -87,20 +91,20 @@ class GrantAbilitySpec extends BaseSpec {
         grantAbility.setRolesToUser(UserGrantRoleReq.builder()
                 .spaceId(spaceId)
                 .roleCode('admin')
-                .uid('todo')
+                .uid('bsh1623052900346u8pQ')
                 .build())
     }
 
     void "测试回收用户角色"() {
         expect:
-        grantAbility.revokeRoleFromUser(spaceId, 'admin', 'todo')
+        grantAbility.revokeRoleFromUser(spaceId, 'admin', 'bsh1623052900346u8pQ')
     }
 
     void "测试批量回收用户角色"() {
         expect:
         grantAbility.revokeRolesFromUser(UserRevokeRolesReq.builder()
                 .spaceId(spaceId)
-                .uid('todo')
+                .uid('bsh1623052900346u8pQ')
                 .roleCodeList(['app'])
                 .build())
     }

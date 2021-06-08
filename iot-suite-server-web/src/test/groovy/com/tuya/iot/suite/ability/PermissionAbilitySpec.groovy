@@ -4,6 +4,7 @@ import com.tuya.iot.suite.ability.idaas.ability.PermissionAbility
 import com.tuya.iot.suite.ability.idaas.model.IdaasPermission
 import com.tuya.iot.suite.ability.idaas.model.PermissionBatchCreateReq
 import com.tuya.iot.suite.ability.idaas.model.PermissionCreateReq
+import com.tuya.iot.suite.ability.idaas.model.PermissionQueryByRolesReq
 import com.tuya.iot.suite.ability.idaas.model.PermissionQueryReq
 import com.tuya.iot.suite.ability.idaas.model.PermissionTypeEnum
 import com.tuya.iot.suite.ability.idaas.model.PermissionUpdateReq
@@ -30,7 +31,7 @@ class PermissionAbilitySpec extends BaseSpec {
     @Autowired
     ProjectProperties projectProperties
 
-    long spaceId
+    String spaceId
 
     void setup() {
         spaceId = projectProperties.getPermissionSpaceId()
@@ -65,7 +66,6 @@ class PermissionAbilitySpec extends BaseSpec {
         given:
         when:
         List<IdaasPermission> permissions = permissionAbility.queryPermissionsByCodes(spaceId, PermissionQueryReq.builder()
-                .spaceId(spaceId)
                 .permissionCodeList(['app'])
                 .build())
         then:
@@ -125,16 +125,19 @@ class PermissionAbilitySpec extends BaseSpec {
     }
 
     @Timeout(1000)
-    void "根据角色查询权限"() {
-        given:
-        expect:
-        permissionAbility.queryPermissionsByUser(spaceId, 'uid')
-    }
-
-    @Timeout(1000)
     void "根据用户查询权限"() {
         given:
         expect:
-        permissionAbility.queryPermissionsByRoleCodes(spaceId, [])
+        permissionAbility.queryPermissionsByUser(spaceId, 'bsh1623052900346u8pQ')
+    }
+
+    @Timeout(1000)
+    void "根据角色查询权限"() {
+        given:
+        expect:
+        permissionAbility.queryPermissionsByRoleCodes(spaceId, PermissionQueryByRolesReq.builder()
+               .roleCodeList(['admin'])
+                .build()
+        )
     }
 }

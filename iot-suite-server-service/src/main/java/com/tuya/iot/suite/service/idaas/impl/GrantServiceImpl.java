@@ -54,11 +54,11 @@ public class GrantServiceImpl implements GrantService {
         return grantAbility.grantPermissionToRole(req);
     }
 
-    private void checkForModifyPermissionToRole(Long spaceId, String operatorUid, String permissionCode, String roleCode) {
+    private void checkForModifyPermissionToRole(String spaceId, String operatorUid, String permissionCode, String roleCode) {
         checkForModifyPermissionToRole(spaceId, operatorUid, Lists.newArrayList(permissionCode), roleCode);
     }
 
-    private void checkForModifyPermissionToRole(Long spaceId, String operatorUid, List<String> permissionCodes, String roleCode) {
+    private void checkForModifyPermissionToRole(String spaceId, String operatorUid, List<String> permissionCodes, String roleCode) {
         // 0. target role cannot be admin
         Assert.isTrue(!RoleTypeEnum.fromRoleCode(roleCode).isAdmin(), "can not grant permission to a admin role!");
         List<IdaasPermission> perms = permissionAbility.queryPermissionsByUser(spaceId, operatorUid);
@@ -93,7 +93,7 @@ public class GrantServiceImpl implements GrantService {
     }
 
     @Override
-    public Boolean revokePermissionFromRole(Long spaceId, String operatorUid, String roleCode, String permissionCode) {
+    public Boolean revokePermissionFromRole(String spaceId, String operatorUid, String roleCode, String permissionCode) {
         checkForModifyPermissionToRole(spaceId, operatorUid, roleCode, permissionCode);
         return grantAbility.revokePermissionFromRole(spaceId, permissionCode, roleCode);
     }
@@ -110,11 +110,11 @@ public class GrantServiceImpl implements GrantService {
         return grantAbility.grantRoleToUser(req);
     }
 
-    private void checkForModifyRoleToUser(Long spaceId, String operatorUid, String roleCode, String uid) {
+    private void checkForModifyRoleToUser(String spaceId, String operatorUid, String roleCode, String uid) {
         checkForModifyRoleToUser(spaceId, operatorUid, Lists.newArrayList(roleCode), uid);
     }
 
-    private void checkForModifyRoleToUser(Long spaceId, String operatorUid, List<String> roleCodes, String uid) {
+    private void checkForModifyRoleToUser(String spaceId, String operatorUid, List<String> roleCodes, String uid) {
         roleCodes.forEach(roleCode ->
                 Assert.isTrue(!RoleTypeEnum.fromRoleCode(roleCode).isAdmin(), "can not grant permission to a admin role!")
         );
@@ -143,7 +143,7 @@ public class GrantServiceImpl implements GrantService {
     }
 
     @Override
-    public Boolean revokeRoleFromUser(Long spaceId, String operatorUid, String roleCode, String uid) {
+    public Boolean revokeRoleFromUser(String spaceId, String operatorUid, String roleCode, String uid) {
         checkForModifyRoleToUser(spaceId, operatorUid, roleCode, uid);
         return grantAbility.revokeRoleFromUser(spaceId, roleCode, uid);
     }
@@ -155,7 +155,7 @@ public class GrantServiceImpl implements GrantService {
     }
 
     @Override
-    public Boolean setRoleToUsers(Long spaceId, String operatorUid, String roleCode, List<String> uidList) {
+    public Boolean setRoleToUsers(String spaceId, String operatorUid, String roleCode, List<String> uidList) {
         // 0. 不能把系统管理员角色设置给用户
         Assert.isTrue(!RoleTypeEnum.fromRoleCode(roleCode).isAdmin(), "can not set 'admin' role to any users!");
         // 1. 操作者有更高级的角色（或相同的角色），才可以把这个角色设置给用户
