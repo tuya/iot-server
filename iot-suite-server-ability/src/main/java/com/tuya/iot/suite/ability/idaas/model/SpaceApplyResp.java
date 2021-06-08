@@ -15,7 +15,11 @@ import lombok.experimental.FieldDefaults;
 @Builder
 public class SpaceApplyResp {
 
-    Boolean success;
-    Long spaceId;
+    Long gmt_create;
+    Long gmt_modified;
+    String space_id;
+    String owner;
+    String space_code;
+    String space_group;
     String msg;
 }

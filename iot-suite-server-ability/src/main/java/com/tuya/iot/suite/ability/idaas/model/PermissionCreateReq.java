@@ -45,4 +45,6 @@ public class PermissionCreateReq {
      */
     String remark;
 
+    String spaceId;
+
 }
