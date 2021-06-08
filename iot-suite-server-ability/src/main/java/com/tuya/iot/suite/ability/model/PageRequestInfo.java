@@ -1,5 +1,6 @@
 package com.tuya.iot.suite.ability.model;
 
+import com.google.gson.annotations.SerializedName;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -20,10 +21,12 @@ public class PageRequestInfo implements Serializable {
     /**
      * Integer	每页容量	是
      */
-    private Integer pageSize;
+    @SerializedName("pageSize")
+    private Integer pageSize ;
     /**
      * Integer	当前页码	是
      */
-    private Integer pageNum;
+    @SerializedName("pageNum")
+    private Integer pageNum ;
 
 }

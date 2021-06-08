@@ -150,7 +150,7 @@ public class RoleController {
     public Response<Boolean> rolePermissions(@RequestBody RolePermissionReq req) {
         log.info("角色授权入参:{}",req);
         Boolean success = grantService.grantPermissionsToRole(ContextUtil.getUserId(), RoleGrantPermissionsReq.builder()
-                .spaceId(projectProperties.getPermissionSpaceId())
+                .spaceId(projectProperties.getPermissionSpaceId().toString())
                 .roleCode(req.getRoleCode())
                 .permissionCodes(req.getPermissionCodes())
                 .build());
