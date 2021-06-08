@@ -61,16 +61,6 @@ class PermissionAbilitySpec extends BaseSpec {
         permission.permissionCode == 'app'
     }
 
-    /**
-     * 踩坑记：
-     发现一个坑，调openapi接口的框架里面，
-     com.tuya.connector.api.core.delegate.RetrofitDelegate#getGlobalRetrofit有一行代码
-     gsonBuilder.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
-     将驼峰转下划线了。
-     有些名称不是很规范的时候，接口调用会失败。
-     比如对方定义字段名为permissionDTOList，我们这边就调不了了。
-     对方网关下划线转驼峰方式和我们的有点不兼容。
-     * */
     void "测试批量查询权限"() {
         given:
         when:
@@ -82,6 +72,15 @@ class PermissionAbilitySpec extends BaseSpec {
         permissions.size() == 1
     }
 
+    /**
+     * 踩坑记：
+     发现一个坑，调openapi接口的框架里面，
+     com.tuya.connector.api.core.delegate.RetrofitDelegate#getGlobalRetrofit有一行代码
+     gsonBuilder.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
+     将驼峰转下划线了。
+     之前对方是使用下划线风格接收的。
+     现在他们一个新的系统用的驼峰风格的。
+     * */
     void "测试批量创建权限"() {
         given:
         when:

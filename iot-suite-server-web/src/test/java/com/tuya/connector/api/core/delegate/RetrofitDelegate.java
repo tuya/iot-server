@@ -272,7 +272,7 @@ public class RetrofitDelegate implements ProxyDelegate {
                     }
 
                     GsonBuilder gsonBuilder = new GsonBuilder();
-                    gsonBuilder.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
+                    //gsonBuilder.setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES);
 
                     retrofitClient = new Retrofit.Builder()
                             .baseUrl(apiDataSource.getBaseUrl())

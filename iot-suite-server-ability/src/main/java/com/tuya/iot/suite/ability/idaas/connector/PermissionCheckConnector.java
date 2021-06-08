@@ -13,19 +13,22 @@ public interface PermissionCheckConnector extends PermissionCheckAbility {
 
     @GET("/v1.0/iot-03/idaas/valid-role-permission")
     @Override
-    Boolean checkPermissionForRole(@Query("spaceId")Long spaceId,
-                                   @Query("roleCode")String roleCode,
-                                   @Query("permissionCode")String permissionCode);
+    Boolean checkPermissionForRole(@Query("spaceId") Long spaceId,
+                                   @Query("permissionCode") String permissionCode,
+                                   @Query("roleCode") String roleCode
+    );
 
     @GET("/v1.0/iot-03/idaas/valid-user-role")
     @Override
-    Boolean checkRoleForUser(@Query("spaceId")Long spaceId,
-                             @Query("uid")String uid,
-                             @Query("roleCode")String roleCode);
+    Boolean checkRoleForUser(@Query("spaceId") Long spaceId,
+                             @Query("roleCode") String roleCode,
+                             @Query("uid") String uid
+    );
 
     @GET("/v1.0/iot-03/idaas/valid-user-permission")
     @Override
-    Boolean checkPermissionForUser(@Query("spaceId")Long spaceId,
-                                   @Query("uid") String uid,
-                                   @Query("permission_code") String permissionCode);
+    Boolean checkPermissionForUser(@Query("spaceId") Long spaceId,
+                                   @Query("permission_code") String permissionCode,
+                                   @Query("uid") String uid
+    );
 }
