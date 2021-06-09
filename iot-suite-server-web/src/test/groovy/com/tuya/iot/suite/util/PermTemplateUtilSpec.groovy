@@ -89,7 +89,7 @@ class PermTemplateUtilSpec extends Specification {
         def trees1 = PermTemplateUtil.loadTrees("classpath:template/permissions_zh.json"){
             true
         }
-        def trees2 = PermTemplateUtil.loadTrees("classpath:template/permissions_zh2.json"){
+        def trees2 = PermTemplateUtil.loadTrees("classpath:template/permissions_zh_new.json"){
             true
         }
         def trees = PermTemplateUtil.mergeTrees(trees1,trees2)
