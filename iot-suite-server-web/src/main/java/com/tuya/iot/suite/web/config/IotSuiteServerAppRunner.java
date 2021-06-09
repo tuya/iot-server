@@ -43,8 +43,6 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
     @Autowired
     PermissionAbility permissionAbility;
 
-    private String TOP_PERMISSION_CODE = "0";
-
 
     String adminUserName = "admin@tuya.com";
     String adminUserId = "superAdmin";
@@ -76,7 +74,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
             return;
         }
         //permissions
-        List<PermissionNodeDTO> trees = PermTemplateUtil.loadTrees("classpath:template/permissions_zh.json", it->true);
+        List<PermissionNodeDTO> trees = PermTemplateUtil.loadTrees("classpath:template/permissions_zh.json", it -> true);
 
         if (!initPermissions(trees)) {
             log.error("init permissions failure!");
@@ -113,51 +111,46 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
 
     private boolean initPermissions(List<PermissionNodeDTO> trees) {
         String spaceId = projectProperties.getPermissionSpaceId();
-        List<PermissionCreateReq> permissionNodeDTOList = PermTemplateUtil.flatten(trees).stream().map(e->{
-           return PermissionCreateReq.builder()
+        List<PermissionCreateReq> permissionNodeDTOList = PermTemplateUtil.flatten(trees).stream().map(e -> {
+            return PermissionCreateReq.builder()
                     .name(e.getPermissionName())
-                   .order(e.getOrder())
-                   .parentCode(e.getParentCode())
-                   .permissionCode(e.getPermissionCode())
-                   .type(PermissionTypeEnum.valueOf(e.getPermissionType()).getCode())
-                   .spaceId(spaceId)
-                   .remark(e.getRemark())
-                   .build();
+                    .order(e.getOrder())
+                    .parentCode(e.getParentCode())
+                    .permissionCode(e.getPermissionCode())
+                    .type(PermissionTypeEnum.valueOf(e.getPermissionType()).getCode())
+                    .spaceId(spaceId)
+                    .remark(e.getRemark())
+                    .build();
         }).collect(Collectors.toList());
         Map<String, PermissionCreateReq> allPerms = permissionNodeDTOList.stream().collect(Collectors.toMap(it -> it.getPermissionCode(), it -> it));
         List<String> permissionCodes = permissionNodeDTOList.stream().map(e -> e.getPermissionCode()).collect(Collectors.toList());
         List<IdaasPermission> permissionQueryReq = permissionAbility.queryPermissionsByCodes(spaceId, PermissionQueryReq.builder().permissionCodeList(permissionCodes).build());
         Map<String, PermissionCreateReq> toAdd = new HashMap<>(16);
-        Map<String, IdaasPermission> existCodes = new HashMap<>(16);
+        Map<String, String> existCodes = new HashMap<>(16);
         if (!CollectionUtils.isEmpty(permissionQueryReq)) {
-            permissionQueryReq.stream().forEach(e -> existCodes.put(e.getPermissionCode(), e));
+            permissionQueryReq.stream().forEach(e -> existCodes.put(e.getPermissionCode(), "exist"));
         }
         permissionCodes.stream().forEach(e -> {
             if (!existCodes.containsKey(e)) {
                 toAdd.put(e, allPerms.get(e));
             }
         });
-        if (!toAdd.isEmpty()) {
-            //分级处理-父级
+        //分级处理-父级
+        while (toAdd.size() > 0) {
             List<PermissionCreateReq> fathers = new ArrayList<>();
-            List<String> fatherCodes = new ArrayList<>();
-            fatherCodes.add(TOP_PERMISSION_CODE);
-            while (fatherCodes.size() > 0) {
-                for (PermissionCreateReq e : toAdd.values()) {
-                    if (fatherCodes.contains(e.getParentCode())) {
-                        if (e.getParentCode().equalsIgnoreCase(TOP_PERMISSION_CODE)) {
-                            e.setParentCode(null);
-                        }
-                        fathers.add(e);
-                    }
-                    e.setSpaceId(spaceId);
+            for (int i = toAdd.size() - 1; i >= 0; i--) {
+                PermissionCreateReq e = toAdd.get(i);
+                if (existCodes.containsKey(e.getParentCode()) || e.getParentCode() == null) {
+                    fathers.add(e);
+                    toAdd.remove(e);
+                    existCodes.put(e.getPermissionCode(), "exist");
                 }
-                fatherCodes = fathers.stream().map(e -> e.getPermissionCode()).collect(Collectors.toList());
-                boolean addResult = permissionAbility.batchCreatePermission(spaceId, PermissionBatchCreateReq.builder().permissionList(fathers).build());
-                if (!addResult) {
-                    log.error("add permission error!");
-                    return false;
-                }
+                e.setSpaceId(spaceId);
+            }
+            boolean addResult = permissionAbility.batchCreatePermission(spaceId, PermissionBatchCreateReq.builder().permissionList(fathers).build());
+            if (!addResult) {
+                log.error("add permission error!");
+                return false;
             }
         }
         return true;
@@ -206,23 +199,23 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
     private boolean initUserByRole(String roleCode, String userId, String userName) {
         String spaceId = projectProperties.getPermissionSpaceId();
         //用户已存在？不存在则创建
-        IdaasUser user = idaasUserAbility.getUserByUid(spaceId,userId);
-        if(user==null){
+        IdaasUser user = idaasUserAbility.getUserByUid(spaceId, userId);
+        if (user == null) {
             Boolean userCreated = idaasUserAbility.createUser(spaceId, IdaasUserCreateReq.builder()
                     .username(userName)
                     .uid(userId)
                     .remark(userName)
                     .build());
             if (!userCreated) {
-                log.info("createUser uid={},username={} failure!",userId,userName);
+                log.info("createUser uid={},username={} failure!", userId, userName);
                 return false;
             }
         }
         //用户已关联角色？没关联则进行关联
         IdaasPageResult<IdaasUser> pageResult = idaasUserAbility.queryUserPage(spaceId, IdaasUserPageReq.builder().roleCode(roleCode).pageNum(1).pageSize(100).build());
         if (pageResult.getTotalCount() > 0) {
-            long count = pageResult.getResults().stream().map(it->it.getUid()).filter(it->it.equals(userId)).count();
-            if(count>0){
+            long count = pageResult.getResults().stream().map(it -> it.getUid()).filter(it -> it.equals(userId)).count();
+            if (count > 0) {
                 return true;
             }
         }
