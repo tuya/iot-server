@@ -1,6 +1,7 @@
 package com.tuya.iot.suite.service.util;
 
 import com.alibaba.fastjson.JSONObject;
+import com.tuya.iot.suite.ability.idaas.model.IdaasPermission;
 import com.tuya.iot.suite.ability.idaas.model.PermissionCreateReq;
 import com.tuya.iot.suite.ability.idaas.model.PermissionTypeEnum;
 import com.tuya.iot.suite.service.dto.PermissionNodeDTO;
@@ -18,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -43,15 +45,29 @@ public abstract class PermTemplateUtil {
                 .order(it.getOrder())
                 .build();
     }
+    public static PermissionNodeDTO convertFromIdaasPermission(IdaasPermission it){
+        return PermissionNodeDTO.builder()
+                .permissionCode(it.getPermissionCode())
+                .permissionName(it.getName())
+                .parentCode(it.getParentCode())
+                .remark(it.getRemark())
+                .permissionType(PermissionTypeEnum.fromCode(it.getType()).name())
+                .order(it.getOrder())
+                .build();
+    }
     /**
      * transform tree to list, then set children to null.
      * */
     public static List<PermissionNodeDTO> loadAsFlattenList(String path,Predicate<PermissionNodeDTO> predicate) {
         List<PermissionNodeDTO> trees = loadTrees(path,predicate);
+        return flatten(trees);
+    }
+
+    public static List<PermissionNodeDTO> flatten(List<PermissionNodeDTO> trees){
         List<PermissionNodeDTO> flatten = new ArrayList<>();
         bfs(trees,node->{
-           flatten.add(node);
-           node.setChildren(null);
+            flatten.add(node);
+            node.setChildren(null);
         });
         return flatten;
     }
@@ -77,9 +93,9 @@ public abstract class PermTemplateUtil {
         }
     }
     /**
+     * 广度优先遍历bfs（层序遍历），先遍历上层
      * openapi那边对权限树的操作有限制。
      * 比如批量新增权限，只能新增叶子节点。不能直接新增一颗树。
-     * 所以写一个广度优先遍历方法，逐层处理。
      * */
     public static void bfs(List<PermissionNodeDTO> trees, Consumer<PermissionNodeDTO> consumer){
         LinkedList<PermissionNodeDTO> queue1 = new LinkedList<>(trees);
@@ -98,7 +114,19 @@ public abstract class PermTemplateUtil {
                 queue2 = new LinkedList<>();
             }
         }
+    }
 
+    /**
+     * 广度优先遍历bfs（层序遍历），先遍历底层
+     * @param trees
+     * @param consumer
+     */
+    public static void bfsReversed(List<PermissionNodeDTO> trees, Consumer<PermissionNodeDTO> consumer){
+        LinkedList<PermissionNodeDTO> nodes = new LinkedList<>();
+        bfs(trees,it->nodes.add(it));
+        while(!nodes.isEmpty()){
+            consumer.accept(nodes.removeLast());
+        }
     }
 
     /**
@@ -131,5 +159,17 @@ public abstract class PermTemplateUtil {
             dfsWithPostOrder(children,consumer);
         }
         consumer.accept(root);
+    }
+
+    public static List<PermissionNodeDTO> buildTrees(List<PermissionNodeDTO> nodes){
+        //permissionCode=>PermissionNodeDTO
+        Map<String, PermissionNodeDTO> map = nodes.stream().collect(Collectors.toMap(it -> it.getPermissionCode(), it -> it));
+        //permissionCode=>children
+        Map<String, List<PermissionNodeDTO>> childrenMap = nodes.stream().collect(Collectors.groupingBy(it -> it.getParentCode()));
+        //find roots, which parentCode not in map
+        List<PermissionNodeDTO> trees = nodes.stream().filter(it -> !map.containsKey(it.getParentCode())).collect(Collectors.toList());
+        //set children
+        nodes.forEach(it -> it.setChildren(childrenMap.get(it.getPermissionCode())));
+        return trees;
     }
 }

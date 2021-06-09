@@ -7,8 +7,10 @@ import com.tuya.iot.suite.ability.idaas.ability.PermissionAbility;
 import com.tuya.iot.suite.ability.idaas.ability.RoleAbility;
 import com.tuya.iot.suite.ability.idaas.ability.SpaceAbility;
 import com.tuya.iot.suite.ability.idaas.model.*;
+import com.tuya.iot.suite.service.dto.PermissionNodeDTO;
 import com.tuya.iot.suite.service.enums.RoleTypeEnum;
 import com.tuya.iot.suite.service.util.PermTemplateUtil;
+import com.tuya.iot.suite.web.util.Env;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.security.Permission;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -47,8 +50,8 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
     PermissionAbility permissionAbility;
 
 
-    String adminUserName = "admin@tuya.com";
-    String adminUserId = "superAdmin";
+    String adminUserName = "18820077637";
+    String adminUserId = "bsh1623052900346u8pQ";
 
     String adminRoleCode = "admin";
 
@@ -77,9 +80,9 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
             return;
         }
         //permissions
-        List<PermissionCreateReq> adminPermissions = PermTemplateUtil.loadAsPermissionCreateReqList("classpath:template/permissions_zh.json", it -> true);
+        List<PermissionNodeDTO> trees = PermTemplateUtil.loadTrees("classpath:template/permissions_zh.json", it->true);
 
-        if (!initPermissions(adminPermissions)) {
+        if (!initPermissions(trees)) {
             log.error("init permissions failure!");
             return;
         }
@@ -98,12 +101,10 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
             return;
         }
         if (!StringUtils.isEmpty(userId)) {
-            userId = initUserByRole(roleCode, userId, userName);
-            if (StringUtils.isEmpty(userId)) {
+            if (initUserByRole(roleCode, userId, userName)) {
                 log.error("init user({}) failure!", roleCode);
                 return;
             }
-
         }
 
         String roleType = RoleTypeEnum.fromRoleCode(roleCode).name();
@@ -114,53 +115,47 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
         }
     }
 
-    private boolean initPermissions(List<PermissionCreateReq> perms) {
+    private boolean initPermissions(List<PermissionNodeDTO> trees) {
         String spaceId = projectProperties.getPermissionSpaceId();
-        Map<String, PermissionCreateReq> allPerms = perms.stream().collect(Collectors.toMap(it -> it.getPermissionCode(), it -> it));
-        List<String> permissionCodes = perms.stream().map(e -> e.getPermissionCode()).collect(Collectors.toList());
-        List<IdaasPermission> permissionQueryReq = permissionAbility.queryPermissionsByCodes(spaceId, PermissionQueryReq.builder().permissionCodeList(permissionCodes).build());
-        Map<String, PermissionCreateReq> toAdd = new HashMap<>(16);
-        Map<String, IdaasPermission> existCodes = new HashMap<>(16);
-        if (!CollectionUtils.isEmpty(permissionQueryReq)) {
-            permissionQueryReq.stream().forEach(e -> existCodes.put(e.getPermissionCode(), e));
+        //角色已关联的权限
+        List<PermissionNodeDTO> roleExistsPerms = permissionAbility.queryPermissionsByRoleCodes(spaceId,
+                PermissionQueryByRolesReq.builder().roleCodeList(Lists.newArrayList(adminRoleCode)).build())
+                .stream().flatMap(it->it.getPermissionList().stream()).map(PermTemplateUtil::convertFromIdaasPermission)
+                .collect(Collectors.toList());
+        List<PermissionNodeDTO> roleExistsTrees = PermTemplateUtil.buildTrees(roleExistsPerms);
+        //全部删除
+        PermTemplateUtil.bfsReversed(roleExistsTrees,it->
+                permissionAbility.deletePermission(spaceId,it.getPermissionCode())
+        );
+        //根据模版查询出来的权限
+        List<String> permCodes = PermTemplateUtil.flatten(trees).stream().map(it->it.getPermissionCode()).collect(Collectors.toList());
+        List<PermissionNodeDTO> existsPerms = permissionAbility.queryPermissionsByCodes(spaceId, PermissionQueryReq.builder()
+                .permissionCodeList(permCodes).build())
+                .stream().map(it->PermTemplateUtil.convertFromIdaasPermission(it)).collect(Collectors.toList());
+        if(permCodes.size() == existsPerms.size()){
+            return true;
         }
-        permissionCodes.stream().forEach(e -> {
-            if (!existCodes.containsKey(e)) {
-                toAdd.put(e, allPerms.get(e));
-            }
-        });
-        if (!toAdd.isEmpty()) {
-            //分级处理-父级
-            List<PermissionCreateReq> fathers = new ArrayList<>();
-            List<PermissionCreateReq> sons = new ArrayList<>();
-            toAdd.values().stream().forEach(e -> {
-                if ("0".equalsIgnoreCase(e.getParentCode())) {
-                    e.setParentCode(null);
-                    fathers.add(e);
-                } else {
-                    sons.add(e);
-                }
-                e.setSpaceId(spaceId);
-            });
-            boolean addResult = permissionAbility.batchCreatePermission(spaceId, PermissionBatchCreateReq.builder().permissionList(fathers).build());
-            if (addResult) {
-                addResult = addResult && permissionAbility.batchCreatePermission(spaceId, PermissionBatchCreateReq.builder().permissionList(sons).build());
-            }
-            if (!addResult) {
-                log.error("add permission error!");
-                return false;
-            }
-        }
+        List<PermissionNodeDTO> existsTrees = PermTemplateUtil.buildTrees(existsPerms);
+        //全部删除
+        PermTemplateUtil.bfsReversed(existsTrees,it->
+                permissionAbility.deletePermission(spaceId,it.getPermissionCode())
+        );
+        //最后添加模版中全部权限
+        PermTemplateUtil.bfs(trees,it->
+                permissionAbility.createPermission(spaceId, PermTemplateUtil.convertToPermissionCreateReq(it))
+        );
         return true;
     }
 
     private boolean grantPermissionsToRole(String roleCode, List<PermissionCreateReq> perms) {
         String spaceId = projectProperties.getPermissionSpaceId();
+        //已存在的关联
         List<PermissionQueryByRolesRespItem> existsPermList = permissionAbility.queryPermissionsByRoleCodes(spaceId, PermissionQueryByRolesReq.builder()
                 .roleCodeList(Lists.newArrayList(roleCode)).build());
         Set<String> allPerms = perms.stream().map(it -> it.getPermissionCode()).collect(Collectors.toSet());
         Set<String> existsPerms = existsPermList.stream().flatMap(it -> it.getPermissionList().stream().map(p -> p.getPermissionCode())).collect(
                 Collectors.toSet());
+        //待添加的关联
         Set<String> toAdd = new HashSet<>();
         toAdd.addAll(allPerms);
         toAdd.removeAll(existsPerms);
@@ -175,7 +170,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
                 return false;
             }
         }
-
+        //待删除的关联
         Set<String> toDelete = new HashSet<>();
         toDelete.addAll(existsPerms);
         toDelete.removeAll(allPerms);
@@ -194,28 +189,35 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
     }
 
 
-    private String initUserByRole(String roleCode, String userId, String userName) {
+    private boolean initUserByRole(String roleCode, String userId, String userName) {
         String spaceId = projectProperties.getPermissionSpaceId();
-        IdaasPageResult<IdaasUser> pageResult = idaasUserAbility.queryUserPage(spaceId, IdaasUserPageReq.builder().roleCode(roleCode).pageNum(1).pageSize(2).build());
-        if (pageResult.getTotalCount() > 0) {
-            IdaasUser idaasUser = pageResult.getResults().get(0);
-            return idaasUser.getUid();
-        }
-        Boolean userCreated = idaasUserAbility.createUser(spaceId, IdaasUserCreateReq.builder()
-                .username(userName)
-                .uid(userId)
-                .remark(userName)
-                .build());
-        if (userCreated) {
-            //授权
-            grantAbility.grantRoleToUser(UserGrantRoleReq.builder()
-                    .spaceId(spaceId)
-                    .roleCode(roleCode)
+        //用户已存在？不存在则创建
+        IdaasUser user = idaasUserAbility.getUserByUid(spaceId,userId);
+        if(user==null){
+            Boolean userCreated = idaasUserAbility.createUser(spaceId, IdaasUserCreateReq.builder()
+                    .username(userName)
                     .uid(userId)
+                    .remark(userName)
                     .build());
-            return userId;
+            if (!userCreated) {
+                log.info("createUser uid={},username={} failure!",userId,userName);
+                return false;
+            }
         }
-        return null;
+        //用户已关联角色？没关联则进行关联
+        IdaasPageResult<IdaasUser> pageResult = idaasUserAbility.queryUserPage(spaceId, IdaasUserPageReq.builder().roleCode(roleCode).pageNum(1).pageSize(100).build());
+        if (pageResult.getTotalCount() > 0) {
+            long count = pageResult.getResults().stream().map(it->it.getUid()).filter(it->it.equals(userId)).count();
+            if(count>0){
+                return true;
+            }
+        }
+        //授权
+        return grantAbility.grantRoleToUser(UserGrantRoleReq.builder()
+                .spaceId(spaceId)
+                .roleCode(roleCode)
+                .uid(userId)
+                .build());
     }
 
     private boolean initRole(String roleCode) {
@@ -235,7 +237,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
     private boolean initPermissionSpace() {
         // if spaceId has config, use it.
         String spaceId = projectProperties.getPermissionSpaceId();
-        if (spaceId != null) {
+        if (StringUtils.hasText(spaceId)) {
             log.info("project.permission-space-id={}", spaceId);
             return true;
         }

@@ -4,7 +4,7 @@
       "permissionName": "Asset",
       "permissionType": "menu",
       "permissionCode": "1000",
-      "parentCode": "0",
+      "parentCode": null,
       "order": "1",
       "authorizable": true,
       "authRoleTypes": [
@@ -84,7 +84,7 @@
       "permissionName": "Device",
       "permissionType": "menu",
       "permissionCode": "2000",
-      "parentCode": "0",
+      "parentCode": null,
       "order": "2",
       "authorizable": true,
       "authRoleTypes": [
@@ -150,7 +150,7 @@
       "permissionName": "Role",
       "permissionType": "menu",
       "permissionCode": "3000",
-      "parentCode": "0",
+      "parentCode": null,
       "order": "3",
       "authorizable": true,
       "authRoleTypes": [
@@ -255,7 +255,7 @@
       "permissionName": "Usesr",
       "permissionType": "menu",
       "permissionCode": "4000",
-      "parentCode": "0",
+      "parentCode": null,
       "order": "4",
       "authorizable": true,
       "authRoleTypes": [
@@ -416,7 +416,7 @@
       "permissionName": "Alarm center",
       "permissionType": "menu",
       "permissionCode": "5000",
-      "parentCode": "0",
+      "parentCode": null,
       "order": "5",
       "authorizable": true,
       "authRoleTypes": [
@@ -448,7 +448,7 @@
       "permissionName": "Account Settings",
       "permissionType": "menu",
       "permissionCode": "6000",
-      "parentCode": "0",
+      "parentCode": null,
       "order": "6",
       "authorizable": true,
       "authRoleTypes": [

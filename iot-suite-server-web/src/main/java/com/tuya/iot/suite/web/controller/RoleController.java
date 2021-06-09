@@ -3,6 +3,7 @@ package com.tuya.iot.suite.web.controller;
 import com.google.common.collect.Lists;
 import com.tuya.iot.suite.ability.idaas.model.IdaasRole;
 import com.tuya.iot.suite.ability.idaas.model.PermissionQueryByRolesReq;
+import com.tuya.iot.suite.ability.idaas.model.PermissionTypeEnum;
 import com.tuya.iot.suite.ability.idaas.model.RoleGrantPermissionsReq;
 import com.tuya.iot.suite.ability.idaas.model.RoleUpdateReq;
 import com.tuya.iot.suite.ability.idaas.model.RolesPaginationQueryReq;
@@ -184,7 +185,7 @@ public class RoleController {
                                         PermissionDto.builder()
                                                 .permissionCode(p.getPermissionCode())
                                                 .permissionName(p.getName())
-                                                .permissionType(p.getType().name())
+                                                .permissionType(PermissionTypeEnum.fromCode(p.getType()).name())
                                                 .order(p.getOrder())
                                                 .remark(p.getRemark())
                                                 .parentCode(p.getParentCode())

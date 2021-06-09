@@ -1,5 +1,6 @@
 package com.tuya.iot.suite.web.controller;
 
+import com.tuya.iot.suite.ability.idaas.model.PermissionTypeEnum;
 import com.tuya.iot.suite.core.constant.Response;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
 import com.tuya.iot.suite.core.util.*;
@@ -76,7 +77,7 @@ public class MyController {
                         PermissionDto.builder()
                                 .permissionCode(it.getPermissionCode())
                                 .permissionName(it.getName())
-                                .permissionType(it.getType().name())
+                                .permissionType(PermissionTypeEnum.fromCode(it.getType()).name())
                                 .remark(it.getRemark())
                                 .order(it.getOrder())
                                 .build())
