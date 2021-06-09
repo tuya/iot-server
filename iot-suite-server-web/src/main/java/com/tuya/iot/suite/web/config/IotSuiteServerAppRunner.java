@@ -77,7 +77,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
             return;
         }
         //permissions
-        List<PermissionCreateReq> adminPermissions = PermTemplateUtil.loadAsPermissionCreateReqList("classpath:template/permissions_zh.json", it -> it.getAuthRoleTypes().contains("admin"));
+        List<PermissionCreateReq> adminPermissions = PermTemplateUtil.loadAsPermissionCreateReqList("classpath:template/permissions_zh.json", it -> true);
 
         if (!initPermissions(adminPermissions)) {
             log.error("init permissions failure!");
@@ -253,7 +253,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
                 .spaceCode(projectProperties.getPermissionSpaceCode())
                 .authentication(projectProperties.getCode())
                 .remark(projectProperties.getName())
-                .owner(projectProperties.getName()).build()
+                .owner(projectProperties.getPermissionSpaceOwner()).build()
         );
         if (spaceId != null) {
             projectProperties.setPermissionSpaceId(spaceId);
