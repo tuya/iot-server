@@ -1,6 +1,7 @@
 package com.tuya.iot.suite.util
 
 import com.alibaba.fastjson.JSON
+import com.tuya.iot.suite.service.dto.PermissionNodeDTO
 import com.tuya.iot.suite.service.util.PermTemplateUtil
 import groovy.util.logging.Slf4j
 import spock.lang.Specification
@@ -71,4 +72,40 @@ class PermTemplateUtilSpec extends Specification {
         noExceptionThrown()
     }
 
+    void "测试bfs按层级遍历"(){
+        when:
+        def root = PermTemplateUtil.load("classpath:template/permissions_zh.json")
+        PermTemplateUtil.bfsByLevel(root){
+            println it.collect{
+                node->
+                    node.permissionName
+            }
+        }
+        then:
+        noExceptionThrown()
+    }
+    void "测试合并树"(){
+        when:
+        def trees1 = PermTemplateUtil.loadTrees("classpath:template/permissions_zh.json"){
+            true
+        }
+        def trees2 = PermTemplateUtil.loadTrees("classpath:template/permissions_zh2.json"){
+            true
+        }
+        def trees = PermTemplateUtil.mergeTrees(trees1,trees2)
+        println "trees1===>"
+        PermTemplateUtil.dfsWithPreOrder(trees1){
+            println it
+        }
+        println "trees2===>"
+        PermTemplateUtil.dfsWithPreOrder(trees2){
+            println it
+        }
+        println "trees===>"
+        PermTemplateUtil.dfsWithPreOrder(trees){
+            println it
+        }
+        then:
+        noExceptionThrown()
+    }
 }
