@@ -2,11 +2,9 @@ package com.tuya.iot.suite.ability
 
 import com.tuya.iot.suite.ability.idaas.ability.PermissionCheckAbility
 import com.tuya.iot.suite.service.BaseSpec
-import com.tuya.iot.suite.test.Env
 import com.tuya.iot.suite.web.config.ProjectProperties
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
-import spock.lang.Ignore
 import spock.lang.Stepwise
 
 /**
@@ -17,9 +15,6 @@ import spock.lang.Stepwise
 @Slf4j
 @Stepwise
 class PermissionCheckerAbilitySpec extends BaseSpec{
-    static{
-        Env.useDailyCn()
-    }
     @Autowired
     PermissionCheckAbility permissionCheckAbility
     @Autowired
