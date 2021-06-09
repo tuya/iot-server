@@ -37,4 +37,16 @@ class PermTemplateUtilSpec extends Specification {
         }.containsAll(['1000', '1001', '2000', '2001'])
     }
 
+    void "测试权限bfs"(){
+        when:
+        def trees = PermTemplateUtil.loadAsFlattenList("classpath:template/permissions_zh.json"){
+            true
+        }
+        PermTemplateUtil.bfs(trees){
+            println it
+        }
+        then:
+        true
+    }
+
 }

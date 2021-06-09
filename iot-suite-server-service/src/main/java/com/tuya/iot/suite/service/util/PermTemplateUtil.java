@@ -18,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -48,23 +49,10 @@ public abstract class PermTemplateUtil {
     public static List<PermissionNodeDTO> loadAsFlattenList(String path,Predicate<PermissionNodeDTO> predicate) {
         List<PermissionNodeDTO> trees = loadTrees(path,predicate);
         List<PermissionNodeDTO> flatten = new ArrayList<>();
-        LinkedList<PermissionNodeDTO> queue1 = new LinkedList<>(trees);
-        LinkedList<PermissionNodeDTO> queue2 = new LinkedList<>();
-        PermissionNodeDTO node;
-        List<PermissionNodeDTO> children;
-        while(!queue1.isEmpty()){
-            node = queue1.poll();
-            flatten.add(node);
-            children = node.getChildren();
-            node.setChildren(null);
-            if(children!=null && !children.isEmpty()){
-                queue2.addAll(children);
-            }
-            if(queue1.isEmpty()){
-                queue1 = queue2;
-                queue2 = new LinkedList<>();
-            }
-        }
+        bfs(trees,node->{
+           flatten.add(node);
+           node.setChildren(null);
+        });
         return flatten;
     }
 
@@ -87,5 +75,29 @@ public abstract class PermTemplateUtil {
             node.setChildren(node.getChildren().stream().filter(it->predicate.test(it)).collect(Collectors.toList()));
             node.getChildren().forEach(child->filterChildren(child,predicate));
         }
+    }
+    /**
+     * openapi那边对权限树的操作有限制。
+     * 比如批量新增权限，只能新增叶子节点。不能直接新增一颗树。
+     * 所以写一个广度优先遍历方法，逐层处理。
+     * */
+    public static void bfs(List<PermissionNodeDTO> trees, Consumer<PermissionNodeDTO> consumer){
+        LinkedList<PermissionNodeDTO> queue1 = new LinkedList<>(trees);
+        LinkedList<PermissionNodeDTO> queue2 = new LinkedList<>();
+        PermissionNodeDTO node;
+        List<PermissionNodeDTO> children;
+        while(!queue1.isEmpty()){
+            node = queue1.poll();
+            children = node.getChildren();
+            consumer.accept(node);
+            if(children!=null && !children.isEmpty()){
+                queue2.addAll(children);
+            }
+            if(queue1.isEmpty()){
+                queue1 = queue2;
+                queue2 = new LinkedList<>();
+            }
+        }
+
     }
 }
