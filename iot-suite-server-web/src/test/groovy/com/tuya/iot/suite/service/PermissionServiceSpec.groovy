@@ -26,30 +26,7 @@ class PermissionServiceSpec extends BaseSpec{
     @Autowired
     PermissionService permissionService
     void "测试查询我的权限树"(){
-        given:
-        def permAbility = Mock(PermissionAbility)
-        permissionService.permissionAbility = permAbility
-        permAbility.queryPermissionsByUser(_,_) >> loadAllPerms()
 
-        def spaceId = 1000
-        def uid = "1000"
-        when:
-        def trees = permissionService.queryPermissionTrees(spaceId, uid)
-        log.info(JSON.toJSONString(trees,true))
-        then:
-        trees.size() == 5
     }
-    private List<IdaasPermission> loadAllPerms() {
-        PermTemplateUtil.loadAsList("classpath:template/permissions-admin.json")
-        .collect{
-            it->IdaasPermission.builder()
-            .name(it.permissionName)
-            .parentCode(it.parentCode)
-            .type(PermissionTypeEnum.valueOf(it.permissionType))
-            .remark(it.remark)
-            .order(it.order)
-            .permissionCode(it.permissionCode)
-                    .build()
-        }
-    }
+
 }

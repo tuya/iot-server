@@ -7,7 +7,7 @@ import com.tuya.iot.suite.ability.idaas.ability.PermissionAbility;
 import com.tuya.iot.suite.ability.idaas.ability.RoleAbility;
 import com.tuya.iot.suite.ability.idaas.ability.SpaceAbility;
 import com.tuya.iot.suite.ability.idaas.model.*;
-import com.tuya.iot.suite.service.model.RoleTypeEnum;
+import com.tuya.iot.suite.service.enums.RoleTypeEnum;
 import com.tuya.iot.suite.service.util.PermTemplateUtil;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -77,7 +77,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
             return;
         }
         //permissions
-        List<PermissionCreateReq> adminPermissions = PermTemplateUtil.loadAsPermissionCreateReqList("classpath:template/permissions.json", it -> it.getAuthRoleTypes().contains("admin"));
+        List<PermissionCreateReq> adminPermissions = PermTemplateUtil.loadAsPermissionCreateReqList("classpath:template/permissions_zh.json", it -> it.getAuthRoleTypes().contains("admin"));
 
         if (!initPermissions(adminPermissions)) {
             log.error("init permissions failure!");
@@ -107,7 +107,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
         }
 
         String roleType = RoleTypeEnum.fromRoleCode(roleCode).name();
-        List<PermissionCreateReq> perms = PermTemplateUtil.loadAsPermissionCreateReqList("classpath:template/permissions.json", it -> it.getAuthRoleTypes().contains(roleType));
+        List<PermissionCreateReq> perms = PermTemplateUtil.loadAsPermissionCreateReqList("classpath:template/permissions_zh.json", it -> it.getAuthRoleTypes().contains(roleType));
         if (!grantPermissionsToRole(roleCode, perms)) {
             log.error("grant permissions to role({}) failure!", roleCode);
             return;

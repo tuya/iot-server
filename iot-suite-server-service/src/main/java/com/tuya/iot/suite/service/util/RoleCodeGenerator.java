@@ -1,4 +1,6 @@
-package com.tuya.iot.suite.service.model;
+package com.tuya.iot.suite.service.util;
+
+import com.tuya.iot.suite.service.enums.RoleTypeEnum;
 
 import java.util.UUID;
 
@@ -14,7 +16,7 @@ public class RoleCodeGenerator {
      * @return
      */
     public static String generate(String roleType){
-        return roleType+RoleTypeEnum.SEPARATOR+UUID.randomUUID().toString().replaceAll("-","").toLowerCase();
+        return roleType+ RoleTypeEnum.SEPARATOR+UUID.randomUUID().toString().replaceAll("-","").toLowerCase();
     }
     public static String generate(RoleTypeEnum roleType,String suffix){
         return roleType.name()+RoleTypeEnum.SEPARATOR+suffix;

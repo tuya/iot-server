@@ -16,7 +16,7 @@ import com.tuya.iot.suite.core.constant.ErrorCode;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
 import com.tuya.iot.suite.service.idaas.GrantService;
 import com.tuya.iot.suite.service.idaas.PermissionTemplateService;
-import com.tuya.iot.suite.service.model.RoleTypeEnum;
+import com.tuya.iot.suite.service.enums.RoleTypeEnum;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;

@@ -22,7 +22,7 @@ import com.tuya.iot.suite.service.dto.RoleCreateReqDTO;
 import com.tuya.iot.suite.service.idaas.PermissionTemplateService;
 import com.tuya.iot.suite.service.idaas.RoleService;
 import com.tuya.iot.suite.core.model.PageVO;
-import com.tuya.iot.suite.service.model.RoleTypeEnum;
+import com.tuya.iot.suite.service.enums.RoleTypeEnum;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +32,7 @@ import org.springframework.util.Assert;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 /**
@@ -60,7 +61,7 @@ public class RoleServiceImpl implements RoleService {
         // 0. check permission
         checkRoleWritePermission(spaceId, req.getUid(), req.getRoleCode());
         String roleType = RoleTypeEnum.fromRoleCode(req.getRoleCode()).name();
-        List<PermissionNodeDTO> perms = permissionTemplateService.getTemplatePermissionFlattenList(roleType);
+        List<PermissionNodeDTO> perms = permissionTemplateService.getTemplatePermissionFlattenList(roleType, Locale.CHINESE.getLanguage());
         // 1. create role
         boolean createRoleRes = roleAbility.createRole(spaceId, IdaasRoleCreateReq.builder()
                 .roleCode(req.getRoleCode())
@@ -173,7 +174,7 @@ public class RoleServiceImpl implements RoleService {
         RoleTypeEnum roleType = RoleTypeEnum.fromRoleCode(roleCode);
 
         // 1. get permissions from template
-        List<String> templatePerms = permissionTemplateService.getTemplatePermissionFlattenList(roleType.name())
+        List<String> templatePerms = permissionTemplateService.getTemplatePermissionFlattenList(roleType.name(),Locale.CHINESE.getLanguage())
                 .stream().map(it -> it.getPermissionCode())
                 .collect(Collectors.toList());
 

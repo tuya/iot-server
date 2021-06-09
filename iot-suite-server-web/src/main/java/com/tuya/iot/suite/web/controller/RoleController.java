@@ -13,7 +13,7 @@ import com.tuya.iot.suite.service.idaas.GrantService;
 import com.tuya.iot.suite.service.idaas.PermissionService;
 import com.tuya.iot.suite.service.idaas.RoleService;
 import com.tuya.iot.suite.core.model.PageVO;
-import com.tuya.iot.suite.service.model.RoleCodeGenerator;
+import com.tuya.iot.suite.service.util.RoleCodeGenerator;
 import com.tuya.iot.suite.web.config.ProjectProperties;
 import com.tuya.iot.suite.web.model.RoleVO;
 import com.tuya.iot.suite.web.model.request.role.RoleAddReq;

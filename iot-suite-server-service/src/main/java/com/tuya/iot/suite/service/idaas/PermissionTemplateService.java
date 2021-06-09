@@ -12,9 +12,9 @@ import java.util.Set;
  */
 public interface PermissionTemplateService {
 
-    List<PermissionNodeDTO> getTemplatePermissionTrees(String roleType);
+    List<PermissionNodeDTO> getTemplatePermissionTrees(String roleType,String lang);
 
-    List<PermissionNodeDTO> getTemplatePermissionFlattenList(String roleType);
+    List<PermissionNodeDTO> getTemplatePermissionFlattenList(String roleType,String lang);
 
     Set<String> getAuthorizablePermissions();
 
