@@ -5,11 +5,15 @@ import com.tuya.iot.suite.ability.idaas.model.PermissionCreateReq;
 import com.tuya.iot.suite.ability.idaas.model.PermissionTypeEnum;
 import com.tuya.iot.suite.service.dto.PermissionNodeDTO;
 import lombok.SneakyThrows;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.util.ResourceUtils;
 import org.springframework.util.StreamUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -66,8 +70,11 @@ public abstract class PermTemplateUtil {
 
     @SneakyThrows
     private static PermissionNodeDTO load(String path) {
-        File file = ResourceUtils.getFile(path);
-        String json = StreamUtils.copyToString(new FileInputStream(file), StandardCharsets.UTF_8);
+        ResourceLoader loader = new DefaultResourceLoader();
+        Resource resource = loader.getResource(path);
+
+        InputStream inputStream = resource.getInputStream();
+        String json = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
         return JSONObject.parseObject(json,PermissionNodeDTO.class);
     }
     public static List<PermissionNodeDTO> loadTrees(String path, Predicate<PermissionNodeDTO> predicate) {
