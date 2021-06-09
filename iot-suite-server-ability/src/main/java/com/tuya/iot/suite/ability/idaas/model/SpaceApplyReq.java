@@ -36,7 +36,7 @@ public class SpaceApplyReq {
     /**
      * 鉴权扩展字段
      */
-    String authentication;
+    Integer authentication;
 
     /**
      * 拥有者

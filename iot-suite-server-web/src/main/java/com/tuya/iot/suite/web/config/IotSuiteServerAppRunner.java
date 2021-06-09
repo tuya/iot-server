@@ -44,6 +44,8 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
     PermissionAbility permissionAbility;
 
 
+    Integer authentication = 3;
+
     String adminUserName = "admin@tuya.com";
     String adminUserId = "superAdmin";
 
@@ -161,7 +163,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
         List<PermissionQueryByRolesRespItem> existsPermList = permissionAbility.queryPermissionsByRoleCodes(spaceId, PermissionQueryByRolesReq.builder()
                 .roleCodeList(Lists.newArrayList(roleCode)).build());
         Set<String> allPerms = perms.stream().map(it -> it.getPermissionCode()).collect(Collectors.toSet());
-        Set<String> existsPerms = existsPermList.stream().flatMap(it -> it.getPermissionModels().stream().map(p -> p.getPermissionCode())).collect(
+        Set<String> existsPerms = existsPermList.stream().flatMap(it -> it.getPermissionList().stream().map(p -> p.getPermissionCode())).collect(
                 Collectors.toSet());
         Set<String> toAdd = new HashSet<>();
         toAdd.addAll(allPerms);
@@ -260,7 +262,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
         spaceId = spaceAbility.applySpace(SpaceApplyReq.builder()
                 .spaceGroup(projectProperties.getPermissionGroup())
                 .spaceCode(projectProperties.getPermissionSpaceCode())
-                .authentication(projectProperties.getCode())
+                .authentication(authentication)
                 .remark(projectProperties.getName())
                 .owner(projectProperties.getPermissionSpaceOwner()).build()
         );
