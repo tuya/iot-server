@@ -22,9 +22,14 @@ class UserAbilitySpec extends BaseSpec {
     void "测试用户登陆"() {
         expect:
         userAbility.loginUser(UserRegisteredRequest.builder()
-                .username('xxx')
-                .password(Sha256Util.encryption('xxx'))
+                .username('18820077637')
+                .password(Sha256Util.encryption('ty1198094110'))
                 .build())
+    }
+
+    void "测试查询用户"() {
+        expect:
+        userAbility.selectUser('bsh1623052900346u8pQ')
     }
 
 }

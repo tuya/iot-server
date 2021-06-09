@@ -1,6 +1,9 @@
 package com.tuya.iot.suite.service.util;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Lists;
 import com.tuya.iot.suite.ability.idaas.model.IdaasPermission;
 import com.tuya.iot.suite.ability.idaas.model.PermissionCreateReq;
 import com.tuya.iot.suite.ability.idaas.model.PermissionTypeEnum;
@@ -9,14 +12,12 @@ import lombok.SneakyThrows;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.util.ResourceUtils;
 import org.springframework.util.StreamUtils;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 
 /**
  * @description permission template util
+ * todo 循环依赖校验
  * @author benguan.zhou@tuya.com
  * @date 2021/06/02
  */
@@ -34,7 +36,9 @@ public abstract class PermTemplateUtil {
     public static List<PermissionCreateReq> loadAsPermissionCreateReqList(String path,Predicate<PermissionNodeDTO> predicate) {
         return loadAsFlattenList(path,predicate).stream().map(it->convertToPermissionCreateReq(it)).collect(Collectors.toList());
     }
-
+    /**
+     * pure function
+     * */
     public static PermissionCreateReq convertToPermissionCreateReq(PermissionNodeDTO it){
         return PermissionCreateReq.builder()
                 .permissionCode(it.getPermissionCode())
@@ -45,6 +49,9 @@ public abstract class PermTemplateUtil {
                 .order(it.getOrder())
                 .build();
     }
+    /**
+     * pure function
+     * */
     public static PermissionNodeDTO convertFromIdaasPermission(IdaasPermission it){
         return PermissionNodeDTO.builder()
                 .permissionCode(it.getPermissionCode())
@@ -62,8 +69,11 @@ public abstract class PermTemplateUtil {
         List<PermissionNodeDTO> trees = loadTrees(path,predicate);
         return flatten(trees);
     }
-
+    /**
+     * pure function
+     * */
     public static List<PermissionNodeDTO> flatten(List<PermissionNodeDTO> trees){
+        trees = JSONArray.parseArray(JSON.toJSONString(trees),PermissionNodeDTO.class);
         List<PermissionNodeDTO> flatten = new ArrayList<>();
         bfs(trees,node->{
             flatten.add(node);
@@ -116,6 +126,19 @@ public abstract class PermTemplateUtil {
         }
     }
 
+    public static void bfsByLevel(List<PermissionNodeDTO> trees, Consumer<List<PermissionNodeDTO>> consumer){
+        List<PermissionNodeDTO> queue = new LinkedList<>(trees);
+        while(!queue.isEmpty()){
+            consumer.accept(queue);
+            queue = queue.stream().filter(it->it.getChildren()!=null).flatMap(it->it.getChildren().stream()).collect(Collectors.toList());
+        }
+    }
+
+
+    public static void bfsByLevel(PermissionNodeDTO root, Consumer<List<PermissionNodeDTO>> consumer){
+        bfsByLevel(Lists.newArrayList(root),consumer);
+    }
+
     /**
      * 广度优先遍历bfs（层序遍历），先遍历底层
      * @param trees
@@ -160,16 +183,51 @@ public abstract class PermTemplateUtil {
         }
         consumer.accept(root);
     }
-
+    /**
+     * pure function
+     * */
     public static List<PermissionNodeDTO> buildTrees(List<PermissionNodeDTO> nodes){
+        nodes = JSONArray.parseArray(JSON.toJSONString(nodes),PermissionNodeDTO.class);
         //permissionCode=>PermissionNodeDTO
-        Map<String, PermissionNodeDTO> map = nodes.stream().collect(Collectors.toMap(it -> it.getPermissionCode(), it -> it));
+        //Map<String, PermissionNodeDTO> map = nodes.stream().collect(Collectors.toMap(it -> it.getPermissionCode(), it -> it));
         //permissionCode=>children
-        Map<String, List<PermissionNodeDTO>> childrenMap = nodes.stream().collect(Collectors.groupingBy(it -> it.getParentCode()));
+        Map<String, List<PermissionNodeDTO>> childrenMap = nodes.stream().filter(it->it.getParentCode()!=null)
+                .collect(Collectors.groupingBy(it -> it.getParentCode()));
         //find roots, which parentCode not in map
-        List<PermissionNodeDTO> trees = nodes.stream().filter(it -> !map.containsKey(it.getParentCode())).collect(Collectors.toList());
+        List<PermissionNodeDTO> trees = nodes.stream().filter(it -> it.getParentCode()==null).collect(Collectors.toList());
         //set children
         nodes.forEach(it -> it.setChildren(childrenMap.get(it.getPermissionCode())));
         return trees;
     }
+
+    /**
+     * not pure function
+     * */
+    private static List<PermissionNodeDTO> buildTreesEnableDuplicateCode(List<PermissionNodeDTO> nodes){
+        //permissionCode=>PermissionNodeDTO
+        Map<String, PermissionNodeDTO> map = new HashMap<>();
+        nodes.forEach(it-> map.put(it.getPermissionCode(),it));
+
+        //find roots, which parentCode not in map
+        List<PermissionNodeDTO> trees = map.values().stream().filter(it -> it.getParentCode()==null).collect(Collectors.toList());
+        //permissionCode=>children
+
+        Map<String, List<PermissionNodeDTO>> childrenMap = map.values().stream().filter(it->it.getParentCode()!=null)
+                .collect(Collectors.groupingBy(it -> it.getParentCode()));
+
+        //set children
+        map.values().forEach(it -> it.setChildren(childrenMap.get(it.getPermissionCode())));
+        return trees;
+    }
+
+    /**
+     * pure function
+     * */
+    public static List<PermissionNodeDTO> mergeTrees(List<PermissionNodeDTO> oldTrees, List<PermissionNodeDTO> newTrees){
+        List<PermissionNodeDTO> list1 = flatten(oldTrees);
+        List<PermissionNodeDTO> list2 = flatten(newTrees);
+        list1.addAll(list2);
+        return buildTreesEnableDuplicateCode(list1);
+    }
+
 }
