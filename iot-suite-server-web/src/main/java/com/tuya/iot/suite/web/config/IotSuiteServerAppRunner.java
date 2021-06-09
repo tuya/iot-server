@@ -1,16 +1,11 @@
 package com.tuya.iot.suite.web.config;
 
 import com.google.common.collect.Lists;
-import com.tuya.iot.suite.ability.idaas.ability.GrantAbility;
-import com.tuya.iot.suite.ability.idaas.ability.IdaasUserAbility;
-import com.tuya.iot.suite.ability.idaas.ability.PermissionAbility;
-import com.tuya.iot.suite.ability.idaas.ability.RoleAbility;
-import com.tuya.iot.suite.ability.idaas.ability.SpaceAbility;
+import com.tuya.iot.suite.ability.idaas.ability.*;
 import com.tuya.iot.suite.ability.idaas.model.*;
 import com.tuya.iot.suite.service.dto.PermissionNodeDTO;
 import com.tuya.iot.suite.service.enums.RoleTypeEnum;
 import com.tuya.iot.suite.service.util.PermTemplateUtil;
-import com.tuya.iot.suite.web.util.Env;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +16,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.security.Permission;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -49,9 +43,11 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
     @Autowired
     PermissionAbility permissionAbility;
 
+    private String TOP_PERMISSION_CODE = "0";
 
-    String adminUserName = "18820077637";
-    String adminUserId = "bsh1623052900346u8pQ";
+
+    String adminUserName = "admin@tuya.com";
+    String adminUserId = "superAdmin";
 
     String adminRoleCode = "admin";
 
@@ -101,7 +97,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
             return;
         }
         if (!StringUtils.isEmpty(userId)) {
-            if (initUserByRole(roleCode, userId, userName)) {
+            if (!initUserByRole(roleCode, userId, userName)) {
                 log.error("init user({}) failure!", roleCode);
                 return;
             }
@@ -117,45 +113,63 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
 
     private boolean initPermissions(List<PermissionNodeDTO> trees) {
         String spaceId = projectProperties.getPermissionSpaceId();
-        //角色已关联的权限
-        List<PermissionNodeDTO> roleExistsPerms = permissionAbility.queryPermissionsByRoleCodes(spaceId,
-                PermissionQueryByRolesReq.builder().roleCodeList(Lists.newArrayList(adminRoleCode)).build())
-                .stream().flatMap(it->it.getPermissionList().stream()).map(PermTemplateUtil::convertFromIdaasPermission)
-                .collect(Collectors.toList());
-        List<PermissionNodeDTO> roleExistsTrees = PermTemplateUtil.buildTrees(roleExistsPerms);
-        //全部删除
-        PermTemplateUtil.bfsReversed(roleExistsTrees,it->
-                permissionAbility.deletePermission(spaceId,it.getPermissionCode())
-        );
-        //根据模版查询出来的权限
-        List<String> permCodes = PermTemplateUtil.flatten(trees).stream().map(it->it.getPermissionCode()).collect(Collectors.toList());
-        List<PermissionNodeDTO> existsPerms = permissionAbility.queryPermissionsByCodes(spaceId, PermissionQueryReq.builder()
-                .permissionCodeList(permCodes).build())
-                .stream().map(it->PermTemplateUtil.convertFromIdaasPermission(it)).collect(Collectors.toList());
-        if(permCodes.size() == existsPerms.size()){
-            return true;
+        List<PermissionCreateReq> permissionNodeDTOList = PermTemplateUtil.flatten(trees).stream().map(e->{
+           return PermissionCreateReq.builder()
+                    .name(e.getPermissionName())
+                   .order(e.getOrder())
+                   .parentCode(e.getParentCode())
+                   .permissionCode(e.getPermissionCode())
+                   .type(PermissionTypeEnum.valueOf(e.getPermissionType()).getCode())
+                   .spaceId(spaceId)
+                   .remark(e.getRemark())
+                   .build();
+        }).collect(Collectors.toList());
+        Map<String, PermissionCreateReq> allPerms = permissionNodeDTOList.stream().collect(Collectors.toMap(it -> it.getPermissionCode(), it -> it));
+        List<String> permissionCodes = permissionNodeDTOList.stream().map(e -> e.getPermissionCode()).collect(Collectors.toList());
+        List<IdaasPermission> permissionQueryReq = permissionAbility.queryPermissionsByCodes(spaceId, PermissionQueryReq.builder().permissionCodeList(permissionCodes).build());
+        Map<String, PermissionCreateReq> toAdd = new HashMap<>(16);
+        Map<String, IdaasPermission> existCodes = new HashMap<>(16);
+        if (!CollectionUtils.isEmpty(permissionQueryReq)) {
+            permissionQueryReq.stream().forEach(e -> existCodes.put(e.getPermissionCode(), e));
         }
-        List<PermissionNodeDTO> existsTrees = PermTemplateUtil.buildTrees(existsPerms);
-        //全部删除
-        PermTemplateUtil.bfsReversed(existsTrees,it->
-                permissionAbility.deletePermission(spaceId,it.getPermissionCode())
-        );
-        //最后添加模版中全部权限
-        PermTemplateUtil.bfs(trees,it->
-                permissionAbility.createPermission(spaceId, PermTemplateUtil.convertToPermissionCreateReq(it))
-        );
+        permissionCodes.stream().forEach(e -> {
+            if (!existCodes.containsKey(e)) {
+                toAdd.put(e, allPerms.get(e));
+            }
+        });
+        if (!toAdd.isEmpty()) {
+            //分级处理-父级
+            List<PermissionCreateReq> fathers = new ArrayList<>();
+            List<String> fatherCodes = new ArrayList<>();
+            fatherCodes.add(TOP_PERMISSION_CODE);
+            while (fatherCodes.size() > 0) {
+                for (PermissionCreateReq e : toAdd.values()) {
+                    if (fatherCodes.contains(e.getParentCode())) {
+                        if (e.getParentCode().equalsIgnoreCase(TOP_PERMISSION_CODE)) {
+                            e.setParentCode(null);
+                        }
+                        fathers.add(e);
+                    }
+                    e.setSpaceId(spaceId);
+                }
+                fatherCodes = fathers.stream().map(e -> e.getPermissionCode()).collect(Collectors.toList());
+                boolean addResult = permissionAbility.batchCreatePermission(spaceId, PermissionBatchCreateReq.builder().permissionList(fathers).build());
+                if (!addResult) {
+                    log.error("add permission error!");
+                    return false;
+                }
+            }
+        }
         return true;
     }
 
     private boolean grantPermissionsToRole(String roleCode, List<PermissionCreateReq> perms) {
         String spaceId = projectProperties.getPermissionSpaceId();
-        //已存在的关联
         List<PermissionQueryByRolesRespItem> existsPermList = permissionAbility.queryPermissionsByRoleCodes(spaceId, PermissionQueryByRolesReq.builder()
                 .roleCodeList(Lists.newArrayList(roleCode)).build());
         Set<String> allPerms = perms.stream().map(it -> it.getPermissionCode()).collect(Collectors.toSet());
-        Set<String> existsPerms = existsPermList.stream().flatMap(it -> it.getPermissionList().stream().map(p -> p.getPermissionCode())).collect(
+        Set<String> existsPerms = existsPermList.stream().flatMap(it -> it.getPermissionModels().stream().map(p -> p.getPermissionCode())).collect(
                 Collectors.toSet());
-        //待添加的关联
         Set<String> toAdd = new HashSet<>();
         toAdd.addAll(allPerms);
         toAdd.removeAll(existsPerms);
@@ -237,7 +251,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
     private boolean initPermissionSpace() {
         // if spaceId has config, use it.
         String spaceId = projectProperties.getPermissionSpaceId();
-        if (StringUtils.hasText(spaceId)) {
+        if (!StringUtils.isEmpty(spaceId)) {
             log.info("project.permission-space-id={}", spaceId);
             return true;
         }
@@ -257,7 +271,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
                 .remark(projectProperties.getName())
                 .owner(projectProperties.getPermissionSpaceOwner()).build()
         );
-        if (spaceId != null) {
+        if (!StringUtils.isEmpty(spaceId)) {
             projectProperties.setPermissionSpaceId(spaceId);
             log.info("applied spaceId: {}", spaceId);
             return true;

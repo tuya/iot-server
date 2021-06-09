@@ -169,7 +169,7 @@ public class RoleServiceImpl implements RoleService {
 
         List<String> existPerms = permissionAbility.queryPermissionsByRoleCodes(spaceId,PermissionQueryByRolesReq.builder()
                 .roleCodeList(Lists.newArrayList(roleCode))
-                .build()).stream().flatMap(it -> it.getPermissionList().stream()).map(it -> it.getPermissionCode())
+                .build()).stream().flatMap(it -> it.getPermissionModels().stream()).map(it -> it.getPermissionCode())
                 .collect(Collectors.toList());
         RoleTypeEnum roleType = RoleTypeEnum.fromRoleCode(roleCode);
 
@@ -186,7 +186,7 @@ public class RoleServiceImpl implements RoleService {
         // 2. add permissions if need
         if (!permsToAdd.isEmpty()) {
             boolean addRes = grantAbility.grantPermissionsToRole(RoleGrantPermissionsReq.builder()
-                    .spaceId(spaceId.toString())
+                    .spaceId(spaceId)
                     .permissionCodes(permsToAdd)
                     .roleCode(roleCode)
                     .build());

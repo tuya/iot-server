@@ -161,7 +161,7 @@ public class RoleController {
                         .roleCodeList(Lists.newArrayList(roleCode))
                         .build())
                 .stream().flatMap(it ->
-                        it.getPermissionList().stream()
+                        it.getPermissionModels().stream()
                                 .map(p ->
                                         PermissionDto.builder()
                                                 .permissionCode(p.getPermissionCode())

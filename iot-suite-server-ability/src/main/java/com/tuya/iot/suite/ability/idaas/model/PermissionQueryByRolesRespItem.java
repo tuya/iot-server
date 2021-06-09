@@ -17,5 +17,5 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PermissionQueryByRolesRespItem {
     String roleCode;
-    List<IdaasPermission> permissionList;
+    List<IdaasPermission> permissionModels;
 }
