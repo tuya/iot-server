@@ -57,7 +57,7 @@ public abstract class PermTemplateUtil {
     }
 
     @SneakyThrows
-    private static PermissionNodeDTO load(String path) {
+    public static PermissionNodeDTO load(String path) {
         ResourceLoader loader = new DefaultResourceLoader();
         Resource resource = loader.getResource(path);
 
@@ -99,5 +99,37 @@ public abstract class PermTemplateUtil {
             }
         }
 
+    }
+
+    /**
+     * 深度优先遍历-前序遍历
+     * @param trees
+     * @param consumer
+     */
+    public static void dfsWithPreOrder(List<PermissionNodeDTO> trees, Consumer<PermissionNodeDTO> consumer){
+        trees.forEach(it->dfsWithPreOrder(it,consumer));
+    }
+    public static void dfsWithPreOrder(PermissionNodeDTO root, Consumer<PermissionNodeDTO> consumer){
+        List<PermissionNodeDTO> children = root.getChildren();
+        consumer.accept(root);
+        if(children != null && !children.isEmpty()){
+            dfsWithPreOrder(children,consumer);
+        }
+    }
+    //没有中序遍历，因为不是二叉树
+    /**
+     * 深度优先遍历-后序遍历
+     * @param trees
+     * @param consumer
+     */
+    public static void dfsWithPostOrder(List<PermissionNodeDTO> trees, Consumer<PermissionNodeDTO> consumer){
+        trees.forEach(it->dfsWithPostOrder(it,consumer));
+    }
+    public static void dfsWithPostOrder(PermissionNodeDTO root, Consumer<PermissionNodeDTO> consumer){
+        List<PermissionNodeDTO> children = root.getChildren();
+        if(children != null && !children.isEmpty()){
+            dfsWithPostOrder(children,consumer);
+        }
+        consumer.accept(root);
     }
 }
