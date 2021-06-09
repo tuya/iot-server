@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -33,32 +34,30 @@ import java.util.stream.Stream;
 public class PermissionTemplateServiceImpl implements PermissionTemplateService {
 
     private final String defaultLang = Locale.CHINESE.getLanguage();
+    private final Map<String, List<PermissionNodeDTO>> EMPTY_PERMS_MAP = new HashMap<>(0);
 
     /**
      * lang => roleType => permTrees
-     * */
+     */
     private LoadingCache<String, Map<String, List<PermissionNodeDTO>>> permTreesMapCache = CacheBuilder
             .newBuilder()
             .build(new CacheLoader<String, Map<String, List<PermissionNodeDTO>>>() {
                 @Override
                 public Map<String, List<PermissionNodeDTO>> load(String lang) {
-                    return Stream.of(RoleTypeEnum.values()).map(roleTypeEnum ->{
-                        List<PermissionNodeDTO> trees;
-                        try {
-                             trees =
+                    try {
+                        return Stream.of(RoleTypeEnum.values()).map(roleTypeEnum -> {
+                            List<PermissionNodeDTO> trees =
                                     PermTemplateUtil.loadTrees("classpath:template/permissions_" + lang + ".json", node ->
                                             node.getAuthRoleTypes().contains(roleTypeEnum.name()));
-                        }catch (Exception e){
-                            if(e instanceof FileNotFoundException){
-                                trees =
-                                        PermTemplateUtil.loadTrees("classpath:template/permissions_" + defaultLang + ".json", node ->
-                                                node.getAuthRoleTypes().contains(roleTypeEnum.name()));
-                            }else{
-                                throw e;
-                            }
-                        }
                             return new Tuple2<>(roleTypeEnum.name(), trees);
-                    }).collect(Collectors.toMap(it -> it.first(), it -> it.second()));
+                        }).collect(Collectors.toMap(it -> it.first(), it -> it.second()));
+                    } catch (Exception e) {
+                        if (e instanceof FileNotFoundException) {
+                            return EMPTY_PERMS_MAP;
+                        } else {
+                            throw e;
+                        }
+                    }
                 }
             });
     /**
@@ -68,21 +67,22 @@ public class PermissionTemplateServiceImpl implements PermissionTemplateService 
             .build(new CacheLoader<String, Map<String, List<PermissionNodeDTO>>>() {
                 @Override
                 public Map<String, List<PermissionNodeDTO>> load(String lang) {
-                    return Stream.of(RoleTypeEnum.values()).map(roleTypeEnum -> {
-                        List<PermissionNodeDTO> perms;
-                        try {
+                    try {
+                        return Stream.of(RoleTypeEnum.values()).map(roleTypeEnum -> {
+                            List<PermissionNodeDTO> perms;
+
                             perms = PermTemplateUtil.loadAsFlattenList("classpath:template/permissions_" + lang + ".json",
                                     node -> node.getAuthRoleTypes().contains(roleTypeEnum.name()));
-                        }catch (Exception e){
-                            if(e instanceof FileNotFoundException){
-                                perms = PermTemplateUtil.loadAsFlattenList("classpath:template/permissions_" + defaultLang + ".json",
-                                        node -> node.getAuthRoleTypes().contains(roleTypeEnum.name()));
-                            }else{
-                                throw e;
-                            }
+
+                            return new Tuple2<>(roleTypeEnum.name(), perms);
+                        }).collect(Collectors.toMap(it -> it.first(), it -> it.second()));
+                    } catch (Exception e) {
+                        if (e instanceof FileNotFoundException) {
+                            return EMPTY_PERMS_MAP;
+                        } else {
+                            throw e;
                         }
-                        return new Tuple2<>(roleTypeEnum.name(), perms);
-                    }).collect(Collectors.toMap(it -> it.first(), it -> it.second()));
+                    }
                 }
             });
 
@@ -104,8 +104,8 @@ public class PermissionTemplateServiceImpl implements PermissionTemplateService 
     @SneakyThrows
     private Map<String, List<PermissionNodeDTO>> getPermTreesMap(String lang) {
         Map<String, List<PermissionNodeDTO>> permTreesMap = permTreesMapCache.get(lang);
-        if (permTreesMap == null) {
-            permTreesMap = permTreesMapCache.getIfPresent(defaultLang);
+        if (permTreesMap.isEmpty()) {
+            permTreesMap = permTreesMapCache.get(defaultLang);
         }
         return permTreesMap;
     }
@@ -116,11 +116,12 @@ public class PermissionTemplateServiceImpl implements PermissionTemplateService 
         Map<String, List<PermissionNodeDTO>> permFlattenListMap = getPermFlattenListMap(lang);
         return permFlattenListMap.get(roleType);
     }
+
     @SneakyThrows
     private Map<String, List<PermissionNodeDTO>> getPermFlattenListMap(String lang) {
         Map<String, List<PermissionNodeDTO>> permFlattenListMap = permFlattenListMapCache.get(lang);
-        if (permFlattenListMap == null) {
-            permFlattenListMap = permFlattenListMapCache.getIfPresent(defaultLang);
+        if (permFlattenListMap.isEmpty()) {
+            permFlattenListMap = permFlattenListMapCache.get(defaultLang);
         }
         return permFlattenListMap;
     }
