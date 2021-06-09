@@ -46,7 +46,29 @@ class PermTemplateUtilSpec extends Specification {
             println it
         }
         then:
-        true
+        noExceptionThrown()
+    }
+
+    void "测试dfs先序遍历"(){
+        when:
+        def trees = PermTemplateUtil.loadTrees("classpath:template/permissions_zh.json"){
+            true
+        }
+        PermTemplateUtil.dfsWithPreOrder(trees){
+            println it
+        }
+        then:
+        noExceptionThrown()
+    }
+
+    void "测试dfs后序遍历"(){
+        when:
+        def root = PermTemplateUtil.load("classpath:template/permissions_zh.json")
+        PermTemplateUtil.dfsWithPostOrder(root){
+            println it
+        }
+        then:
+        noExceptionThrown()
     }
 
 }
