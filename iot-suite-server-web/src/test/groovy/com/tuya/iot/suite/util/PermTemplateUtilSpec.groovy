@@ -15,7 +15,7 @@ class PermTemplateUtilSpec extends Specification {
     void "测试加载权限模版为列表"() {
         given:
         when:
-        def trees = PermTemplateUtil.loadAsFlattenList("classpath:template/permissions.json"){
+        def trees = PermTemplateUtil.loadAsFlattenList("classpath:template/permissions_zh.json"){
             true
         }
         log.info(JSON.toJSONString(trees, true))
@@ -27,7 +27,7 @@ class PermTemplateUtilSpec extends Specification {
     void "测试加载权限模版为请求列表"() {
         given:
         when:
-        def list = PermTemplateUtil.loadAsPermissionCreateReqList("classpath:template/permissions.json"){
+        def list = PermTemplateUtil.loadAsPermissionCreateReqList("classpath:template/permissions_zh.json"){
             true
         }
         log.info(JSON.toJSONString(list, true))

@@ -1,4 +1,4 @@
-package com.tuya.iot.suite.service.model;
+package com.tuya.iot.suite.service.enums;
 
 import java.util.List;
 

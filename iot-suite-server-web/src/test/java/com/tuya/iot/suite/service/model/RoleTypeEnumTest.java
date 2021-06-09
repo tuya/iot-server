@@ -1,5 +1,6 @@
 package com.tuya.iot.suite.service.model;
 
+import com.tuya.iot.suite.service.enums.RoleTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Test;
