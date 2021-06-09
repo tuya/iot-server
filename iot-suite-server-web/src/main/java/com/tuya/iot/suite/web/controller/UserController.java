@@ -1,5 +1,6 @@
 package com.tuya.iot.suite.web.controller;
 
+import com.tuya.iot.suite.ability.idaas.model.PermissionTypeEnum;
 import com.tuya.iot.suite.ability.user.model.MobileCountries;
 import com.tuya.iot.suite.ability.user.model.UserRegisteredRequest;
 import com.tuya.iot.suite.core.constant.Response;
@@ -222,7 +223,7 @@ public class UserController {
             @ApiParam(value = "用户id") @PathVariable String uid) {
         return Response.buildSuccess(permissionService.queryPermissionsByUser(projectProperties.getPermissionSpaceId(),uid)
                 .stream().map(it->PermissionDto.builder()
-                        .permissionType(it.getType().name())
+                        .permissionType(PermissionTypeEnum.fromCode(it.getType()).name())
                         .permissionName(it.getName())
                         .permissionCode(it.getPermissionCode())
                         .remark(it.getRemark())

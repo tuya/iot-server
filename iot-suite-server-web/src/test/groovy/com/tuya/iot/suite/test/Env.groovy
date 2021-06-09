@@ -8,8 +8,8 @@ import com.tuya.connector.open.common.constant.TuyaRegion
  * @date 2021/06/07
  */
 class Env {
-    static final DAILY_CN = 'https://openapi-daily.tuya-inc.cn'
-    static final PRE_CN = 'https://openapi-cn.wgine.com'
+    static final String DAILY_CN = 'https://openapi-daily.tuya-inc.cn'
+    static final String PRE_CN = 'https://openapi-cn.wgine.com'
     static void use(String apiUrl = TuyaRegion.CN.apiUrl){
         def apiUrlField = TuyaRegion.declaredFields.find{
             it.name == 'apiUrl'

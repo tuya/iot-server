@@ -5,6 +5,7 @@ import com.tuya.iot.suite.ability.idaas.model.*;
 import com.tuya.iot.suite.core.constant.Response;
 import com.tuya.iot.suite.service.dto.PermissionNodeDTO;
 import com.tuya.iot.suite.service.idaas.PermissionService;
+import com.tuya.iot.suite.service.util.PermTemplateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -72,20 +73,12 @@ public class PermissionServiceImpl implements PermissionService {
                         PermissionNodeDTO.builder()
                                 .permissionCode(it.getPermissionCode())
                                 .permissionName(it.getName())
-                                .permissionType(it.getType().name())
+                                .permissionType(PermissionTypeEnum.fromCode(it.getType()).name())
                                 .remark(it.getRemark())
                                 .order(it.getOrder())
                                 .parentCode(it.getParentCode())
                                 .build())
                 .collect(Collectors.toList());
-        //permissionCode=>PermissionNodeDTO
-        Map<String, PermissionNodeDTO> map = perms.stream().collect(Collectors.toMap(it -> it.getPermissionCode(), it -> it));
-        //permissionCode=>children
-        Map<String, List<PermissionNodeDTO>> childrenMap = perms.stream().collect(Collectors.groupingBy(it -> it.getParentCode()));
-        //find roots, which parentCode not in map
-        List<PermissionNodeDTO> trees = perms.stream().filter(it -> !map.containsKey(it.getParentCode())).collect(Collectors.toList());
-        //set children
-        perms.forEach(it -> it.setChildren(childrenMap.get(it.getPermissionCode())));
-        return trees;
+        return PermTemplateUtil.buildTrees(perms);
     }
 }

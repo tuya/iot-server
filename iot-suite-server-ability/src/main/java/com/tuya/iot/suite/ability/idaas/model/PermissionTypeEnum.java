@@ -11,6 +11,15 @@ import lombok.Getter;
 public enum PermissionTypeEnum {
     api(1),menu(2),button(3),data(4);
     private int code;
+    public static PermissionTypeEnum fromCode(int code){
+        PermissionTypeEnum[] values = values();
+        for(PermissionTypeEnum it: values){
+            if(it.code == code){
+                return it;
+            }
+        }
+        return null;
+    }
     PermissionTypeEnum(int c){
         code = c;
     }
