@@ -1,19 +1,13 @@
 package com.tuya.iot.suite.ability
 
 import com.tuya.iot.suite.ability.idaas.ability.IdaasUserAbility
-import com.tuya.iot.suite.ability.idaas.ability.SpaceAbility
 import com.tuya.iot.suite.ability.idaas.model.IdaasUserCreateReq
 import com.tuya.iot.suite.ability.idaas.model.IdaasUserPageReq
 import com.tuya.iot.suite.ability.idaas.model.IdaasUserUpdateReq
-import com.tuya.iot.suite.ability.idaas.model.SpaceApplyReq
 import com.tuya.iot.suite.service.BaseSpec
-import com.tuya.iot.suite.test.Env
-import com.tuya.iot.suite.test.Success
 import com.tuya.iot.suite.web.config.ProjectProperties
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
-import spock.lang.Ignore
-import spock.lang.Stepwise
 
 /**
  * @description 该测试用例依赖日常环境* @author benguan.zhou@tuya.com
@@ -22,9 +16,6 @@ import spock.lang.Stepwise
 @Slf4j
 //@Stepwise//使用该注解，测试按声明顺序执行
 class IdaasUserAbilitySpec extends BaseSpec {
-    static {
-        Env.useDailyCn()
-    }
     @Autowired
     IdaasUserAbility idaasUserAbility
     @Autowired

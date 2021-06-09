@@ -6,7 +6,6 @@ import com.tuya.iot.suite.ability.idaas.model.IdaasRoleCreateReq
 import com.tuya.iot.suite.ability.idaas.model.RoleUpdateReq
 import com.tuya.iot.suite.ability.idaas.model.RolesPaginationQueryReq
 import com.tuya.iot.suite.service.BaseSpec
-import com.tuya.iot.suite.test.Env
 import com.tuya.iot.suite.web.config.ProjectProperties
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,9 +18,6 @@ import spock.lang.Stepwise
 @Slf4j
 //@Stepwise
 class RoleAbilitySpec extends BaseSpec {
-    static {
-        Env.useDailyCn()
-    }
     @Autowired
     RoleAbility roleAbility
     @Autowired

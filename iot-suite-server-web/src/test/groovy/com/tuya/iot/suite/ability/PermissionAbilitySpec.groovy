@@ -9,7 +9,6 @@ import com.tuya.iot.suite.ability.idaas.model.PermissionQueryReq
 import com.tuya.iot.suite.ability.idaas.model.PermissionTypeEnum
 import com.tuya.iot.suite.ability.idaas.model.PermissionUpdateReq
 import com.tuya.iot.suite.service.BaseSpec
-import com.tuya.iot.suite.test.Env
 import com.tuya.iot.suite.web.config.ProjectProperties
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -25,9 +24,6 @@ import spock.lang.Timeout
 @Slf4j
 //@Stepwise
 class PermissionAbilitySpec extends BaseSpec {
-    static {
-        Env.useDailyCn()
-    }
     @Autowired
     PermissionAbility permissionAbility
     @Autowired
