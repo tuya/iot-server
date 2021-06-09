@@ -8,7 +8,6 @@ import com.tuya.iot.suite.ability.idaas.model.UserGrantRoleReq
 import com.tuya.iot.suite.ability.idaas.model.UserGrantRolesReq
 import com.tuya.iot.suite.ability.idaas.model.UserRevokeRolesReq
 import com.tuya.iot.suite.service.BaseSpec
-import com.tuya.iot.suite.test.Env
 import com.tuya.iot.suite.web.config.ProjectProperties
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,9 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired
  */
 @Slf4j
 class GrantAbilitySpec extends BaseSpec {
-    static {
-        Env.useDailyCn()
-    }
     @Autowired
     GrantAbility grantAbility
     @Autowired

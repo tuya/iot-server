@@ -3,7 +3,6 @@ package com.tuya.iot.suite.ability
 import com.tuya.iot.suite.ability.idaas.ability.SpaceAbility
 import com.tuya.iot.suite.ability.idaas.model.SpaceApplyReq
 import com.tuya.iot.suite.service.BaseSpec
-import com.tuya.iot.suite.test.Env
 import com.tuya.iot.suite.test.Success
 import com.tuya.iot.suite.web.config.ProjectProperties
 import groovy.util.logging.Slf4j
@@ -17,9 +16,6 @@ import spock.lang.Ignore
  */
 @Slf4j
 class SpaceAbilitySpec extends BaseSpec{
-    static{
-        Env.useDailyCn()
-    }
     @Autowired
     SpaceAbility spaceAbility
     @Autowired
