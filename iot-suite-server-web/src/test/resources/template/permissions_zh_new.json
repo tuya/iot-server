@@ -9,7 +9,7 @@
       "authorizable": true,
       "authRoleTypes": [
         "admin",
-        "manage",
+        "manager",
         "normal"
       ],
       "remark": "资产能力",
@@ -25,7 +25,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage",
+            "manager",
             "normal"
           ],
           "remark": "审批资产"
@@ -42,7 +42,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage"
+            "manager"
           ],
           "remark": "修改资产",
           "children":[
@@ -58,7 +58,7 @@
               "authorizable": true,
               "authRoleTypes": [
                 "admin",
-                "manage"
+                "manager"
               ],
               "remark": "新增资产"
             }
@@ -76,7 +76,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage"
+            "manager"
           ],
           "remark": "删除资产"
         }
@@ -91,7 +91,7 @@
       "authorizable": true,
       "authRoleTypes": [
         "admin",
-        "manage",
+        "manager",
         "normal"
       ],
       "remark": "设备能力",
@@ -107,7 +107,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage",
+            "manager",
             "normal"
           ],
           "remark": "设备列表",
@@ -124,7 +124,7 @@
               "authorizable": true,
               "authRoleTypes": [
                 "admin",
-                "manage",
+                "manager",
                 "normal"
               ],
               "remark": "设备列表-zi"
@@ -143,7 +143,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage",
+            "manager",
             "normal"
           ],
           "remark": "添加设备"
@@ -160,7 +160,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage",
+            "manager",
             "normal"
           ],
           "remark": "设备操作"
@@ -176,7 +176,7 @@
       "authorizable": true,
       "authRoleTypes": [
         "admin",
-        "manage"
+        "manager"
       ],
       "remark": "角色能力",
       "dependencies": [],
@@ -191,7 +191,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage"
+            "manager"
           ],
           "remark": "角色列表"
         },
@@ -281,7 +281,7 @@
       "authorizable": true,
       "authRoleTypes": [
         "admin",
-        "manage"
+        "manager"
       ],
       "remark": "用户能力",
       "dependencies": [],
@@ -296,7 +296,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage"
+            "manager"
           ],
           "remark": "用户列表"
         },
@@ -312,7 +312,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage"
+            "manager"
           ],
           "remark": "新增用户"
         },
@@ -329,7 +329,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage"
+            "manager"
           ],
           "remark": "修改用户"
         },
@@ -346,7 +346,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage"
+            "manager"
           ],
           "remark": "删除用户"
         },
@@ -363,7 +363,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage"
+            "manager"
           ],
           "remark": "修改密码"
         },
@@ -379,7 +379,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage"
+            "manager"
           ],
           "remark": "分配角色"
         },
@@ -395,7 +395,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage"
+            "manager"
           ],
           "remark": "资产授权"
         },
@@ -411,7 +411,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage"
+            "manager"
           ],
           "remark": "更多操作"
         },
@@ -427,7 +427,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage"
+            "manager"
           ],
           "remark": "批量操作"
         }
@@ -442,7 +442,7 @@
       "authorizable": true,
       "authRoleTypes": [
         "admin",
-        "manage",
+        "manager",
         "normal"
       ],
       "remark": "资产能力",
@@ -458,7 +458,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage",
+            "manager",
             "normal"
           ],
           "remark": "告警列表"
@@ -474,7 +474,7 @@
       "authorizable": true,
       "authRoleTypes": [
         "admin",
-        "manage",
+        "manager",
         "normal"
       ],
       "remark": "账号设置2",
@@ -492,7 +492,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage",
+            "manager",
             "normal"
           ],
           "remark": "账号设置2"
@@ -507,7 +507,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage",
+            "manager",
             "normal"
           ],
           "remark": "查看账号设置2"

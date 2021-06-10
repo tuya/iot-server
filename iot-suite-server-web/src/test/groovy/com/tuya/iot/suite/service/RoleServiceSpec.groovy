@@ -65,8 +65,8 @@ class RoleServiceSpec extends BaseSpec {
 
         where:
         label|operatorRoleCode|operatorRoleName|roleCode||roleName||expectedException
-        '创建成功'|'admin'|'admin'|'manager-1000'|'manage1000'|| Success
-        '没有权限'|'normal'|'normal-1000'|'manager-1000'|'manage1000'||RuntimeException
+        '创建成功'|'admin'|'admin'|'manager-1000'|'manager1000'|| Success
+        '没有权限'|'normal'|'normal-1000'|'manager-1000'|'manager1000'||RuntimeException
         '不能创建管理员'|'admin'|'admin'|'admin-1000'|'admin1000'||RuntimeException
     }
 
