@@ -9,6 +9,7 @@ import com.tuya.iot.suite.ability.user.ability.UserAbility;
 import com.tuya.iot.suite.ability.user.model.User;
 import com.tuya.iot.suite.ability.user.model.UserRegisteredRequest;
 import com.tuya.iot.suite.ability.user.model.UserToken;
+import com.tuya.iot.suite.core.util.Sha256Utils;
 import com.tuya.iot.suite.service.dto.PermissionNodeDTO;
 import com.tuya.iot.suite.service.enums.RoleTypeEnum;
 import com.tuya.iot.suite.service.util.PermTemplateUtil;
@@ -56,7 +57,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
 
     String adminUserName = "admin@tuya.com";
     String adminUserId = "superAdmin";
-    String adminUserPwd = "Test123456";
+    String adminUserPwd = Sha256Utils.getSHA256("Test123456");
     String adminUserCountryCode = "86";
 
     String adminRoleCode = "admin";
