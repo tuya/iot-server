@@ -11,7 +11,7 @@ import com.tuya.iot.suite.core.constant.CaptchaType;
 import com.tuya.iot.suite.core.constant.NoticeType;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
 import com.tuya.iot.suite.core.model.PageVO;
-import com.tuya.iot.suite.core.model.UserBaseInfo;
+import com.tuya.iot.suite.ability.user.model.UserBaseInfo;
 import com.tuya.iot.suite.service.notice.template.CaptchaNoticeTemplate;
 import com.tuya.iot.suite.service.user.CaptchaService;
 import com.tuya.iot.suite.service.user.UserService;
@@ -252,13 +252,15 @@ public class UserServiceImpl implements UserService {
         PageVO<UserBaseInfo> result = new PageVO<>();
         result.setPageNo(pageResult.getPageNumber());
         result.setPageSize(pageResult.getPageSize());
-        result.setData(pageResult.getResults().stream().map(e->UserBaseInfo.builder()
-                .userName(e.getRemark())
-                .userId(e.getUid())
-                .roleCode(e.getRoleCode())
-                .roleName(e.getRoleName())
-                .createTime(e.getGmt_create())
-                .build()).collect(Collectors.toList()));
+        result.setData(pageResult.getResults().stream().map(e->{
+            List<IdaasRole> userRoles = roleAbility.queryRolesByUser(spaceId, e.getUid());
+            return UserBaseInfo.builder()
+                    .userName(e.getUsername())
+                    .userId(e.getUid())
+                    .roles(userRoles)
+                    .createTime(e.getGmt_create())
+                    .build();
+        }).collect(Collectors.toList()));
         result.setTotal(pageResult.getTotalCount());
         return result;
     }

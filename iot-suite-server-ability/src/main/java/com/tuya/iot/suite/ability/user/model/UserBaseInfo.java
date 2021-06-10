@@ -1,11 +1,13 @@
-package com.tuya.iot.suite.core.model;
+package com.tuya.iot.suite.ability.user.model;
 
+import com.tuya.iot.suite.ability.idaas.model.IdaasRole;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author mickey
@@ -23,11 +25,9 @@ public class UserBaseInfo implements Serializable {
 
     private String nickName;
 
-    private String roleCode;
-
-    private String roleName;
+    private List<IdaasRole> roles;
 
     private String createTime;
 
-    
+
 }

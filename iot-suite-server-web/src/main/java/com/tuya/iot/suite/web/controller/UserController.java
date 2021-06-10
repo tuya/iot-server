@@ -5,7 +5,7 @@ import com.tuya.iot.suite.ability.user.model.MobileCountries;
 import com.tuya.iot.suite.ability.user.model.UserRegisteredRequest;
 import com.tuya.iot.suite.core.constant.Response;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
-import com.tuya.iot.suite.core.model.UserBaseInfo;
+import com.tuya.iot.suite.ability.user.model.UserBaseInfo;
 import com.tuya.iot.suite.core.util.ContextUtil;
 import com.tuya.iot.suite.core.util.LibPhoneNumberUtil;
 import com.tuya.iot.suite.core.util.MixUtil;
@@ -201,11 +201,14 @@ public class UserController {
         result.setPageSize(userBaseInfoPageVO.getPageSize());
         result.setData(userBaseInfoPageVO.getData().stream().map(e -> {
                     List<RoleDto> roleDtos = new ArrayList<>();
-                    if (!StringUtils.isEmpty(e.getRoleCode())) {
-                        roleDtos.add(RoleDto.builder()
-                                .roleCode(e.getRoleCode())
-                                .roleName(e.getRoleName())
-                                .build());
+                    if (!CollectionUtils.isEmpty(e.getRoles())) {
+                        e.getRoles().stream().forEach(r->{
+                            roleDtos.add(RoleDto.builder()
+                                    .roleCode(r.getRoleCode())
+                                    .roleName(r.getRoleName())
+                                    .remark(r.getRemark())
+                                    .build());
+                        });
                     }
                     return UserDto.builder()
                             .userName(e.getUserName())
