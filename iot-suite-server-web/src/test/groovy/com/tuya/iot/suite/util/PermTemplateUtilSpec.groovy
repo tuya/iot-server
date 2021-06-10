@@ -1,7 +1,6 @@
 package com.tuya.iot.suite.util
 
 import com.alibaba.fastjson.JSON
-import com.tuya.iot.suite.service.dto.PermissionNodeDTO
 import com.tuya.iot.suite.service.util.PermTemplateUtil
 import groovy.util.logging.Slf4j
 import spock.lang.Specification
