@@ -192,9 +192,17 @@ public class UserController {
     @ApiOperation("用户列表")
     @GetMapping("/users")
     @RequiresPermissions("4001")
-    public Response<PageVO<UserDto>> listUsers(@ApiParam(value = "搜索关键字") @RequestParam String searchKey, @ApiParam(value = "页码") @RequestParam Integer pageNo,
-                                               @ApiParam(value = "角色编码") @RequestParam String roleCode, @ApiParam(value = "页大小") @RequestParam Integer pageSize) {
+    public Response<PageVO<UserDto>> listUsers(@ApiParam(value = "搜索关键字") @RequestParam(required = false) String searchKey,
+                                               @ApiParam(value = "页码") @RequestParam(required = false) Integer pageNo,
+                                               @ApiParam(value = "角色编码") @RequestParam(required = false) String roleCode,
+                                               @ApiParam(value = "页大小") @RequestParam(required = false) Integer pageSize) {
         String spaceId = projectProperties.getPermissionSpaceId();
+        if(pageNo == null){
+            pageNo = 1;
+        }
+        if(pageSize == null){
+            pageSize = 20;
+        }
         PageVO<UserBaseInfo> userBaseInfoPageVO = userService.queryUserByPage(spaceId, searchKey, roleCode, pageNo, pageSize);
         PageVO<UserDto> result = new PageVO<>();
         result.setPageNo(userBaseInfoPageVO.getPageNo());
