@@ -1,0 +1,19 @@
+{
+  "code":"/",
+  "parentCode":null,
+  "children":[{
+    "code":"/a/",
+    "parentCode":"/",
+    "children":[{
+      "code":"/a/a/",
+      "parentCode":"/a/"
+    }]
+  },{
+    "code":"/b/",
+    "parentCode":"/",
+    "children":[{
+      "code":"/b/a/",
+      "parentCode":"/b/"
+    }]
+  }]
+}
