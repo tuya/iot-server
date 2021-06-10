@@ -20,7 +20,7 @@ public class UserToken implements Serializable {
     private String nickName;
     private String token;
     @JsonProperty("role_type")
-    private Integer roleType;
+    private String roleType;
 
     @Override
     public String toString() {
