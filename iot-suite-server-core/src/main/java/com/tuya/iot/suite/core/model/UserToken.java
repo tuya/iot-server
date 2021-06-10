@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
 
 
 /**
@@ -19,8 +20,9 @@ public class UserToken implements Serializable {
     @JsonProperty("nick_name")
     private String nickName;
     private String token;
+
     @JsonProperty("role_type")
-    private String roleType;
+    private List<String> roleType;
 
     @Override
     public String toString() {
