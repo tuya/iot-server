@@ -83,5 +83,5 @@ public interface UserService {
      */
     Boolean batchDeleteUser(String spaceId, String... userIds);
 
-    PageVO<UserBaseInfo> queryUserByPage(String spaceId, String searchKey, String roleCode);
+    PageVO<UserBaseInfo> queryUserByPage(String spaceId, String searchKey, String roleCode, Integer pageNo, Integer pageSize);
 }
