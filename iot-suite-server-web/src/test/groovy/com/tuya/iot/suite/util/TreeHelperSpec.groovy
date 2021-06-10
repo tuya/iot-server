@@ -76,7 +76,8 @@ class TreeHelperSpec extends Specification{
         when:
         List<Area> list = helper.flatten(area)
         list.each{
-            it.children(null)
+            Area it->
+            it.setChildren(null)
             println it
         }
         then:
@@ -120,7 +121,7 @@ class TreeHelperSpec extends Specification{
         def area = JSONObject.parseObject(json, Area)
         when:
         helper.bfsByLevel(area){
-            println it.collect{a->a.code()}
+            println it.collect{Area a->a.getCode()}
         }
         then:
         noExceptionThrown()
