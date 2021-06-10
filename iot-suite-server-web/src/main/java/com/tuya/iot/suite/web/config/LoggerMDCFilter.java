@@ -25,7 +25,7 @@ import java.util.UUID;
  * @description
  * @date 2021/06/04
  */
-//@Component
+@Component
 @Order(Ordered.LOWEST_PRECEDENCE - 1)
 @Slf4j
 public class LoggerMDCFilter implements Filter {
