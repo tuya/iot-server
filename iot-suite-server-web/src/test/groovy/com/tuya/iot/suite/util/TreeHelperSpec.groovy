@@ -23,7 +23,8 @@ class TreeHelperSpec extends Specification{
         "parentCode":"/",
         "children":[{
             "code":"/a/a/",
-            "parentCode":"/a/"
+            "parentCode":"/a/",
+            "children":[]
         }]
     },{
         "code":"/b/",
@@ -63,7 +64,7 @@ class TreeHelperSpec extends Specification{
         def area = JSONObject.parseObject(json, Area)
         when:
         helper.bfs(area){
-            println it
+            println it.code
         }
         then:
         noExceptionThrown()
@@ -100,7 +101,7 @@ class TreeHelperSpec extends Specification{
         def area = JSONObject.parseObject(json, Area)
         when:
         helper.dfsWithPreOrder(area){
-            println it
+            println it.code
         }
         then:
         noExceptionThrown()
@@ -111,7 +112,7 @@ class TreeHelperSpec extends Specification{
         def area = JSONObject.parseObject(json, Area)
         when:
         helper.dfsWithPostOrder(area){
-            println it
+            println it.code
         }
         then:
         noExceptionThrown()
@@ -180,5 +181,21 @@ class TreeHelperSpec extends Specification{
         then:
         noExceptionThrown()
     }
-
+    void testCircleRef(){
+        given:
+        def area = JSONObject.parseObject(json, Area)
+        area.children[0].children = [area]
+        println JSON.toJSONString(area)
+        when:
+        helper.bfs(area){
+            println it.code
+        }
+        then:
+        def err = thrown(RuntimeException)
+        check(err)
+    }
+    def check(err){
+        println err
+        true
+    }
 }
