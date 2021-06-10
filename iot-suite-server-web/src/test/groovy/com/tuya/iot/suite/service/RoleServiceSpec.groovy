@@ -65,8 +65,8 @@ class RoleServiceSpec extends BaseSpec {
 
         where:
         label|operatorRoleCode|operatorRoleName|roleCode||roleName||expectedException
-        '创建成功'|'admin'|'admin'|'manage-1000'|'manage1000'|| Success
-        '没有权限'|'normal'|'normal-1000'|'manage-1000'|'manage1000'||RuntimeException
+        '创建成功'|'admin'|'admin'|'manager-1000'|'manage1000'|| Success
+        '没有权限'|'normal'|'normal-1000'|'manager-1000'|'manage1000'||RuntimeException
         '不能创建管理员'|'admin'|'admin'|'admin-1000'|'admin1000'||RuntimeException
     }
 
@@ -115,11 +115,11 @@ class RoleServiceSpec extends BaseSpec {
                 .totalCount(1)
                 .results([IdaasUser.builder().username('monkey').build()])
                 .build()||RuntimeException
-        '权限不足'|'normal-1000'|'normal1000'|'u123456'|'manage-1000'|IdaasPageResult.builder()
+        '权限不足'|'normal-1000'|'normal1000'|'u123456'|'manager-1000'|IdaasPageResult.builder()
                 .totalCount(0)
                 .results([])
                 .build()||RuntimeException
-        '成功'|'admin'|'admin'|'u123456'|'manage-1000'|IdaasPageResult.builder()
+        '成功'|'admin'|'admin'|'u123456'|'manager-1000'|IdaasPageResult.builder()
                 .totalCount(0)
                 .results([])
                 .build()||Success
@@ -168,7 +168,7 @@ class RoleServiceSpec extends BaseSpec {
 
         def spaceId = 1000
         when:
-        def result = roleService.resetRolePermissionsFromTemplate(spaceId, "u123456", "manage-1000")
+        def result = roleService.resetRolePermissionsFromTemplate(spaceId, "u123456", "manager-1000")
         then:
         result
     }

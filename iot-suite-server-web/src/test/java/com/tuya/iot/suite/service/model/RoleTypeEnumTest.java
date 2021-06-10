@@ -15,13 +15,13 @@ public class RoleTypeEnumTest {
     @Test
     public void testIsOffspringOrSelf() {
         Assert.assertTrue(RoleTypeEnum.admin.isOffspringOrSelfOf(RoleTypeEnum.admin));
-        Assert.assertFalse(RoleTypeEnum.admin.isOffspringOrSelfOf(RoleTypeEnum.manage));
+        Assert.assertFalse(RoleTypeEnum.admin.isOffspringOrSelfOf(RoleTypeEnum.manager));
         Assert.assertFalse(RoleTypeEnum.admin.isOffspringOrSelfOf(RoleTypeEnum.normal));
-        Assert.assertTrue(RoleTypeEnum.manage.isOffspringOrSelfOf(RoleTypeEnum.admin));
-        Assert.assertTrue(RoleTypeEnum.manage.isOffspringOrSelfOf(RoleTypeEnum.manage));
-        Assert.assertFalse(RoleTypeEnum.manage.isOffspringOrSelfOf(RoleTypeEnum.normal));
+        Assert.assertTrue(RoleTypeEnum.manager.isOffspringOrSelfOf(RoleTypeEnum.admin));
+        Assert.assertTrue(RoleTypeEnum.manager.isOffspringOrSelfOf(RoleTypeEnum.manager));
+        Assert.assertFalse(RoleTypeEnum.manager.isOffspringOrSelfOf(RoleTypeEnum.normal));
         Assert.assertTrue(RoleTypeEnum.normal.isOffspringOrSelfOf(RoleTypeEnum.admin));
-        Assert.assertTrue(RoleTypeEnum.normal.isOffspringOrSelfOf(RoleTypeEnum.manage));
+        Assert.assertTrue(RoleTypeEnum.normal.isOffspringOrSelfOf(RoleTypeEnum.manager));
         Assert.assertTrue(RoleTypeEnum.normal.isOffspringOrSelfOf(RoleTypeEnum.normal));
     }
 }

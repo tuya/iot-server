@@ -1,8 +1,14 @@
 package com.tuya.iot.suite.web.config;
 
 import com.google.common.collect.Lists;
+import com.sun.org.apache.xpath.internal.operations.Equals;
+import com.tuya.connector.api.exceptions.ConnectorResultException;
 import com.tuya.iot.suite.ability.idaas.ability.*;
 import com.tuya.iot.suite.ability.idaas.model.*;
+import com.tuya.iot.suite.ability.user.ability.UserAbility;
+import com.tuya.iot.suite.ability.user.model.User;
+import com.tuya.iot.suite.ability.user.model.UserRegisteredRequest;
+import com.tuya.iot.suite.ability.user.model.UserToken;
 import com.tuya.iot.suite.service.dto.PermissionNodeDTO;
 import com.tuya.iot.suite.service.enums.RoleTypeEnum;
 import com.tuya.iot.suite.service.util.PermTemplateUtil;
@@ -35,6 +41,8 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
     @Autowired
     RoleAbility roleAbility;
     @Autowired
+    UserAbility userAbility;
+    @Autowired
     IdaasUserAbility idaasUserAbility;
 
     @Autowired
@@ -48,10 +56,12 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
 
     String adminUserName = "admin@tuya.com";
     String adminUserId = "superAdmin";
+    String adminUserPwd = "Test123456";
+    String adminUserCountryCode = "86";
 
     String adminRoleCode = "admin";
 
-    String manageRoleCode = "manage-1000";
+    String manageRoleCode = "manager-1000";
 
     String normalRoleCode = "normal-1000";
 
@@ -64,8 +74,11 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
         if (!StringUtils.isEmpty(projectProperties.getAdminUserName())) {
             adminUserName = projectProperties.getAdminUserName();
         }
-        if (!StringUtils.isEmpty(projectProperties.getAdminUserId())) {
-            adminUserId = projectProperties.getAdminUserId();
+        if (!StringUtils.isEmpty(projectProperties.getAdminUserPwd())) {
+            adminUserPwd = projectProperties.getAdminUserPwd();
+        }
+        if (!StringUtils.isEmpty(projectProperties.getAdminUserCountryCode())) {
+            adminUserCountryCode = projectProperties.getAdminUserCountryCode();
         }
         if (!projectProperties.permissionAutoInit) {
             return;
@@ -84,20 +97,20 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
         }
 
         //admin
-        initFromTemplate(adminRoleCode, adminUserId, adminUserName);
-        initFromTemplate(manageRoleCode, null, null);
-        initFromTemplate(normalRoleCode, null, null);
+        initFromTemplate(adminRoleCode, adminUserName);
+        initFromTemplate(manageRoleCode, null);
+        initFromTemplate(normalRoleCode, null);
 
         log.info("permission data has been initialized successful!");
     }
 
-    private void initFromTemplate(String roleCode, String userId, String userName) {
+    private void initFromTemplate(String roleCode, String userName) {
         if (!initRole(roleCode)) {
             log.error("init role({}) failure!", roleCode);
             return;
         }
-        if (!StringUtils.isEmpty(userId)) {
-            if (!initUserByRole(roleCode, userId, userName)) {
+        if (!StringUtils.isEmpty(userName)) {
+            if (!initUserByRole(roleCode, userName)) {
                 log.error("init user({}) failure!", roleCode);
                 return;
             }
@@ -198,25 +211,55 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
     }
 
 
-    private boolean initUserByRole(String roleCode, String userId, String userName) {
+    private boolean initUserByRole(String roleCode, String userName) {
         String spaceId = projectProperties.getPermissionSpaceId();
+        String userId = null;
+        //先登录管理员
+        try {
+            UserToken userToken = userAbility.loginUser(UserRegisteredRequest.builder().username(userName)
+                    .nick_name(userName).password(adminUserPwd)
+                    .country_code(adminUserCountryCode).build());
+            userId = userToken.getUid();
+        } catch (ConnectorResultException e) {
+            if ("2401".equalsIgnoreCase(e.getErrorInfo().getErrorCode())) {
+                log.info("用户登录失败，需要重新注册一个");
+            }
+        }
+        if (userId == null) {
+            try {
+                User registeredUser = userAbility.registeredUser(UserRegisteredRequest.builder().username(userName)
+                        .nick_name(userName).password(adminUserPwd)
+                        .country_code(adminUserCountryCode).build());
+                userId = registeredUser.getUser_id();
+            } catch (ConnectorResultException e) {
+                //已经存在用户，但之前又登录失败了，说明管理员密码已经被修改
+                if ("909".equalsIgnoreCase(e.getErrorInfo().getErrorCode())) {
+                    log.info("openAPI admin user pwd changed ！init fail ==》 userName={}", userName);
+                }
+                return false;
+            }catch (Exception e) {
+                log.info("openAPI createUser uid={},username={} failure!", adminUserId, userName);
+                return false;
+            }
+        }
+        adminUserId = userId;
         //用户已存在？不存在则创建
-        IdaasUser user = idaasUserAbility.getUserByUid(spaceId, userId);
+        IdaasUser user = idaasUserAbility.getUserByUid(spaceId, adminUserId);
         if (user == null) {
             Boolean userCreated = idaasUserAbility.createUser(spaceId, IdaasUserCreateReq.builder()
                     .username(userName)
-                    .uid(userId)
+                    .uid(adminUserId)
                     .remark(userName)
                     .build());
             if (!userCreated) {
-                log.info("createUser uid={},username={} failure!", userId, userName);
+                log.info("createUser uid={},username={} failure!", adminUserId, userName);
                 return false;
             }
         }
         //用户已关联角色？没关联则进行关联
         IdaasPageResult<IdaasUser> pageResult = idaasUserAbility.queryUserPage(spaceId, IdaasUserPageReq.builder().roleCode(roleCode).pageNum(1).pageSize(100).build());
         if (pageResult.getTotalCount() > 0) {
-            long count = pageResult.getResults().stream().map(it -> it.getUid()).filter(it -> it.equals(userId)).count();
+            long count = pageResult.getResults().stream().map(it -> it.getUid()).filter(it -> it.equals(adminUserId)).count();
             if (count > 0) {
                 return true;
             }
@@ -225,7 +268,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
         return grantAbility.grantRoleToUser(UserGrantRoleReq.builder()
                 .spaceId(spaceId)
                 .roleCode(roleCode)
-                .uid(userId)
+                .uid(adminUserId)
                 .build());
     }
 

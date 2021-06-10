@@ -42,7 +42,7 @@ class PermissionTemplateServiceSpec extends BaseSpec{
         where:
         roleType|lang|exType
         'admin'|'zh'|Success
-        'manage'|'en'|Success
+        'manager'|'en'|Success
         'normal'|'ab'|Success
     }
 }

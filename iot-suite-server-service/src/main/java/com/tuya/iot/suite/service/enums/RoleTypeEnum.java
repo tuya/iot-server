@@ -11,9 +11,9 @@ public enum RoleTypeEnum {
     /**系统管理员*/
     admin(null),
     /**管理员*/
-    manage(admin),
+    manager(admin),
     /**普通用户*/
-    normal(manage);
+    normal(manager);
 
     public static final String SEPARATOR = "-";
 
@@ -66,7 +66,7 @@ public enum RoleTypeEnum {
         return admin.equals(this);
     }
     public boolean isManage(){
-        return manage.equals(this);
+        return manager.equals(this);
     }
     public boolean isNormal(){
         return normal.equals(this);
@@ -76,7 +76,7 @@ public enum RoleTypeEnum {
         return admin.name().equals(roleType);
     }
     public static boolean isManageRoleType(String roleType){
-        return manage.name().equals(roleType);
+        return manager.name().equals(roleType);
     }
     public static boolean isNormalRoleType(String roleType){
         return normal.name().equals(roleType);
@@ -86,7 +86,7 @@ public enum RoleTypeEnum {
         return admin.name().equals(roleCode);
     }
     public static boolean isManageRoleCode(String roleCode){
-        return roleCode.startsWith(manage.name()+SEPARATOR);
+        return roleCode.startsWith(manager.name()+SEPARATOR);
     }
     public static boolean isNormalRoleCode(String roleCode){
         return roleCode.startsWith(normal.name()+SEPARATOR);
