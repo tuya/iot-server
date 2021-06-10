@@ -2,6 +2,7 @@ package com.tuya.iot.suite.service.user.impl;
 
 import com.tuya.iot.suite.ability.idaas.ability.GrantAbility;
 import com.tuya.iot.suite.ability.idaas.ability.IdaasUserAbility;
+import com.tuya.iot.suite.ability.idaas.ability.RoleAbility;
 import com.tuya.iot.suite.ability.idaas.model.*;
 import com.tuya.iot.suite.ability.notice.model.ResetPasswordReq;
 import com.tuya.iot.suite.ability.user.ability.UserAbility;
@@ -41,6 +42,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private IdaasUserAbility idaasUserAbility;
     @Autowired
+    private RoleAbility roleAbility;
+    @Autowired
     private GrantAbility grantAbility;
 
     @Autowired
@@ -77,8 +80,9 @@ public class UserServiceImpl implements UserService {
                 .password(password)
                 .nick_name(userName).build());
 
-        IdaasUser userByUid = idaasUserAbility.getUserByUid(spaceId, loginToken.getUid());
-        com.tuya.iot.suite.core.model.UserToken userToken = new com.tuya.iot.suite.core.model.UserToken(loginToken.getUid(),userName,null,userByUid.getRoleCode());
+        List<IdaasRole> roles = roleAbility.queryRolesByUser(spaceId, loginToken.getUid());
+        com.tuya.iot.suite.core.model.UserToken userToken =
+                new com.tuya.iot.suite.core.model.UserToken(loginToken.getUid(),userName,null,roles.stream().map(e->e.getRoleCode()).collect(Collectors.toList()));
         return userToken;
     }
 
