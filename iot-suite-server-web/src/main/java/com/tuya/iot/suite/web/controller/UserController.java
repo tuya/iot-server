@@ -5,7 +5,7 @@ import com.tuya.iot.suite.ability.user.model.MobileCountries;
 import com.tuya.iot.suite.ability.user.model.UserRegisteredRequest;
 import com.tuya.iot.suite.core.constant.Response;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
-import com.tuya.iot.suite.core.model.UserBaseInfo;
+import com.tuya.iot.suite.ability.user.model.UserBaseInfo;
 import com.tuya.iot.suite.core.util.ContextUtil;
 import com.tuya.iot.suite.core.util.LibPhoneNumberUtil;
 import com.tuya.iot.suite.core.util.MixUtil;
@@ -149,7 +149,7 @@ public class UserController {
         return Response.buildSuccess(userService.createUser(spaceId, UserRegisteredRequest.builder()
                 .username(req.getUserName())
                 .password(req.getPassword())
-                .country_code(req.getCountryCode())
+                .country_code(StringUtils.isEmpty(req.getCountryCode()) ? "86" : req.getCountryCode())
                 .nick_name(req.getNickName())
                 .build(), req.getRoleCodes()));
     }
@@ -192,25 +192,31 @@ public class UserController {
     @ApiOperation("用户列表")
     @GetMapping("/users")
     @RequiresPermissions("4001")
-    public Response<PageVO<UserDto>> listUsers(@ApiParam(value = "搜索关键字") @RequestParam String searchKey,
-                                               @ApiParam(value = "角色编码") @RequestParam String roleCode) {
+    public Response<PageVO<UserDto>> listUsers(@ApiParam(value = "搜索关键字") @RequestParam String searchKey, @ApiParam(value = "页码") @RequestParam Integer pageNo,
+                                               @ApiParam(value = "角色编码") @RequestParam String roleCode, @ApiParam(value = "页大小") @RequestParam Integer pageSize) {
         String spaceId = projectProperties.getPermissionSpaceId();
-        PageVO<UserBaseInfo> userBaseInfoPageVO = userService.queryUserByPage(spaceId, searchKey, roleCode);
+        PageVO<UserBaseInfo> userBaseInfoPageVO = userService.queryUserByPage(spaceId, searchKey, roleCode, pageNo, pageSize);
         PageVO<UserDto> result = new PageVO<>();
         result.setPageNo(userBaseInfoPageVO.getPageNo());
         result.setPageSize(userBaseInfoPageVO.getPageSize());
-        result.setData(userBaseInfoPageVO.getData().stream().map(e->{
+        result.setData(userBaseInfoPageVO.getData().stream().map(e -> {
                     List<RoleDto> roleDtos = new ArrayList<>();
-                    roleDtos.add(RoleDto.builder()
-                            .roleCode(e.getRoleCode())
-                            .roleName(e.getRoleName())
-                            .build());
-                   return  UserDto.builder()
+                    if (!CollectionUtils.isEmpty(e.getRoles())) {
+                        e.getRoles().stream().forEach(r->{
+                            roleDtos.add(RoleDto.builder()
+                                    .roleCode(r.getRoleCode())
+                                    .roleName(r.getRoleName())
+                                    .remark(r.getRemark())
+                                    .build());
+                        });
+                    }
+                    return UserDto.builder()
                             .userName(e.getUserName())
                             .userId(e.getUserId())
+                            .createTime(e.getCreateTime())
                             .roles(roleDtos)
                             .build();
-        }
+                }
         ).collect(Collectors.toList()));
         result.setTotal(userBaseInfoPageVO.getTotal());
         return Response.buildSuccess(result);
@@ -221,8 +227,8 @@ public class UserController {
     @RequiresPermissions("4001")
     public Response<List<PermissionDto>> listUserPermissions(
             @ApiParam(value = "用户id") @PathVariable String uid) {
-        return Response.buildSuccess(permissionService.queryPermissionsByUser(projectProperties.getPermissionSpaceId(),uid)
-                .stream().map(it->PermissionDto.builder()
+        return Response.buildSuccess(permissionService.queryPermissionsByUser(projectProperties.getPermissionSpaceId(), uid)
+                .stream().map(it -> PermissionDto.builder()
                         .permissionType(PermissionTypeEnum.fromCode(it.getType()).name())
                         .permissionName(it.getName())
                         .permissionCode(it.getPermissionCode())
@@ -236,9 +242,9 @@ public class UserController {
     @ApiOperation("批量给用户授角色")
     @PutMapping("/users/roles")
     @RequiresPermissions("4009")
-    public Response<Boolean> grantRole(@RequestBody BatchUserGrantRoleReq req){
+    public Response<Boolean> grantRole(@RequestBody BatchUserGrantRoleReq req) {
         String spaceId = projectProperties.getPermissionSpaceId();
         String uid = ContextUtil.getUserId();
-        return Response.buildSuccess(grantService.setRoleToUsers(spaceId,uid,req.getRoleCode(),req.getUserIds()));
+        return Response.buildSuccess(grantService.setRoleToUsers(spaceId, uid, req.getRoleCode(), req.getUserIds()));
     }
 }

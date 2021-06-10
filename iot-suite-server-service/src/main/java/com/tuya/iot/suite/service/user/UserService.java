@@ -6,7 +6,7 @@ import com.tuya.iot.suite.ability.user.model.MobileCountries;
 import com.tuya.iot.suite.ability.user.model.UserRegisteredRequest;
 import com.tuya.iot.suite.core.model.UserToken;
 import com.tuya.iot.suite.core.model.PageVO;
-import com.tuya.iot.suite.core.model.UserBaseInfo;
+import com.tuya.iot.suite.ability.user.model.UserBaseInfo;
 import com.tuya.iot.suite.service.user.model.CaptchaPushBo;
 import com.tuya.iot.suite.service.user.model.ResetPasswordBo;
 
@@ -83,5 +83,5 @@ public interface UserService {
      */
     Boolean batchDeleteUser(String spaceId, String... userIds);
 
-    PageVO<UserBaseInfo> queryUserByPage(String spaceId, String searchKey, String roleCode);
+    PageVO<UserBaseInfo> queryUserByPage(String spaceId, String searchKey, String roleCode, Integer pageNo, Integer pageSize);
 }
