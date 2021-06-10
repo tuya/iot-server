@@ -75,7 +75,7 @@ public class UserServiceImpl implements UserService {
         return userAbility.loginUser(UserRegisteredRequest.builder()
                 .username(userName)
                 .password(password)
-                .nicke_name(userName).build());
+                .nick_name(userName).build());
     }
 
     @Override

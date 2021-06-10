@@ -150,7 +150,7 @@ public class UserController {
                 .username(req.getUserName())
                 .password(req.getPassword())
                 .country_code(req.getCountryCode())
-                .nicke_name(req.getNickName())
+                .nick_name(req.getNickName())
                 .build(), req.getRoleCodes()));
     }
 

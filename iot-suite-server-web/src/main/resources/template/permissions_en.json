@@ -9,7 +9,7 @@
       "authorizable": true,
       "authRoleTypes": [
         "admin",
-        "manage",
+        "manager",
         "normal"
       ],
       "remark": "Asset ability",
@@ -25,7 +25,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage",
+            "manager",
             "normal"
           ],
           "remark": "Asset list"
@@ -42,7 +42,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage"
+            "manager"
           ],
           "remark": "Create asset"
         },
@@ -58,7 +58,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage"
+            "manager"
           ],
           "remark": "Edit asset"
         },
@@ -74,7 +74,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage"
+            "manager"
           ],
           "remark": "Delete asset"
         }
@@ -89,7 +89,7 @@
       "authorizable": true,
       "authRoleTypes": [
         "admin",
-        "manage",
+        "manager",
         "normal"
       ],
       "remark": "Device ability",
@@ -105,7 +105,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage",
+            "manager",
             "normal"
           ],
           "remark": "Device list"
@@ -122,7 +122,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage",
+            "manager",
             "normal"
           ],
           "remark": "Create device"
@@ -139,7 +139,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage",
+            "manager",
             "normal"
           ],
           "remark": "Device operate"
@@ -155,7 +155,7 @@
       "authorizable": true,
       "authRoleTypes": [
         "admin",
-        "manage"
+        "manager"
       ],
       "remark": "Role ability",
       "dependencies": [],
@@ -170,7 +170,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage"
+            "manager"
           ],
           "remark": "Role list"
         },
@@ -260,7 +260,7 @@
       "authorizable": true,
       "authRoleTypes": [
         "admin",
-        "manage"
+        "manager"
       ],
       "remark": "Usesr ability",
       "dependencies": [],
@@ -275,7 +275,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage"
+            "manager"
           ],
           "remark": "Usesr list"
         },
@@ -291,7 +291,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage"
+            "manager"
           ],
           "remark": "Create usesr"
         },
@@ -308,7 +308,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage"
+            "manager"
           ],
           "remark": "Edit usesr"
         },
@@ -325,7 +325,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage"
+            "manager"
           ],
           "remark": "Delete usesr"
         },
@@ -342,7 +342,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage"
+            "manager"
           ],
           "remark": "Change password"
         },
@@ -358,7 +358,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage"
+            "manager"
           ],
           "remark": "Modify role"
         },
@@ -374,7 +374,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage"
+            "manager"
           ],
           "remark": "Asset authorize"
         },
@@ -390,7 +390,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage"
+            "manager"
           ],
           "remark": "More operations"
         },
@@ -406,7 +406,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage"
+            "manager"
           ],
           "remark": "Batch operation"
         }
@@ -421,7 +421,7 @@
       "authorizable": true,
       "authRoleTypes": [
         "admin",
-        "manage",
+        "manager",
         "normal"
       ],
       "remark": "Asset ability",
@@ -437,7 +437,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage",
+            "manager",
             "normal"
           ],
           "remark": "Alarm list"
@@ -453,7 +453,7 @@
       "authorizable": true,
       "authRoleTypes": [
         "admin",
-        "manage",
+        "manager",
         "normal"
       ],
       "remark": "Account Settings",
@@ -471,7 +471,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage"
+            "manager"
           ],
           "remark": "Account Settings"
         },
@@ -485,7 +485,7 @@
           "authorizable": true,
           "authRoleTypes": [
             "admin",
-            "manage",
+            "manager",
             "normal"
           ],
           "remark": "View Account Settings"
