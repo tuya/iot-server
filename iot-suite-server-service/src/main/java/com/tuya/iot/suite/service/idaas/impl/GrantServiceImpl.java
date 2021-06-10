@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -75,7 +76,7 @@ public class GrantServiceImpl implements GrantService {
         }
         // 3. permissions are authorizable
         Set<String> authorizablePerms = permissionTemplateService.getAuthorizablePermissions();
-        if(authorizablePerms.containsAll(permissionCodes)){
+        if (authorizablePerms.containsAll(permissionCodes)) {
             throw new ServiceLogicException(ErrorCode.NO_DATA_PERMISSION);
         }
     }
@@ -168,23 +169,31 @@ public class GrantServiceImpl implements GrantService {
         // 2. 被设置角色的用户，如果有比操作者更高级的角色，则不允许操作。（不允许 普通员工 把 部门经理 设置为 项目经理）
         RoleTypeEnum operatorRoleType = RoleTypeEnum.fromRoleCode(operateRoleCode);
 
-        for (String uid : uidList) {
+        for (int i = uidList.size() - 1; i >= 0; i--) {
+            String uid = uidList.get(i);
             List<IdaasRole> userRoles = roleAbility.queryRolesByUser(spaceId, uid);
-            if (!operatorRoleType.isOffspringOrSelfOfAll(userRoles.stream().map(it -> it.getRoleCode()).collect(Collectors.toList()))) {
+            Map<String, String> roleMap = userRoles.stream().collect(Collectors.toMap(it -> it.getRoleCode(), it -> it.getRoleName()));
+            if (operatorRoleType.isOffspringOrSelfOfAll(userRoles.stream().map(it -> it.getRoleCode()).collect(Collectors.toList()))) {
                 throw new ServiceLogicException(ErrorCode.NO_DATA_PERMISSION);
+            }
+            if (roleMap.containsKey(roleCode)) {
+                uidList.remove(uid);
             }
         }
         // 3. 逐个授权
-        boolean success;
-        for (String uid : uidList) {
-            success = grantAbility.grantRoleToUser(UserGrantRoleReq.builder()
-                    .spaceId(spaceId)
-                    .uid(uid)
-                    .roleCode(roleCode).build());
-            if (!success) {
-                return false;
+        if (uidList.size() > 0) {
+            boolean success;
+            for (String uid : uidList) {
+                success = grantAbility.grantRoleToUser(UserGrantRoleReq.builder()
+                        .spaceId(spaceId)
+                        .uid(uid)
+                        .roleCode(roleCode).build());
+                if (!success) {
+                    return false;
+                }
             }
         }
+
         return true;
     }
 }

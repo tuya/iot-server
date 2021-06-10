@@ -242,19 +242,22 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public PageVO<UserBaseInfo> queryUserByPage(String spaceId, String searchKey, String roleCode) {
+    public PageVO<UserBaseInfo> queryUserByPage(String spaceId, String searchKey, String roleCode, Integer pageNo, Integer pageSize) {
         IdaasPageResult<IdaasUser> pageResult = idaasUserAbility.queryUserPage(spaceId, IdaasUserPageReq.builder()
                 .roleCode(roleCode)
                 .username(searchKey)
+                .pageSize(pageSize)
+                .pageNum(pageNo)
                 .build());
         PageVO<UserBaseInfo> result = new PageVO<>();
         result.setPageNo(pageResult.getPageNumber());
         result.setPageSize(pageResult.getPageSize());
         result.setData(pageResult.getResults().stream().map(e->UserBaseInfo.builder()
-                .userName(e.getUsername())
+                .userName(e.getRemark())
                 .userId(e.getUid())
                 .roleCode(e.getRoleCode())
                 .roleName(e.getRoleName())
+                .createTime(e.getGmt_create())
                 .build()).collect(Collectors.toList()));
         result.setTotal(pageResult.getTotalCount());
         return result;

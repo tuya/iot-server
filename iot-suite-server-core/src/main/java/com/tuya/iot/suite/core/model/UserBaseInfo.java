@@ -27,5 +27,7 @@ public class UserBaseInfo implements Serializable {
 
     private String roleName;
 
+    private String createTime;
+
     
 }

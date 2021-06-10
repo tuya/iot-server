@@ -36,4 +36,6 @@ public class IdaasUser {
 
     String roleName;
 
+    String gmt_create;
+
 }
