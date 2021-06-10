@@ -1,7 +1,6 @@
 package com.tuya.iot.suite.web.config;
 
 import com.google.common.collect.Lists;
-import com.sun.org.apache.xpath.internal.operations.Equals;
 import com.tuya.connector.api.exceptions.ConnectorResultException;
 import com.tuya.iot.suite.ability.idaas.ability.*;
 import com.tuya.iot.suite.ability.idaas.model.*;
@@ -62,7 +61,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
 
     String adminRoleCode = "admin";
 
-    String manageRoleCode = "manager-1000";
+    String managerRoleCode = "manager-1000";
 
     String normalRoleCode = "normal-1000";
 
@@ -99,7 +98,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
 
         //admin
         initFromTemplate(adminRoleCode, adminUserName);
-        initFromTemplate(manageRoleCode, null);
+        initFromTemplate(managerRoleCode, null);
         initFromTemplate(normalRoleCode, null);
 
         log.info("permission data has been initialized successful!");
@@ -156,7 +155,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
             List<PermissionCreateReq> fathers = new ArrayList<>();
             for (int i = toAdd.size() - 1; i >= 0; i--) {
                 PermissionCreateReq e = toAdd.get(i);
-                if (existCodes.containsKey(e.getParentCode()) || e.getParentCode() == null) {
+                if (e.getParentCode() == null || existCodes.containsKey(e.getParentCode())) {
                     fathers.add(e);
                     toAdd.remove(e);
                     existCodes.put(e.getPermissionCode(), "exist");
