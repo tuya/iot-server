@@ -56,10 +56,11 @@ class TreeHelperSpec extends Specification{
     }]
 }
 """
+    TreeHelper<String,Area> helper = new TreeHelper('code','parentCode','children',Area)
+
     void testBfs(){
         given:
         def area = JSONObject.parseObject(json, Area)
-        def helper = TreeHelper.create(Area)
         when:
         helper.bfs(area){
             println it
@@ -72,7 +73,6 @@ class TreeHelperSpec extends Specification{
         given:
 
         def area = JSONObject.parseObject(json, Area)
-        def helper = TreeHelper.create(Area)
         when:
         List<Area> list = helper.flatten(area)
         list.each{
@@ -86,7 +86,6 @@ class TreeHelperSpec extends Specification{
     void testBfsReversed(){
         given:
         def area = JSONObject.parseObject(json, Area)
-        def helper = TreeHelper.create(Area)
         when:
         helper.bfsReversed(area){
             println it
@@ -98,7 +97,6 @@ class TreeHelperSpec extends Specification{
     void testDfsWithPreOrder(){
         given:
         def area = JSONObject.parseObject(json, Area)
-        def helper = TreeHelper.create(Area)
         when:
         helper.dfsWithPreOrder(area){
             println it
@@ -110,7 +108,6 @@ class TreeHelperSpec extends Specification{
     void testDfsWithPostOrder(){
         given:
         def area = JSONObject.parseObject(json, Area)
-        def helper = TreeHelper.create(Area)
         when:
         helper.dfsWithPostOrder(area){
             println it
@@ -121,7 +118,6 @@ class TreeHelperSpec extends Specification{
     void testBfsByLevel(){
         given:
         def area = JSONObject.parseObject(json, Area)
-        def helper = TreeHelper.create(Area)
         when:
         helper.bfsByLevel(area){
             println it.collect{a->a.code()}
@@ -133,7 +129,6 @@ class TreeHelperSpec extends Specification{
     void testTreeify(){
         given:
         def area = JSONObject.parseObject(json, Area)
-        def helper = TreeHelper.create(Area)
         List<Area> list = helper.flatten(area)
         list.each {
             println it.code
@@ -148,7 +143,6 @@ class TreeHelperSpec extends Specification{
     void testTreeifyEnableDuplicateCode(){
         given:
         def area = JSONObject.parseObject(json, Area)
-        def helper = TreeHelper.create(Area)
         List<Area> list = helper.flatten(area)
         list.add(list[0])
         list.each {
@@ -165,8 +159,6 @@ class TreeHelperSpec extends Specification{
         given:
         def area = JSONObject.parseObject(json, Area)
         def area2 = JSONObject.parseObject(json2, Area)
-        def helper = TreeHelper.create(Area)
-
         when:
         def newArea = helper.mergeTrees(area,area2)
         println JSON.toJSONString(newArea,true)
@@ -174,16 +166,15 @@ class TreeHelperSpec extends Specification{
         noExceptionThrown()
     }
 
-    void testWithDummyRoot(){
+    void testDummyRoot(){
         given:
         def area = JSONObject.parseObject(json, Area)
-        def helper = TreeHelper.create(Area)
 
         when:
-        helper.withDummyRoot(area.children(),'|'){
-            helper.bfs(it){
-                println it
-            }
+        Area root = helper.dummyRoot('+',area.getChildren())
+        helper.bfs(root){
+            Area it->
+            println it.code
         }
         then:
         noExceptionThrown()
