@@ -4,7 +4,7 @@ package com.tuya.iot.suite.service.user;
 import com.tuya.iot.suite.ability.idaas.model.IdaasUser;
 import com.tuya.iot.suite.ability.user.model.MobileCountries;
 import com.tuya.iot.suite.ability.user.model.UserRegisteredRequest;
-import com.tuya.iot.suite.ability.user.model.UserToken;
+import com.tuya.iot.suite.core.model.UserToken;
 import com.tuya.iot.suite.core.model.PageVO;
 import com.tuya.iot.suite.core.model.UserBaseInfo;
 import com.tuya.iot.suite.service.user.model.CaptchaPushBo;
@@ -36,7 +36,7 @@ public interface UserService {
      * @param password
      * @return
      */
-    UserToken login(String userName, String password);
+    UserToken login(String spaceId,String userName, String password);
 
     /**
      * 获取手机号城市编码

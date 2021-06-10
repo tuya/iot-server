@@ -71,11 +71,15 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     @Override
-    public UserToken login(String userName, String password) {
-        return userAbility.loginUser(UserRegisteredRequest.builder()
+    public com.tuya.iot.suite.core.model.UserToken login(String spaceId,String userName, String password) {
+        UserToken loginToken = userAbility.loginUser(UserRegisteredRequest.builder()
                 .username(userName)
                 .password(password)
                 .nick_name(userName).build());
+
+        IdaasUser userByUid = idaasUserAbility.getUserByUid(spaceId, loginToken.getUid());
+        com.tuya.iot.suite.core.model.UserToken userToken = new com.tuya.iot.suite.core.model.UserToken(loginToken.getUid(),userName,null,userByUid.getRoleCode());
+        return userToken;
     }
 
     @Override

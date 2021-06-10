@@ -3,7 +3,6 @@ package com.tuya.iot.suite.web.config.shiro;
 import com.tuya.iot.suite.ability.idaas.model.IdaasPermission;
 import com.tuya.iot.suite.ability.idaas.model.IdaasRole;
 import com.tuya.iot.suite.core.model.UserToken;
-import com.tuya.iot.suite.service.idaas.PermissionCheckService;
 import com.tuya.iot.suite.service.idaas.PermissionService;
 import com.tuya.iot.suite.service.idaas.RoleService;
 import com.tuya.iot.suite.service.user.UserService;
@@ -37,8 +36,6 @@ public class TuyaCloudRealm extends AuthorizingRealm {
     @Autowired
     private UserService userService;
     @Autowired
-    private PermissionCheckService permissionCheckService;
-    @Autowired
     private PermissionService permissionService;
     @Autowired
     private RoleService roleService;
@@ -50,17 +47,18 @@ public class TuyaCloudRealm extends AuthorizingRealm {
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principalCollection) {
         UserToken userToken = SessionContext.getUserToken();
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
-        List<IdaasRole> roles = roleService.queryRolesByUser(projectProperties.getPermissionSpaceId(),userToken.getUserId());
-        info.addRoles(roles.stream().map(it->it.getRoleCode()).collect(Collectors.toSet()));
+        List<IdaasRole> roles = roleService.queryRolesByUser(projectProperties.getPermissionSpaceId(), userToken.getUserId());
+        info.addRoles(roles.stream().map(it -> it.getRoleCode()).collect(Collectors.toSet()));
 
-        List<IdaasPermission> perms = permissionService.queryPermissionsByUser(projectProperties.getPermissionSpaceId(),userToken.getUserId());
+        List<IdaasPermission> perms = permissionService.queryPermissionsByUser(projectProperties.getPermissionSpaceId(), userToken.getUserId());
 
-        info.addStringPermissions(perms.stream().map(it->it.getPermissionCode()).collect(Collectors.toSet()));
+        info.addStringPermissions(perms.stream().map(it -> it.getPermissionCode()).collect(Collectors.toSet()));
         return info;
     }
 
     /**
      * 认证信息
+     *
      * @param authenticationToken
      * @return
      * @throws AuthenticationException
@@ -69,10 +67,11 @@ public class TuyaCloudRealm extends AuthorizingRealm {
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken authenticationToken) throws AuthenticationException {
         String username = (String) authenticationToken.getPrincipal();
         String password = new String((char[]) authenticationToken.getCredentials());
-        String uid = userService.login(username,password).getUid();
+        UserToken userToken = userService.login(projectProperties.getPermissionSpaceId(), username, password);
         HttpSession session = HttpRequestUtils.getHttpSession();
+        userToken.setToken(session.getId());
         //小心，有两个类叫UserToken，在不同包下面，不要搞混了
-        SessionContext.setUserToken(new UserToken(uid, username, session.getId(), 1));
-        return new SimpleAuthenticationInfo(username, password,getName());
+        SessionContext.setUserToken(userToken);
+        return new SimpleAuthenticationInfo(username, password, getName());
     }
 }
