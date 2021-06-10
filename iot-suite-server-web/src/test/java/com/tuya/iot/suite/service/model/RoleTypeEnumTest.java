@@ -14,14 +14,14 @@ import org.junit.Test;
 public class RoleTypeEnumTest {
     @Test
     public void testIsOffspringOrSelf() {
-        Assert.assertTrue(RoleTypeEnum.admin.isOffspringOrSelfOf(RoleTypeEnum.admin));
-        Assert.assertFalse(RoleTypeEnum.admin.isOffspringOrSelfOf(RoleTypeEnum.manager));
-        Assert.assertFalse(RoleTypeEnum.admin.isOffspringOrSelfOf(RoleTypeEnum.normal));
-        Assert.assertTrue(RoleTypeEnum.manager.isOffspringOrSelfOf(RoleTypeEnum.admin));
-        Assert.assertTrue(RoleTypeEnum.manager.isOffspringOrSelfOf(RoleTypeEnum.manager));
-        Assert.assertFalse(RoleTypeEnum.manager.isOffspringOrSelfOf(RoleTypeEnum.normal));
-        Assert.assertTrue(RoleTypeEnum.normal.isOffspringOrSelfOf(RoleTypeEnum.admin));
-        Assert.assertTrue(RoleTypeEnum.normal.isOffspringOrSelfOf(RoleTypeEnum.manager));
-        Assert.assertTrue(RoleTypeEnum.normal.isOffspringOrSelfOf(RoleTypeEnum.normal));
+        Assert.assertTrue(RoleTypeEnum.admin.ltEq(RoleTypeEnum.admin));
+        Assert.assertFalse(RoleTypeEnum.admin.ltEq(RoleTypeEnum.manager));
+        Assert.assertFalse(RoleTypeEnum.admin.ltEq(RoleTypeEnum.normal));
+        Assert.assertTrue(RoleTypeEnum.manager.ltEq(RoleTypeEnum.admin));
+        Assert.assertTrue(RoleTypeEnum.manager.ltEq(RoleTypeEnum.manager));
+        Assert.assertFalse(RoleTypeEnum.manager.ltEq(RoleTypeEnum.normal));
+        Assert.assertTrue(RoleTypeEnum.normal.ltEq(RoleTypeEnum.admin));
+        Assert.assertTrue(RoleTypeEnum.normal.ltEq(RoleTypeEnum.manager));
+        Assert.assertTrue(RoleTypeEnum.normal.ltEq(RoleTypeEnum.normal));
     }
 }

@@ -85,7 +85,7 @@ public class RoleServiceImpl implements RoleService {
         //数据权限校验，校验操作者自己是否为更高的角色。
         //比如有从高到低低角色 a->b->c->d->e。当前用户有角色 a、e，修改角色c，由于当前用户存在比c高级低角色a，所以该操作是允许的。
         roleAbility.queryRolesByUser(spaceId, operatorUid).stream().filter(
-                it -> RoleTypeEnum.fromRoleCode(targetRoleCode).isOffspringOrSelfOf(RoleTypeEnum.fromRoleCode(it.getRoleCode()))
+                it -> RoleTypeEnum.fromRoleCode(targetRoleCode).ltEq(RoleTypeEnum.fromRoleCode(it.getRoleCode()))
         ).findAny().orElseThrow(() -> new ServiceLogicException(ErrorCode.NO_DATA_PERMISSION));
     }
 
@@ -97,7 +97,7 @@ public class RoleServiceImpl implements RoleService {
         for (String targetRoleCode : targetRoleCodes) {
             for (IdaasRole myRole : roles) {
                 boolean enabled =
-                        RoleTypeEnum.fromRoleCode(targetRoleCode).isOffspringOrSelfOf(RoleTypeEnum.fromRoleCode(myRole.getRoleCode()));
+                        RoleTypeEnum.fromRoleCode(targetRoleCode).ltEq(RoleTypeEnum.fromRoleCode(myRole.getRoleCode()));
                 if (!enabled) {
                     throw new ServiceLogicException(ErrorCode.NO_DATA_PERMISSION);
                 }
@@ -108,7 +108,7 @@ public class RoleServiceImpl implements RoleService {
     private void checkRoleReadPermission(String spaceId, String operatorUid, String targetRoleCode) {
         //数据权限校验，校验操作者自己是否为更高的角色。
         roleAbility.queryRolesByUser(spaceId, operatorUid).stream().filter(
-                it -> RoleTypeEnum.fromRoleCode(targetRoleCode).isOffspringOrSelfOf(RoleTypeEnum.fromRoleCode(it.getRoleCode()))
+                it -> RoleTypeEnum.fromRoleCode(targetRoleCode).ltEq(RoleTypeEnum.fromRoleCode(it.getRoleCode()))
         ).findAny().orElseThrow(() -> new ServiceLogicException(ErrorCode.NO_DATA_PERMISSION));
     }
 
