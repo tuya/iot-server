@@ -11,9 +11,11 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -114,10 +116,13 @@ public class TreeHelper<T, N> {
         N tree = JSONObject.parseObject(JSON.toJSONString(root), nodeClass());
         List<N> flatten = new ArrayList<>();
         bfs(tree, node -> flatten.add(node));
+        flatten.forEach(it->children(it,null));
         return flatten;
     }
 
     public void bfs(N tree, Consumer<N> consumer) {
+        //检测循环引用
+        Set<T> acceptedCodes = new HashSet<>();
         LinkedList<N> queue1 = new LinkedList<>();
         LinkedList<N> queue2 = new LinkedList<>();
         queue1.add(tree);
@@ -125,6 +130,9 @@ public class TreeHelper<T, N> {
         List<N> children;
         while (!queue1.isEmpty()) {
             node = queue1.poll();
+            if(!acceptedCodes.add(code(node))){
+                throw new RuntimeException("multiple code: "+code(node)+", maybe there is circular reference!");
+            }
             children = children(node);
             consumer.accept(node);
             if (children != null) {
@@ -146,29 +154,47 @@ public class TreeHelper<T, N> {
     }
 
     public void dfsWithPreOrder(N root, Consumer<N> consumer) {
+        dfsWithPreOrder0(root,consumer, new HashSet<>());
+    }
+    private void dfsWithPreOrder0(N root, Consumer<N> consumer,Set<T> visitedCodes) {
+        if(!visitedCodes.add(code(root))){
+            throw new RuntimeException("multiple code: "+code(root)+", maybe there is circular reference!");
+        }
         List<N> children = children(root);
         consumer.accept(root);
         if (children != null) {
             for (N child : children) {
-                dfsWithPreOrder(child, consumer);
+                dfsWithPreOrder0(child, consumer, visitedCodes);
             }
         }
     }
 
     public void dfsWithPostOrder(N root, Consumer<N> consumer) {
+        dfsWithPostOrder0(root,consumer,new HashSet<>());
+    }
+    private void dfsWithPostOrder0(N root, Consumer<N> consumer,Set<T> acceptedCodes) {
+        if(!acceptedCodes.add(code(root))){
+            throw new RuntimeException("multiple code: "+code(root)+", maybe there is circular reference!");
+        }
         List<N> children = children(root);
         if (children != null) {
             for (N child : children) {
-                dfsWithPostOrder(child, consumer);
+                dfsWithPostOrder0(child, consumer,acceptedCodes);
             }
         }
         consumer.accept(root);
     }
 
     public void bfsByLevel(N root, Consumer<List<N>> consumer) {
+        Set<T> visitedCodes = new HashSet<>();
         List<N> queue = new LinkedList<>();
         queue.add(root);
         while (!queue.isEmpty()) {
+            for (N n : queue) {
+                if(!visitedCodes.add(code(n))){
+                    throw new RuntimeException("multiple code: "+code(root)+", maybe there is circular reference!");
+                }
+            }
             consumer.accept(queue);
             queue = queue.stream().filter(it -> children(it) != null)
                     .flatMap(it -> children(it).stream())
@@ -181,10 +207,11 @@ public class TreeHelper<T, N> {
         if (nodes.isEmpty()) {
             return null;
         }
+        //copy
         nodes = JSONArray.parseArray(JSON.toJSONString(nodes), nodeClass());
-        //permissionCode=>PermissionNodeDTO
+        //code=>node
         Map<T, N> map = nodes.stream().collect(Collectors.toMap(it -> code(it), it -> it));
-        //permissionCode=>children
+        //code=>children
         Map<T, List<N>> childrenMap = nodes.stream().filter(it -> parentCode(it) != null)
                 .collect(Collectors.groupingBy(it -> parentCode(it)));
         //find roots, which parentCode not in map
@@ -207,7 +234,7 @@ public class TreeHelper<T, N> {
     }
 
     private N treeifyEnableDuplicateCode0(Collection<N> nodes) {
-        //permissionCode=>PermissionNodeDTO
+        //code=>node
         Map<T, N> map = new HashMap<>();
         nodes.forEach(it -> map.put(code(it), it));
 
@@ -218,7 +245,7 @@ public class TreeHelper<T, N> {
         if (roots.size() != 1) {
             throw new RuntimeException("error! can't treeify nodes, cause roots.size()==" + roots.size());
         }
-        //permissionCode=>children
+        //code=>children
         Map<T, List<N>> childrenMap = map.values().stream().filter(it -> parentCode(it) != null)
                 .collect(Collectors.groupingBy(it -> parentCode(it)));
         //set children
