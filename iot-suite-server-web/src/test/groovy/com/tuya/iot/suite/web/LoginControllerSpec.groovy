@@ -5,6 +5,7 @@ import com.tuya.connector.open.common.util.Sha256Util
 import com.tuya.iot.suite.ability.user.ability.UserAbility
 import com.tuya.iot.suite.ability.user.model.UserToken
 import com.tuya.iot.suite.service.user.UserService
+import com.tuya.iot.suite.web.config.ProjectProperties
 import com.tuya.iot.suite.web.model.request.login.LoginReq
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -30,6 +31,8 @@ class LoginControllerSpec extends Specification{
     MockMvc mvc
     @Autowired
     UserService userService
+    @Autowired
+    ProjectProperties projectProperties
     void "测试登陆"(){
         given:
         def userAbility = userService.userAbility = Mock(UserAbility)
@@ -43,8 +46,9 @@ class LoginControllerSpec extends Specification{
                 token.expire = 7200
                 token
         }
-        def data = LoginReq.builder().country_code("86").telephone("15262900902")
-                .login_password(Sha256Util.encryption("mypassword")).build()
+        def data = LoginReq.builder().country_code(projectProperties.adminUserCountryCode)
+                .user_name(projectProperties.adminUserName)
+                .login_password(Sha256Util.encryption(projectProperties.adminUserPwd)).build()
         def json = JSON.toJSONString(data)
         when:
         expect: "登陆成功"
@@ -52,6 +56,6 @@ class LoginControllerSpec extends Specification{
                 .contentType("application/json")
                 .content(json))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath('$.result.nick_name').value("15262900902"))
+                .andExpect(MockMvcResultMatchers.jsonPath('$.result.nick_name').value(projectProperties.adminUserName))
     }
 }
