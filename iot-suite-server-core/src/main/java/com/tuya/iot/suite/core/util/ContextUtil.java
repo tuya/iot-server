@@ -20,6 +20,8 @@ public class ContextUtil {
 
     private static final String KEY_LANGUAGE = "language";
 
+    private static final String DEFAULT_LANG = "zh";
+
 
     private static Map<String, Object> getLocalMap() {
         Map<String, Object> value = MAP.get();
@@ -70,6 +72,13 @@ public class ContextUtil {
             return (String) o;
         }
         return null;
+    }
+    public static String getLanguageOrDefault() {
+        Object o = getLocalMap().get(KEY_LANGUAGE);
+        if (Objects.nonNull(o)) {
+            return (String) o;
+        }
+        return DEFAULT_LANG;
     }
 
     public static void remove() {

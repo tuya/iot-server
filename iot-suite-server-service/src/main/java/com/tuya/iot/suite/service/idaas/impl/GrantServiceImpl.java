@@ -81,7 +81,7 @@ public class GrantServiceImpl implements GrantService {
         }
         // 3. permissions are authorizable
         Set<String> authorizablePerms = permissionTemplateService.getAuthorizablePermissions();
-        if (authorizablePerms.containsAll(permissionCodes)) {
+        if (!authorizablePerms.containsAll(permissionCodes)) {
             throw new ServiceLogicException(ErrorCode.NO_DATA_PERMISSION);
         }
     }

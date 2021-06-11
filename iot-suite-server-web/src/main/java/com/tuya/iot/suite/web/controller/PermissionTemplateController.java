@@ -30,8 +30,8 @@ public class PermissionTemplateController {
     @GetMapping("/permission-template/role")
     public Response<List<PermissionNodeDTO>> listTemplateTrees(@RequestParam  String roleCode){
         log.info("查询模板权限森林入参:roleCode={}",roleCode);
-        List<PermissionNodeDTO> trees = permissionTemplateService.getTemplatePermissionTrees(roleCode,ContextUtil.getLanguage());
-        log.info("查询模板权限森林入参:trees.size={}",trees.size());
+        List<PermissionNodeDTO> trees = permissionTemplateService.getTemplatePermissionTrees(roleCode,ContextUtil.getLanguageOrDefault());
+        log.info("查询模板权限森林出参:trees.size={}",trees.size());
         return Response.buildSuccess(trees);
     }
 }

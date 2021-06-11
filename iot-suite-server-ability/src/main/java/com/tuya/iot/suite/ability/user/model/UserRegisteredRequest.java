@@ -10,9 +10,9 @@ import java.io.Serializable;
  * @author Chyern
  * @date 2021/3/26
  */
-@Getter
-@Setter
-@ToString
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class UserRegisteredRequest implements Serializable {
 
