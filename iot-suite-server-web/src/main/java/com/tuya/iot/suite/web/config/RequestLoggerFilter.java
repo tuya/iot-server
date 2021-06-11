@@ -17,6 +17,7 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.UUID;
 
@@ -37,7 +38,8 @@ public class RequestLoggerFilter implements Filter {
     @Override
     @SneakyThrows
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterchain) {
-        log.info("requestUri=>{}", HttpRequestUtils.getHttpServletRequest().getRequestURI());
+        HttpServletRequest req = (HttpServletRequest) request;
+        log.info("request =>{} {}", req.getMethod(), req.getRequestURI());
         filterchain.doFilter(request, response);
     }
 

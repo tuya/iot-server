@@ -25,6 +25,7 @@ public enum ErrorCode {
      * SYSTEM_ERROR
      */
     SYSTEM_ERROR("500", "system_error"),
+    SYSTEM_TIP("e-100", "系统提示"),
 
     /**
      * NOT_FOUND
@@ -62,6 +63,10 @@ public enum ErrorCode {
      * ROLE_DEL_FAIL_FOR_RELATED_USERS
      * */
     ROLE_DEL_FAIL_FOR_RELATED_USERS("e-1108","角色删除失败，存在关联用户"),
+
+     ADMIN_CANT_NOT_UPDATE ("e-1109","admin不可被修改角色") ,
+
+     ADMIN_CANT_NOT_GRANT ("e-1110","不允许修改为admin") ,
 
     /**
      * WITHOUT_PERMISSION
