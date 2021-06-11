@@ -90,4 +90,18 @@ class ControllerSpec extends Specification {
         then:
         noExceptionThrown()
     }
+
+    void "测试查询权限模板"() {
+        given:
+        when:
+        def mvcResult = mvc.perform(MockMvcRequestBuilders.get("/permission-template/role")
+                .cookie(new Cookie('token', token))
+            .header("Accept-Language","zh")
+                .contentType("application/json")
+                .param('roleCode', 'admin')
+        ).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
+        println mvcResult.response.contentAsString
+        then:
+        noExceptionThrown()
+    }
 }
