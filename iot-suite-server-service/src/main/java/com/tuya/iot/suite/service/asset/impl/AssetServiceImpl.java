@@ -743,20 +743,6 @@ public class AssetServiceImpl implements AssetService {
     }
 
     @Override
-    public List<AssetDTO> getAllTree(String roleCode, String userId) {
-        RoleType roleType = RoleType.valueByCode(roleCode);
-        switch (roleType) {
-            case ADMIN: {
-                return queryAllAssetTree();
-            }
-            default:
-                List<AuthorizedAsset> authorizedAssets = listAuthorizedAssets(userId);
-                AssetDTO assetDTO = buildAuthedAssetTree(authorizedAssets, "-1", false);
-                return assetDTO.getSubAssets();
-        }
-    }
-
-    @Override
     public List<AssetDTO> getTreeByUser(String userId) {
         List<AuthorizedAsset> authorizedAssets = listAuthorizedAssets(userId);
         if (CollectionUtils.isEmpty(authorizedAssets)) {
@@ -774,24 +760,29 @@ public class AssetServiceImpl implements AssetService {
         return assetAbility.batchAssetsAuthorizedToUser(userId, new AssetAuthToUser(assetIds, false));
     }
 
-    private List<AssetDTO> queryAllAssetTree() {
-        boolean hasNext = true;
-        String lastRowKey = "";
-        List<AssetDTO> resList = new ArrayList<>();
-        while (hasNext) {
-            PageResult<Asset> pageResult = assetAbility.selectAssets("", "", lastRowKey, 100);
-            if (!CollectionUtils.isEmpty(pageResult.getList())) {
-                resList.addAll(AssetConvertor.$.toAssetDTOList(pageResult.getList()));
-            }
-            hasNext = pageResult.getHasNext();
-            lastRowKey = pageResult.getLastRowKey();
+    @Override
+    public Boolean grantAllAsset(String adminUserId) {
+        List<Asset> assetList = getChildAssetsBy("-1");
+        if (!CollectionUtils.isEmpty(assetList)) {
+            List<String> assetIds = assetList.stream().map(e -> e.getAsset_id()).collect(Collectors.toList());
+            return assetAbility.batchAssetsAuthorizedToUser(adminUserId, new AssetAuthToUser(assetIds, true));
         }
-        resList.stream().forEach(e -> {
-            e.setIs_authorized(true);
-            e.setSubAssets(new ArrayList<>());
-        });
-        resList = buildTree(resList, "-1");
-        return resList;
+        return true;
+    }
+
+    private List<AssetDTO> queryAllAssetTree(List<AssetDTO> tree) {
+        if (tree == null) {
+            tree = getTree("-1");
+        }
+        if (!CollectionUtils.isEmpty(tree)) {
+            tree.stream().forEach(e -> {
+                e.setIs_authorized(true);
+                if (!CollectionUtils.isEmpty(e.getSubAssets())) {
+                    queryAllAssetTree(e.getSubAssets());
+                }
+            });
+        }
+        return tree;
     }
 
     /**

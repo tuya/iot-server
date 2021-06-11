@@ -72,9 +72,9 @@ public interface AssetService {
 
     List<AssetDTO> getTreeFast(String assetId, String userId);
 
-    List<AssetDTO> getAllTree(String roleCode, String userId);
-
     List<AssetDTO> getTreeByUser(String userId);
 
     Boolean authAssetToUser(String userId, List<String> assetIds);
+
+    Boolean grantAllAsset(String adminUserId);
 }
