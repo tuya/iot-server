@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * 本地调试启动指南：
+ * 方式一
  * 为了将本地调试的一些properties配置提交到github，需要将本地调试的properties文件外置。
  * 假设本地的properties全路径为/Users/tuya/properties/application-local.properties
  * 例如通过mvn插件启动
@@ -28,6 +29,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * -Dspring.config.location=/Users/tuya/properties/application-local.properties
  *
  * 注意：指定命令行参数和指定jvm参数的区别。
+ *
+ * 方式二
+ * 在resources目录添加application-local.properties文件
+ * （.ignore中已经设置了过滤）
+ * 然后修改application.properties，
+ * 将spring.profiles.active=prod改为spring.profiles.active=local
+ * 启动项目
  */
 @SpringBootApplication(scanBasePackages = "com.tuya.iot.suite")
 @ConnectorScan(basePackages = {"com.tuya.iot.suite.ability.*.connector"})
