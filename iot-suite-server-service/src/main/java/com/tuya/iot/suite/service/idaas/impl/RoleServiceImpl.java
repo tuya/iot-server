@@ -216,7 +216,7 @@ public class RoleServiceImpl implements RoleService {
         if (!CollectionUtils.isEmpty(roleCodes)) {
             for (String roleCode : roleCodes) {
                 if(RoleTypeEnum.isAdminRoleCode(roleCode)){
-                    throw new ServiceLogicException(ErrorCode.ADMIN_CANT_NOT_UPDATE);
+                    throw new ServiceLogicException(ErrorCode.ADMIN_CANT_NOT_GRANT);
                 }
                 if (!roleMap.containsKey(roleCode)) {
                     newRoles.add(roleCode);
@@ -241,12 +241,19 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public RoleTypeEnum userOperateRole(String spaceId, String operatUserId) {
         List<IdaasRole> operatorRoles = roleAbility.queryRolesByUser(spaceId, operatUserId);
-        Assertion.isTrue(operatorRoles.size() >= 1, "a user can at most have one role!");
+        Assertion.isTrue(CollectionUtils.isEmpty(operatorRoles) , "a user can at most have one role!");
+        return userOperateRole(spaceId,operatUserId,operatorRoles.stream().map(e->e.getRoleCode()).collect(Collectors.toList()));
+    }
+
+    @Override
+    public RoleTypeEnum userOperateRole(String spaceId, String operatUserId, List<String> roleCodes) {
         RoleTypeEnum roleType = RoleTypeEnum.normal;
-        for (IdaasRole operatorRole : operatorRoles) {
-            RoleTypeEnum roleTypeEnum = RoleTypeEnum.fromRoleCode(operatorRole.getRoleCode());
-            if (roleType.lt(roleTypeEnum)) {
-                roleType = roleTypeEnum;
+        if (!CollectionUtils.isEmpty(roleCodes)) {
+            for (String roleCode : roleCodes) {
+                RoleTypeEnum roleTypeEnum = RoleTypeEnum.fromRoleCode(roleCode);
+                if (roleType.lt(roleTypeEnum)) {
+                    roleType = roleTypeEnum;
+                }
             }
         }
         return roleType;
