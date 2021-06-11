@@ -8,10 +8,13 @@ import com.tuya.iot.suite.ability.notice.model.ResetPasswordReq;
 import com.tuya.iot.suite.ability.user.ability.UserAbility;
 import com.tuya.iot.suite.ability.user.model.*;
 import com.tuya.iot.suite.core.constant.CaptchaType;
+import com.tuya.iot.suite.core.constant.ErrorCode;
 import com.tuya.iot.suite.core.constant.NoticeType;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
 import com.tuya.iot.suite.core.model.PageVO;
 import com.tuya.iot.suite.ability.user.model.UserBaseInfo;
+import com.tuya.iot.suite.service.enums.RoleTypeEnum;
+import com.tuya.iot.suite.service.idaas.RoleService;
 import com.tuya.iot.suite.service.notice.template.CaptchaNoticeTemplate;
 import com.tuya.iot.suite.service.user.CaptchaService;
 import com.tuya.iot.suite.service.user.UserService;
@@ -49,6 +52,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private CaptchaService captchaService;
 
+    @Autowired
+    private RoleService roleService;
+
     /**
      * 修改用户密码
      *
@@ -74,7 +80,7 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     @Override
-    public com.tuya.iot.suite.core.model.UserToken login(String spaceId,String userName, String password) {
+    public com.tuya.iot.suite.core.model.UserToken login(String spaceId, String userName, String password) {
         UserToken loginToken = userAbility.loginUser(UserRegisteredRequest.builder()
                 .username(userName)
                 .password(password)
@@ -82,7 +88,7 @@ public class UserServiceImpl implements UserService {
 
         List<IdaasRole> roles = roleAbility.queryRolesByUser(spaceId, loginToken.getUid());
         com.tuya.iot.suite.core.model.UserToken userToken =
-                new com.tuya.iot.suite.core.model.UserToken(loginToken.getUid(),userName,null,roles.stream().map(e->e.getRoleCode()).collect(Collectors.toList()));
+                new com.tuya.iot.suite.core.model.UserToken(loginToken.getUid(), userName, null, roles.stream().map(e -> e.getRoleCode()).collect(Collectors.toList()));
         return userToken;
     }
 
@@ -184,13 +190,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Boolean updateUser(String spaceId, String uid, String nickName, List<String> roleCodes) {
+    public Boolean updateUser(String spaceId, String operatUserId, String uid, String nickName, List<String> roleCodes) {
         if (!StringUtils.isEmpty(nickName)) {
             //修改昵称 TODO 等待云端开放
 
         }
+        if (CollectionUtils.isEmpty(roleCodes)) {
+            return true;
+        }
         //修改角色
-        if (!CollectionUtils.isEmpty(roleCodes)) {
+        RoleTypeEnum operatorRoleType = roleService.userOperateRole(spaceId, operatUserId);
+        for (String roleCode : roleCodes) {
+            if (operatorRoleType.lt(RoleTypeEnum.fromRoleCode(roleCode))) {
+                throw new ServiceLogicException(ErrorCode.NO_DATA_PERMISSION);
+            }
+        }
+        roleCodes  = roleService.checkAndRemoveOldRole(spaceId, uid, roleCodes, false);
+        if (roleCodes.size()>0) {
             Boolean auth = grantAbility.setRolesToUser(UserGrantRolesReq.builder()
                     .spaceId(spaceId)
                     .roleCodeList(roleCodes)
@@ -252,7 +268,7 @@ public class UserServiceImpl implements UserService {
         PageVO<UserBaseInfo> result = new PageVO<>();
         result.setPageNo(pageResult.getPageNumber());
         result.setPageSize(pageResult.getPageSize());
-        result.setData(pageResult.getResults().stream().map(e->{
+        result.setData(pageResult.getResults().stream().map(e -> {
             List<IdaasRole> userRoles = roleAbility.queryRolesByUser(spaceId, e.getUid());
             return UserBaseInfo.builder()
                     .userName(e.getUsername())
