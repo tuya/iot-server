@@ -178,6 +178,14 @@ public class GrantServiceImpl implements GrantService {
             }
             if (roleMap.containsKey(roleCode)) {
                 uidList.remove(uid);
+            } else {
+                //去除原来的角色
+                roleMap.values().stream().forEach(e -> {
+                    Boolean removeRole = grantAbility.revokeRoleFromUser(spaceId, e, uid);
+                    if (removeRole) {
+                        log.info("移除了uid={} 的角色roleCode={}", uid, e);
+                    }
+                });
             }
         }
         // 3. 逐个授权
