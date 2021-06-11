@@ -215,6 +215,9 @@ public class RoleServiceImpl implements RoleService {
         List<String> newRoles = new ArrayList<>();
         if (!CollectionUtils.isEmpty(roleCodes)) {
             for (String roleCode : roleCodes) {
+                if(RoleTypeEnum.isAdminRoleCode(roleCode)){
+                    throw new ServiceLogicException(ErrorCode.ADMIN_CANT_NOT_UPDATE);
+                }
                 if (!roleMap.containsKey(roleCode)) {
                     newRoles.add(roleCode);
                 } else {
