@@ -5,34 +5,24 @@ import com.tuya.iot.suite.ability.idaas.ability.GrantAbility;
 import com.tuya.iot.suite.ability.idaas.ability.IdaasUserAbility;
 import com.tuya.iot.suite.ability.idaas.ability.PermissionAbility;
 import com.tuya.iot.suite.ability.idaas.ability.RoleAbility;
-import com.tuya.iot.suite.ability.idaas.model.IdaasPageResult;
-import com.tuya.iot.suite.ability.idaas.model.IdaasRole;
-import com.tuya.iot.suite.ability.idaas.model.IdaasRoleCreateReq;
-import com.tuya.iot.suite.ability.idaas.model.IdaasUser;
-import com.tuya.iot.suite.ability.idaas.model.IdaasUserPageReq;
-import com.tuya.iot.suite.ability.idaas.model.PermissionQueryByRolesReq;
-import com.tuya.iot.suite.ability.idaas.model.RoleGrantPermissionsReq;
-import com.tuya.iot.suite.ability.idaas.model.RoleRevokePermissionsReq;
-import com.tuya.iot.suite.ability.idaas.model.RoleUpdateReq;
-import com.tuya.iot.suite.ability.idaas.model.RolesPaginationQueryReq;
+import com.tuya.iot.suite.ability.idaas.model.*;
 import com.tuya.iot.suite.core.constant.ErrorCode;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
+import com.tuya.iot.suite.core.model.PageVO;
+import com.tuya.iot.suite.core.util.Assertion;
 import com.tuya.iot.suite.service.dto.PermissionNodeDTO;
 import com.tuya.iot.suite.service.dto.RoleCreateReqDTO;
+import com.tuya.iot.suite.service.enums.RoleTypeEnum;
 import com.tuya.iot.suite.service.idaas.PermissionTemplateService;
 import com.tuya.iot.suite.service.idaas.RoleService;
-import com.tuya.iot.suite.core.model.PageVO;
-import com.tuya.iot.suite.service.enums.RoleTypeEnum;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -125,7 +115,7 @@ public class RoleServiceImpl implements RoleService {
         //底层api没有判断删除角色时是否存在关联的用户，那么我们就需要实现这个逻辑
         IdaasPageResult<IdaasUser> pageResult = idaasUserAbility.queryUserPage(spaceId, IdaasUserPageReq.builder()
                 .roleCode(roleCode).build());
-        if(pageResult.getTotalCount()>0){
+        if (pageResult.getTotalCount() > 0) {
             throw new ServiceLogicException(ErrorCode.ROLE_DEL_FAIL_FOR_RELATED_USERS);
         }
         return roleAbility.deleteRole(spaceId, roleCode);
@@ -165,16 +155,16 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Boolean resetRolePermissionsFromTemplate(String spaceId, String operatorUid, String roleCode) {
         // 0. check permission
-        checkRoleWritePermission(spaceId,operatorUid,roleCode);
+        checkRoleWritePermission(spaceId, operatorUid, roleCode);
 
-        List<String> existPerms = permissionAbility.queryPermissionsByRoleCodes(spaceId,PermissionQueryByRolesReq.builder()
+        List<String> existPerms = permissionAbility.queryPermissionsByRoleCodes(spaceId, PermissionQueryByRolesReq.builder()
                 .roleCodeList(Lists.newArrayList(roleCode))
                 .build()).stream().flatMap(it -> it.getPermissionList().stream()).map(it -> it.getPermissionCode())
                 .collect(Collectors.toList());
         RoleTypeEnum roleType = RoleTypeEnum.fromRoleCode(roleCode);
 
         // 1. get permissions from template
-        List<String> templatePerms = permissionTemplateService.getTemplatePermissionFlattenList(roleType.name(),Locale.CHINESE.getLanguage())
+        List<String> templatePerms = permissionTemplateService.getTemplatePermissionFlattenList(roleType.name(), Locale.CHINESE.getLanguage())
                 .stream().map(it -> it.getPermissionCode())
                 .collect(Collectors.toList());
 
@@ -208,6 +198,55 @@ public class RoleServiceImpl implements RoleService {
             }
         }
         return true;
+    }
+
+    @Override
+    public List<String> checkAndRemoveOldRole(String spaceId, String uid, List<String> roleCodes, boolean removeOld) {
+        List<IdaasRole> userRoles = roleAbility.queryRolesByUser(spaceId, uid);
+        Map<String, String> roleMap = new HashMap<>();
+        if (!CollectionUtils.isEmpty(userRoles)) {
+            for (IdaasRole userRole : userRoles) {
+                if(RoleTypeEnum.isAdminRoleCode(userRole.getRoleCode())){
+                    throw new ServiceLogicException(ErrorCode.ADMIN_CANT_NOT_UPDATE);
+                }
+                roleMap.put(userRole.getRoleCode(), userRole.getRoleName());
+            }
+        }
+        List<String> newRoles = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(roleCodes)) {
+            for (String roleCode : roleCodes) {
+                if (!roleMap.containsKey(roleCode)) {
+                    newRoles.add(roleCode);
+                } else {
+                    roleMap.remove(roleCode);
+                }
+            }
+        }
+        if (removeOld) {
+            //去除原来的角色
+            roleMap.values().stream().forEach(e -> {
+                Boolean removeRole = grantAbility.revokeRoleFromUser(spaceId, e, uid);
+                if (removeRole) {
+                    log.info("移除了uid={} 的角色roleCode={}", uid, e);
+                }
+            });
+            return newRoles;
+        }
+        return newRoles;
+    }
+
+    @Override
+    public RoleTypeEnum userOperateRole(String spaceId, String operatUserId) {
+        List<IdaasRole> operatorRoles = roleAbility.queryRolesByUser(spaceId, operatUserId);
+        Assertion.isTrue(operatorRoles.size() >= 1, "a user can at most have one role!");
+        RoleTypeEnum roleType = RoleTypeEnum.normal;
+        for (IdaasRole operatorRole : operatorRoles) {
+            RoleTypeEnum roleTypeEnum = RoleTypeEnum.fromRoleCode(operatorRole.getRoleCode());
+            if (roleType.lt(roleTypeEnum)) {
+                roleType = roleTypeEnum;
+            }
+        }
+        return roleType;
     }
 
 }
