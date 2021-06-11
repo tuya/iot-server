@@ -100,3 +100,5 @@ Network Trash Folder
 Temporary Items
 .apdisk
 *.flattened-pom.xml
+
+application-local.properties
