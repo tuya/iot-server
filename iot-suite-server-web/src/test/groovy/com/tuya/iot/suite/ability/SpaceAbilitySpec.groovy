@@ -27,7 +27,7 @@ class SpaceAbilitySpec extends BaseSpec{
         def spaceId = spaceAbility.applySpace(SpaceApplyReq.builder()
         .spaceGroup(projectProperties.permissionGroup)
         .spaceCode(projectProperties.permissionSpaceCode)
-        .authentication(projectProperties.code)
+        .authentication(3)
         .owner(projectProperties.permissionSpaceOwner)
         .remark('test')
                 .build())
