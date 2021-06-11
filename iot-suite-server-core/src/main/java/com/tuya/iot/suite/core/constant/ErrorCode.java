@@ -66,6 +66,8 @@ public enum ErrorCode {
 
      ADMIN_CANT_NOT_UPDATE ("e-1109","admin不可被修改角色") ,
 
+     ADMIN_CANT_NOT_GRANT ("e-1110","不允许修改为admin") ,
+
     /**
      * WITHOUT_PERMISSION
      */
