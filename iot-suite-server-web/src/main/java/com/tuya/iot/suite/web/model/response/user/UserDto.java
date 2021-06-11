@@ -13,9 +13,9 @@ import java.util.List;
  * @author: benguan.zhou@tuya.com
  * @date: 2021/05/28
  */
-@Getter
-@Setter
-@ToString
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserDto {

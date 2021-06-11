@@ -1,7 +1,9 @@
 package com.tuya.iot.suite.ability.idaas.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @author benguan.zhou@tuya.com
@@ -10,6 +12,8 @@ import lombok.Data;
  */
 @Data
 @Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class IdaasSpace {
     String spaceGroup;
     String spaceId;
