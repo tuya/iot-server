@@ -159,7 +159,7 @@ public class UserController {
     @RequiresPermissions("4003")
     public Response<Boolean> updateUserName(@RequestBody UserEditReq req) {
         String spaceId = projectProperties.getPermissionSpaceId();
-        return Response.buildSuccess(userService.updateUser(spaceId, req.getUserId(), req.getNickName(), req.getRoleCodes()));
+        return Response.buildSuccess(userService.updateUser(spaceId,ContextUtil.getUserId(), req.getUserId(), req.getNickName(), req.getRoleCodes()));
     }
 
     @ApiOperation("修改用户密码")

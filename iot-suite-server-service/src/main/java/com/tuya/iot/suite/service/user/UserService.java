@@ -61,7 +61,7 @@ public interface UserService {
 
     Boolean createUser(String spaceId, UserRegisteredRequest req, List<String> roleCodes);
 
-    Boolean updateUser(String spaceId, String uid, String nickName,List<String> roleCodes);
+    Boolean updateUser(String spaceId,String operatUserId, String uid, String nickName,List<String> roleCodes);
 
     Boolean deleteUser(String spaceId, String uid);
 
