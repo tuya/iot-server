@@ -13,6 +13,7 @@ import com.tuya.iot.suite.core.constant.NoticeType;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
 import com.tuya.iot.suite.core.model.PageVO;
 import com.tuya.iot.suite.ability.user.model.UserBaseInfo;
+import com.tuya.iot.suite.service.asset.AssetService;
 import com.tuya.iot.suite.service.enums.RoleTypeEnum;
 import com.tuya.iot.suite.service.idaas.RoleService;
 import com.tuya.iot.suite.service.notice.template.CaptchaNoticeTemplate;
@@ -54,6 +55,8 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private RoleService roleService;
+    @Autowired
+    private AssetService assetService;
 
     /**
      * 修改用户密码
@@ -185,6 +188,11 @@ public class UserServiceImpl implements UserService {
                 .uid(user.getUser_id()).build());
         if (!auth) {
             throw new ServiceLogicException(USER_CREATE_FAIL);
+        }
+        //授权资产
+        RoleTypeEnum roleTypeEnum = roleService.userOperateRole(spaceId, user.getUser_id(),roleCodes);
+        if (RoleTypeEnum.normal.lt(roleTypeEnum)) {
+            auth = auth && assetService.grantAllAsset(user.getUser_id());
         }
         return res && auth;
     }

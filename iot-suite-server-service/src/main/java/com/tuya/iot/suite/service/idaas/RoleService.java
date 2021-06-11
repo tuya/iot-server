@@ -46,4 +46,10 @@ public interface RoleService {
      * @date 2021/6/11 14:59 [spaceId, operatUserId]  com.tuya.iot.suite.service.enums.RoleTypeEnum
      */
     RoleTypeEnum userOperateRole(String spaceId, String operatUserId);
+    /**
+     * 查询用户等级最高的角色
+     * @author mickey
+     * @date 2021/6/11 14:59 [spaceId, operatUserId]  com.tuya.iot.suite.service.enums.RoleTypeEnum
+     */
+    RoleTypeEnum userOperateRole(String spaceId, String operatUserId, List<String> roleCodes);
 }

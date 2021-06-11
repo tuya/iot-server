@@ -2,16 +2,16 @@ package com.tuya.iot.suite.web.controller;
 
 
 import com.tuya.iot.suite.core.constant.Response;
+import com.tuya.iot.suite.core.model.PageDataVO;
 import com.tuya.iot.suite.core.util.ContextUtil;
 import com.tuya.iot.suite.service.asset.AssetService;
 import com.tuya.iot.suite.service.dto.AssetConvertor;
 import com.tuya.iot.suite.service.dto.AssetVO;
 import com.tuya.iot.suite.service.dto.DeviceDTO;
-import com.tuya.iot.suite.core.model.PageDataVO;
-import com.tuya.iot.suite.web.model.response.device.DeviceInfoVO;
 import com.tuya.iot.suite.web.model.convert.DeviceInfoConvert;
 import com.tuya.iot.suite.web.model.criteria.AssetCriteria;
 import com.tuya.iot.suite.web.model.request.asset.AssetAuths;
+import com.tuya.iot.suite.web.model.response.device.DeviceInfoVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -98,12 +98,12 @@ public class AssetController {
     @GetMapping(value = "/{asset_id}/deviceInfos")
     @RequiresPermissions("1001")
     public Response<PageDataVO<DeviceInfoVO>> getDeviceInfoBy(@PathVariable("asset_id") String assetId,
-                                                @RequestParam(value = "page_no", required = false, defaultValue = "1") Integer pageNo,
-                                                @RequestParam(value = "page_size", required = false, defaultValue = "10") Integer pageSize) {
+                                                              @RequestParam(value = "page_no", required = false, defaultValue = "1") Integer pageNo,
+                                                              @RequestParam(value = "page_size", required = false, defaultValue = "10") Integer pageSize) {
         PageDataVO<DeviceInfoVO> vo = new PageDataVO<>();
         vo.setPage_no(pageNo);
         vo.setPage_size(pageSize);
-        PageDataVO<DeviceDTO> resultPage = assetService.getChildDeviceInfoPage(ContextUtil.getUserId(),assetId, pageNo, pageSize);
+        PageDataVO<DeviceDTO> resultPage = assetService.getChildDeviceInfoPage(ContextUtil.getUserId(), assetId, pageNo, pageSize);
         vo.setTotal(resultPage.getTotal());
         vo.setData(DeviceInfoConvert.INSTANCE.deviceDTO2VO(resultPage.getData()));
         return Response.buildSuccess(vo);
@@ -114,7 +114,7 @@ public class AssetController {
     @PutMapping(value = "/auths")
     @RequiresPermissions("4007")
     public Response<Boolean> authAssetToUser(@RequestBody AssetAuths req) {
-        return  Response.buildSuccess(assetService.authAssetToUser(req.getUserId(),req.getAssetIds()));
+        return Response.buildSuccess(assetService.authAssetToUser(req.getUserId(), req.getAssetIds()));
     }
 
     @ApiOperation(value = "用户被授权的资产")
@@ -131,8 +131,7 @@ public class AssetController {
     @GetMapping(value = "/all")
     @RequiresPermissions("1001")
     public Response<List<AssetVO>> sysAssetAll() {
-        String roleCode = "admin";
-        return Response.buildSuccess(AssetConvertor.$.toAssetVOList(assetService.getAllTree(roleCode,ContextUtil.getUserId())));
+        return Response.buildSuccess(AssetConvertor.$.toAssetVOList(assetService.getTreeByUser(ContextUtil.getUserId())));
     }
 
 
