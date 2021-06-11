@@ -413,38 +413,6 @@
       ]
     },
     {
-      "permissionName": "Alarm center",
-      "permissionType": "menu",
-      "permissionCode": "5000",
-      "parentCode": null,
-      "order": "5",
-      "authorizable": true,
-      "authRoleTypes": [
-        "admin",
-        "manager",
-        "normal"
-      ],
-      "remark": "Asset ability",
-      "dependencies": [],
-      "children": [
-        {
-          "permissionName": "View Alarm",
-          "permissionType": "api",
-          "permissionCode": "5001",
-          "parentCode": "5000",
-          "order": "1",
-          "dependencies": [],
-          "authorizable": true,
-          "authRoleTypes": [
-            "admin",
-            "manager",
-            "normal"
-          ],
-          "remark": "Alarm list"
-        }
-      ]
-    },
-    {
       "permissionName": "Account Settings",
       "permissionType": "menu",
       "permissionCode": "6000",

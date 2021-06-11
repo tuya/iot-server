@@ -43,28 +43,28 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseBody
     public Response MethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        LogUtil.info(log, e, "全局拦截MethodArgumentNotValidException异常:{}", e.getMessage());
+        info( e, "全局拦截MethodArgumentNotValidException异常:{}", e.getMessage());
         return ResponseI18n.buildFailure(ErrorCode.PARAM_ERROR);
     }
 
     @ExceptionHandler(NoHandlerFoundException.class)
     @ResponseBody
     public Response handleException(NoHandlerFoundException e) {
-        LogUtil.info(log, e, "全局拦截NoHandlerFoundException异常:{}", e.getMessage());
+        info( e, "全局拦截NoHandlerFoundException异常:{}", e.getMessage());
         return ResponseI18n.buildFailure(ErrorCode.NOT_FOUND);
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     @ResponseBody
     public Response handleException(HttpRequestMethodNotSupportedException e) {
-        LogUtil.info(log, e, "全局拦截HttpRequestMethodNotSupportedException异常:{}", e.getMessage());
+        info( e, "全局拦截HttpRequestMethodNotSupportedException异常:{}", e.getMessage());
         return ResponseI18n.buildFailure(ErrorCode.NOT_FOUND);
     }
 
     @ExceptionHandler(ServiceLogicException.class)
     @ResponseBody
     public Response handleServiceLogicException(ServiceLogicException e) {
-        LogUtil.info(log, e, "全局拦截ServiceLogicException提示: code={} , message={} ", e.getErrorCode().getCode(), e.getErrorCode().getMsg());
+        info( e, "全局拦截ServiceLogicException提示: code={} , message={} ", e.getErrorCode().getCode(), e.getErrorCode().getMsg());
         String outMsg = StringUtils.isEmpty(e.getOutMsg()) ? "" : "[" + e.getOutMsg() + "]";
         return Response
                 .buildFailure(e.getErrorCode().getCode(),
@@ -75,7 +75,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConnectorResultException.class)
     @ResponseBody
     public Response handleException(ConnectorResultException e) {
-        log.error("全局拦截ConnectorResultException异常:", e);
+        error("全局拦截ConnectorResultException异常:", e);
         ErrorInfo errorInfo = e.getErrorInfo();
         String errMsg = fixErrMsgIfNeed(errorInfo.getErrorMsg());
         return Response.buildFailure(errorInfo.getErrorCode(), getI18nMessageByCode(errorInfo.getErrorCode(), errMsg));
@@ -95,7 +95,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ConnectorException.class)
     @ResponseBody
     public Response handleException(ConnectorException e) {
-        log.error("全局拦截ConnectorException异常:", e);
+        error("全局拦截ConnectorException异常:", e);
         Throwable cause = e.getCause();
         if (cause instanceof UndeclaredThrowableException) {
             UndeclaredThrowableException undeclaredThrowableException = (UndeclaredThrowableException) cause;
@@ -113,7 +113,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public Response handleException(Exception e) {
-        log.error("全局拦截Exception异常:", e);
+        error("全局拦截Exception异常:", e);
         return ResponseI18n.buildFailure(ErrorCode.SYSTEM_ERROR);
     }
 
@@ -123,7 +123,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnauthenticatedException.class)
     @ResponseBody
     public Response handleException(UnauthenticatedException e) {
-        LogUtil.info(log, e, "全局拦截UnauthenticatedException异常:{}", e.getMessage());
+        info( e, "全局拦截UnauthenticatedException异常:{}", e.getMessage());
         return ResponseI18n.buildFailure(ErrorCode.NO_LOGIN);
     }
 
@@ -133,8 +133,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UnauthorizedException.class)
     @ResponseBody
     public Response handleException(UnauthorizedException e) {
-        LogUtil.info(log, e, "全局拦截UnauthorizedException异常:{}", e.getMessage());
+        info( e, "全局拦截UnauthorizedException异常:{}", e.getMessage());
         return ResponseI18n.buildFailure(ErrorCode.USER_NOT_AUTH);
+    }
+    private void info(Exception e, String msg, Object... args){
+        LogUtil.info(log,e,msg,args);
+    }
+    private void error(String msg,Exception e){
+        log.error(msg,e);
     }
 
     /***

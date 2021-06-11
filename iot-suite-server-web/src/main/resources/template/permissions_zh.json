@@ -413,38 +413,6 @@
       ]
     },
     {
-      "permissionName": "告警中心",
-      "permissionType": "menu",
-      "permissionCode": "5000",
-      "parentCode": null,
-      "order": "5",
-      "authorizable": true,
-      "authRoleTypes": [
-        "admin",
-        "manager",
-        "normal"
-      ],
-      "remark": "资产能力",
-      "dependencies": [],
-      "children": [
-        {
-          "permissionName": "查看告警",
-          "permissionType": "api",
-          "permissionCode": "5001",
-          "parentCode": "5000",
-          "order": "1",
-          "dependencies": [],
-          "authorizable": true,
-          "authRoleTypes": [
-            "admin",
-            "manager",
-            "normal"
-          ],
-          "remark": "告警列表"
-        }
-      ]
-    },
-    {
       "permissionName": "账号设置",
       "permissionType": "menu",
       "permissionCode": "6000",
