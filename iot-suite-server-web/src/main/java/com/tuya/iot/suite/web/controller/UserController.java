@@ -184,9 +184,9 @@ public class UserController {
     @DeleteMapping("/users")
     @RequiresPermissions("4009")
     public Response<Boolean> batchDeleteUser(@ApiParam(value = "uid列表，逗号分隔", required = true)
-                                             @RequestParam String uidList) {
+                                             @RequestParam String userIds) {
         String spaceId = projectProperties.getPermissionSpaceId();
-        return Response.buildSuccess(userService.batchDeleteUser(spaceId, uidList.split(",")));
+        return Response.buildSuccess(userService.batchDeleteUser(spaceId, userIds.split(",")));
     }
 
     @ApiOperation("用户列表")
