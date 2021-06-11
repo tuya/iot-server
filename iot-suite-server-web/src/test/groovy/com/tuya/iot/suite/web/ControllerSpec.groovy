@@ -6,6 +6,7 @@ import com.tuya.connector.open.common.util.Sha256Util
 import com.tuya.iot.suite.ability.user.ability.UserAbility
 import com.tuya.iot.suite.ability.user.model.UserToken
 import com.tuya.iot.suite.service.user.UserService
+import com.tuya.iot.suite.web.config.ProjectProperties
 import com.tuya.iot.suite.web.model.request.login.LoginReq
 import groovy.util.logging.Slf4j
 import org.springframework.beans.factory.annotation.Autowired
@@ -34,11 +35,15 @@ class ControllerSpec extends Specification {
 
     @Autowired
     MockMvc mvc
+    @Autowired
+    ProjectProperties projectProperties
     String token
 
     void setup() {
-        def data = LoginReq.builder().country_code("86").user_name('xxx')
-                .login_password(Sha256Util.encryption("xxx")).build()
+        def data = LoginReq.builder().country_code(projectProperties.adminUserCountryCode)
+                .user_name(projectProperties.adminUserName)
+                .login_password(Sha256Util.encryption(projectProperties.adminUserPwd))
+                .build()
         def json = JSON.toJSONString(data)
         def mvcResult = mvc.perform(MockMvcRequestBuilders.post("/login")
                 .contentType("application/json")
@@ -53,7 +58,7 @@ class ControllerSpec extends Specification {
         given:
         when:
         def mvcResult = mvc.perform(MockMvcRequestBuilders.get("/users")
-        .cookie(new Cookie('token',token))
+                .cookie(new Cookie('token', token))
                 .contentType("application/json")
         ).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
         println mvcResult.response.contentAsString
@@ -65,7 +70,7 @@ class ControllerSpec extends Specification {
         given:
         when:
         def mvcResult = mvc.perform(MockMvcRequestBuilders.get("/roles")
-                .cookie(new Cookie('token',token))
+                .cookie(new Cookie('token', token))
                 .contentType("application/json")
         ).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
         println mvcResult.response.contentAsString
@@ -77,9 +82,9 @@ class ControllerSpec extends Specification {
         given:
         when:
         def mvcResult = mvc.perform(MockMvcRequestBuilders.get("/roles/permissions")
-                .cookie(new Cookie('token',token))
+                .cookie(new Cookie('token', token))
                 .contentType("application/json")
-                .param('roleCode','normal-1000')
+                .param('roleCode', 'normal-1000')
         ).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
         println mvcResult.response.contentAsString
         then:
