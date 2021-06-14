@@ -9,7 +9,6 @@ import com.tuya.iot.suite.ability.idaas.model.*;
 import com.tuya.iot.suite.core.constant.ErrorCode;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
 import com.tuya.iot.suite.core.model.PageVO;
-import com.tuya.iot.suite.core.util.Assertion;
 import com.tuya.iot.suite.service.dto.PermissionNodeDTO;
 import com.tuya.iot.suite.service.dto.RoleCreateReqDTO;
 import com.tuya.iot.suite.service.enums.RoleTypeEnum;
@@ -206,7 +205,7 @@ public class RoleServiceImpl implements RoleService {
         Map<String, String> roleMap = new HashMap<>();
         if (!CollectionUtils.isEmpty(userRoles)) {
             for (IdaasRole userRole : userRoles) {
-                if(RoleTypeEnum.isAdminRoleCode(userRole.getRoleCode())){
+                if (RoleTypeEnum.isAdminRoleCode(userRole.getRoleCode())) {
                     throw new ServiceLogicException(ErrorCode.ADMIN_CANT_NOT_UPDATE);
                 }
                 roleMap.put(userRole.getRoleCode(), userRole.getRoleName());
@@ -215,7 +214,7 @@ public class RoleServiceImpl implements RoleService {
         List<String> newRoles = new ArrayList<>();
         if (!CollectionUtils.isEmpty(roleCodes)) {
             for (String roleCode : roleCodes) {
-                if(RoleTypeEnum.isAdminRoleCode(roleCode)){
+                if (RoleTypeEnum.isAdminRoleCode(roleCode)) {
                     throw new ServiceLogicException(ErrorCode.ADMIN_CANT_NOT_GRANT);
                 }
                 if (!roleMap.containsKey(roleCode)) {
@@ -241,8 +240,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public RoleTypeEnum userOperateRole(String spaceId, String operatUserId) {
         List<IdaasRole> operatorRoles = roleAbility.queryRolesByUser(spaceId, operatUserId);
-        Assertion.isTrue(CollectionUtils.isEmpty(operatorRoles) , "a user can at most have one role!");
-        return userOperateRole(spaceId,operatUserId,operatorRoles.stream().map(e->e.getRoleCode()).collect(Collectors.toList()));
+        return userOperateRole(spaceId, operatUserId, operatorRoles.stream().map(e -> e.getRoleCode()).collect(Collectors.toList()));
     }
 
     @Override
