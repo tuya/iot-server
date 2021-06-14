@@ -245,7 +245,7 @@
           ],
           "authorizable": true,
           "authRoleTypes": [
-            "admin"
+            "admin","manager"
           ],
           "remark": "查询角色拥有权限"
         }

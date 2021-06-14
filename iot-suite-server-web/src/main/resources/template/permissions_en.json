@@ -245,7 +245,7 @@
           ],
           "authorizable": true,
           "authRoleTypes": [
-            "admin"
+            "admin","manager"
           ],
           "remark": "View role permission"
         }
