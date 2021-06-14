@@ -2,6 +2,7 @@ package com.tuya.iot.suite.web.config;
 
 import com.google.common.collect.Lists;
 import com.tuya.connector.api.exceptions.ConnectorResultException;
+import com.tuya.iot.suite.ability.asset.ability.AssetAbility;
 import com.tuya.iot.suite.ability.idaas.ability.*;
 import com.tuya.iot.suite.ability.idaas.model.*;
 import com.tuya.iot.suite.ability.user.ability.UserAbility;
@@ -9,6 +10,7 @@ import com.tuya.iot.suite.ability.user.model.User;
 import com.tuya.iot.suite.ability.user.model.UserRegisteredRequest;
 import com.tuya.iot.suite.ability.user.model.UserToken;
 import com.tuya.iot.suite.core.util.Sha256Utils;
+import com.tuya.iot.suite.service.asset.AssetService;
 import com.tuya.iot.suite.service.dto.PermissionNodeDTO;
 import com.tuya.iot.suite.service.enums.RoleTypeEnum;
 import com.tuya.iot.suite.service.util.PermTemplateUtil;
@@ -47,6 +49,8 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
 
     @Autowired
     GrantAbility grantAbility;
+    @Autowired
+    AssetService assetService;
 
     @Autowired
     PermissionAbility permissionAbility;
@@ -265,11 +269,14 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
             }
         }
         //授权
-        return grantAbility.grantRoleToUser(UserGrantRoleReq.builder()
+        Boolean grant = grantAbility.grantRoleToUser(UserGrantRoleReq.builder()
                 .spaceId(spaceId)
                 .roleCode(roleCode)
                 .uid(adminUserId)
                 .build());
+        assetService.grantAllAsset(adminUserId);
+
+        return grant;
     }
 
     private boolean initRole(String roleCode) {

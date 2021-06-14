@@ -10,11 +10,10 @@ import com.tuya.iot.suite.core.exception.ServiceLogicException;
 public class Assertion {
 
     public static void isTrue(boolean b, String message) {
-        if (!b) {
-            throw new ServiceLogicException(ErrorCode.SYSTEM_TIP, message);
-        }
+        isTrue(b, ErrorCode.SYSTEM_TIP, message);
     }
-    public static void isTrue(boolean b,ErrorCode code, String message) {
+
+    public static void isTrue(boolean b, ErrorCode code, String message) {
         if (!b) {
             throw new ServiceLogicException(code, message);
         }

@@ -56,10 +56,6 @@ public class UserController {
 
     @Autowired
     private UserService userService;
-    @Autowired
-    private HttpSession session;
-    @Autowired
-    private I18nMessage i18nMessage;
 
     @Autowired
     private ProjectProperties projectProperties;
