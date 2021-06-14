@@ -226,7 +226,7 @@ public class UserController {
 
     @ApiOperation("用户权限列表")
     @GetMapping("/users/{uid}/permissions")
-    @RequiresPermissions("4001")
+    //@RequiresPermissions("4001")
     public Response<List<PermissionDto>> listUserPermissions(
             @ApiParam(value = "用户id") @PathVariable String uid) {
         return Response.buildSuccess(permissionService.queryPermissionsByUser(projectProperties.getPermissionSpaceId(), uid)
