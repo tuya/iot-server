@@ -155,7 +155,7 @@ public class GrantServiceImpl implements GrantService {
     @Override
     public Boolean setRoleToUsers(String spaceId, String operatorUid, String roleCode, List<String> uidList) {
         // 0. 不能把系统管理员角色设置给用户
-        Assertion.isTrue(RoleTypeEnum.fromRoleCode(roleCode).isAdmin(), "can not set 'admin' role to any users!");
+        Assertion.isTrue(!RoleTypeEnum.fromRoleCode(roleCode).isAdmin(), "can not set 'admin' role to any users!");
         // 1. 操作者有更高级的角色（或相同的角色），才可以把这个角色设置给用户
         RoleTypeEnum operatorRoleType = roleService.userOperateRole(spaceId, operatorUid);
         if (operatorRoleType.lt(RoleTypeEnum.fromRoleCode(roleCode))) {
