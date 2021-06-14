@@ -81,8 +81,9 @@ public class GrantServiceImpl implements GrantService {
 
     @Override
     public Boolean grantPermissionsToRole(String operatorUid, RoleGrantPermissionsReq req) {
-        checkForModifyPermissionToRole(req.getSpaceId(), operatorUid, req.getPermissionCodes(), req.getRoleCode());
-        return grantAbility.grantPermissionsToRole(req);
+        throw new RuntimeException("this method not implements!");
+        //checkForModifyPermissionToRole(req.getSpaceId(), operatorUid, req.getPermissionCodes(), req.getRoleCode());
+        //return grantAbility.grantPermissionsToRole(req);
     }
 
     @Override

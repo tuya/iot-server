@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import spock.lang.Stepwise
 import spock.lang.Timeout
 
+import java.util.stream.Collectors
+
 /**
  * @description
  * 字段名命名风格：我们这边会转成下划线风格传过去，然后网关那边处理了，两种都支持。
@@ -130,7 +132,9 @@ class PermissionAbilitySpec extends BaseSpec {
                 .build()
         )
         then:
-        perms.size() == 0
+        perms.stream().flatMap(){
+            it.permissionList.stream()
+        }.collect(Collectors.toList()).size() == 0
     }
 
     @Timeout(1000)
