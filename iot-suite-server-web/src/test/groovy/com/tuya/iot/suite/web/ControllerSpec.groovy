@@ -104,4 +104,23 @@ class ControllerSpec extends Specification {
         then:
         noExceptionThrown()
     }
+
+    void "测试用户授予角色"() {
+        given:
+        when:
+        def mvcResult = mvc.perform(MockMvcRequestBuilders.put("/users/roles")
+                .cookie(new Cookie('token', token))
+                .header("Accept-Language","zh")
+                .contentType("application/json")
+                .content("""
+{
+    "roleCode":"manager-1000",
+    "userIds":["12345"]
+}
+""")
+        ).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
+        println mvcResult.response.contentAsString
+        then:
+        noExceptionThrown()
+    }
 }

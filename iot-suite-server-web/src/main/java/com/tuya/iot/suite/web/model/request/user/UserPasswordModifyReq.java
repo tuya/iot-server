@@ -11,10 +11,12 @@ import lombok.experimental.FieldDefaults;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserPasswordModifyReq {
-    @ApiModelProperty(value = "用户id", required = true)
-    String uid;
+   /* @ApiModelProperty(value = "用户id", required = true)
+    String uid;*/
+    @ApiModelProperty(value = "用户名", required = true)
+    String user_name;
     @ApiModelProperty(value = "旧密码", required = true)
-    String oldPassword;
+    String current_password;
     @ApiModelProperty(value = "新密码", required = true)
-    String newPassword;
+    String new_password;
 }
