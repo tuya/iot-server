@@ -61,7 +61,7 @@ class GrantAbilitySpec extends BaseSpec {
 
     void "测试回收角色权限"() {
         when:
-        def success = grantAbility.revokePermissionFromRole(spaceId, 'app', 'admin')
+        def success = grantAbility.revokePermissionFromRole(spaceId, '1000', 'admin')
         then:
         success
     }

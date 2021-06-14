@@ -1,6 +1,7 @@
 package com.tuya.iot.suite.service.idaas.impl;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.tuya.iot.suite.ability.idaas.ability.GrantAbility;
 import com.tuya.iot.suite.ability.idaas.ability.IdaasUserAbility;
 import com.tuya.iot.suite.ability.idaas.ability.PermissionAbility;
@@ -9,9 +10,11 @@ import com.tuya.iot.suite.ability.idaas.model.*;
 import com.tuya.iot.suite.core.constant.ErrorCode;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
 import com.tuya.iot.suite.core.model.PageVO;
+import com.tuya.iot.suite.core.util.Todo;
 import com.tuya.iot.suite.service.dto.PermissionNodeDTO;
 import com.tuya.iot.suite.service.dto.RoleCreateReqDTO;
 import com.tuya.iot.suite.service.enums.RoleTypeEnum;
+import com.tuya.iot.suite.service.idaas.GrantService;
 import com.tuya.iot.suite.service.idaas.PermissionTemplateService;
 import com.tuya.iot.suite.service.idaas.RoleService;
 import lombok.Setter;
@@ -61,8 +64,8 @@ public class RoleServiceImpl implements RoleService {
         }
         // 2. grant permissions from template
         // if grant failure, need not rollback
-        return grantAbility.grantPermissionsToRole(RoleGrantPermissionsReq.builder()
-                .spaceId(spaceId.toString())
+       return grantAbility.grantPermissionsToRole(RoleGrantPermissionsReq.builder()
+                .spaceId(spaceId)
                 .roleCode(req.getRoleCode())
                 .permissionCodes(perms.stream().map(it ->
                         it.getPermissionCode()).collect(Collectors.toList())
@@ -156,10 +159,10 @@ public class RoleServiceImpl implements RoleService {
         // 0. check permission
         checkRoleWritePermission(spaceId, operatorUid, roleCode);
 
-        List<String> existPerms = permissionAbility.queryPermissionsByRoleCodes(spaceId, PermissionQueryByRolesReq.builder()
+        Set<String> existPermSet = permissionAbility.queryPermissionsByRoleCodes(spaceId, PermissionQueryByRolesReq.builder()
                 .roleCodeList(Lists.newArrayList(roleCode))
                 .build()).stream().flatMap(it -> it.getPermissionList().stream()).map(it -> it.getPermissionCode())
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
         RoleTypeEnum roleType = RoleTypeEnum.fromRoleCode(roleCode);
 
         // 1. get permissions from template
@@ -167,32 +170,31 @@ public class RoleServiceImpl implements RoleService {
                 .stream().map(it -> it.getPermissionCode())
                 .collect(Collectors.toList());
 
-        List<String> permsToAdd = new ArrayList<>(templatePerms);
-        permsToAdd.removeAll(existPerms);
+        Set<String> templatePermSet = Sets.newHashSet(templatePerms);
 
-        List<String> permsToDel = new ArrayList<>(existPerms);
-        permsToDel.removeAll(templatePerms);
-        // 2. add permissions if need
-        if (!permsToAdd.isEmpty()) {
-            boolean addRes = grantAbility.grantPermissionsToRole(RoleGrantPermissionsReq.builder()
-                    .spaceId(spaceId)
-                    .permissionCodes(permsToAdd)
-                    .roleCode(roleCode)
-                    .build());
-            if (!addRes) {
-                log.info("grant permissions to role failed");
-                return false;
-            }
-        }
-        // 3. delete permissions if need
-        if (!permsToDel.isEmpty()) {
+        List<String> permsToRevoke = Lists.newArrayList(Sets.difference(existPermSet,templatePermSet));
+        List<String> permsToGrant = Lists.newArrayList(Sets.difference(templatePermSet,existPermSet));
+        // 2. delete permissions if need
+        if (!permsToRevoke.isEmpty()) {
             boolean delRes = grantAbility.revokePermissionsFromRole(RoleRevokePermissionsReq.builder()
                     .spaceId(spaceId)
-                    .permissionCodes(permsToDel)
+                    .permissionCodes(permsToRevoke)
                     .roleCode(roleCode)
                     .build());
             if (!delRes) {
                 log.info("revoke permissions from role failed");
+                return false;
+            }
+        }
+        // 3. add permissions if need
+        if (!permsToGrant.isEmpty()) {
+            boolean addRes = grantAbility.grantPermissionsToRole(RoleGrantPermissionsReq.builder()
+                    .spaceId(spaceId)
+                    .permissionCodes(permsToGrant)
+                    .roleCode(roleCode)
+                    .build());
+            if (!addRes) {
+                log.info("grant permissions to role failed");
                 return false;
             }
         }
