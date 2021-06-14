@@ -12,7 +12,6 @@ import com.tuya.iot.suite.core.constant.ErrorCode;
 import com.tuya.iot.suite.core.constant.NoticeType;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
 import com.tuya.iot.suite.core.model.PageVO;
-import com.tuya.iot.suite.ability.user.model.UserBaseInfo;
 import com.tuya.iot.suite.service.asset.AssetService;
 import com.tuya.iot.suite.service.enums.RoleTypeEnum;
 import com.tuya.iot.suite.service.idaas.RoleService;
@@ -190,7 +189,7 @@ public class UserServiceImpl implements UserService {
             throw new ServiceLogicException(USER_CREATE_FAIL);
         }
         //授权资产
-        RoleTypeEnum roleTypeEnum = roleService.userOperateRole(spaceId, user.getUser_id(),roleCodes);
+        RoleTypeEnum roleTypeEnum = roleService.userOperateRole(spaceId, user.getUser_id(), roleCodes);
         if (RoleTypeEnum.normal.lt(roleTypeEnum)) {
             auth = auth && assetService.grantAllAsset(user.getUser_id());
         }
@@ -213,8 +212,8 @@ public class UserServiceImpl implements UserService {
                 throw new ServiceLogicException(ErrorCode.NO_DATA_PERMISSION);
             }
         }
-        roleCodes  = roleService.checkAndRemoveOldRole(spaceId, uid, roleCodes, false);
-        if (roleCodes.size()>0) {
+        roleCodes = roleService.checkAndRemoveOldRole(spaceId, uid, roleCodes, true);
+        if (roleCodes.size() > 0) {
             Boolean auth = grantAbility.setRolesToUser(UserGrantRolesReq.builder()
                     .spaceId(spaceId)
                     .roleCodeList(roleCodes)

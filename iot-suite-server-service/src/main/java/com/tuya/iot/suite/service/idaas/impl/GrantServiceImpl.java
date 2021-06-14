@@ -4,20 +4,13 @@ import com.google.common.collect.Lists;
 import com.tuya.iot.suite.ability.idaas.ability.GrantAbility;
 import com.tuya.iot.suite.ability.idaas.ability.PermissionAbility;
 import com.tuya.iot.suite.ability.idaas.ability.RoleAbility;
-import com.tuya.iot.suite.ability.idaas.model.IdaasPermission;
-import com.tuya.iot.suite.ability.idaas.model.IdaasRole;
-import com.tuya.iot.suite.ability.idaas.model.RoleGrantPermissionReq;
-import com.tuya.iot.suite.ability.idaas.model.RoleGrantPermissionsReq;
-import com.tuya.iot.suite.ability.idaas.model.RoleRevokePermissionsReq;
-import com.tuya.iot.suite.ability.idaas.model.UserGrantRoleReq;
-import com.tuya.iot.suite.ability.idaas.model.UserGrantRolesReq;
-import com.tuya.iot.suite.ability.idaas.model.UserRevokeRolesReq;
+import com.tuya.iot.suite.ability.idaas.model.*;
 import com.tuya.iot.suite.core.constant.ErrorCode;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
 import com.tuya.iot.suite.core.util.Assertion;
+import com.tuya.iot.suite.service.enums.RoleTypeEnum;
 import com.tuya.iot.suite.service.idaas.GrantService;
 import com.tuya.iot.suite.service.idaas.PermissionTemplateService;
-import com.tuya.iot.suite.service.enums.RoleTypeEnum;
 import com.tuya.iot.suite.service.idaas.RoleService;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -28,7 +21,6 @@ import org.springframework.util.Assert;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -163,7 +155,7 @@ public class GrantServiceImpl implements GrantService {
     @Override
     public Boolean setRoleToUsers(String spaceId, String operatorUid, String roleCode, List<String> uidList) {
         // 0. 不能把系统管理员角色设置给用户
-        Assertion.isTrue(!RoleTypeEnum.fromRoleCode(roleCode).isAdmin(), "can not set 'admin' role to any users!");
+        Assertion.isTrue(RoleTypeEnum.fromRoleCode(roleCode).isAdmin(), "can not set 'admin' role to any users!");
         // 1. 操作者有更高级的角色（或相同的角色），才可以把这个角色设置给用户
         RoleTypeEnum operatorRoleType = roleService.userOperateRole(spaceId, operatorUid);
         if (operatorRoleType.lt(RoleTypeEnum.fromRoleCode(roleCode))) {
@@ -171,7 +163,7 @@ public class GrantServiceImpl implements GrantService {
         }
         for (int i = uidList.size() - 1; i >= 0; i--) {
             String uid = uidList.get(i);
-            List<String> newRoles = roleService.checkAndRemoveOldRole(spaceId, uid, Arrays.asList(roleCode), false);
+            List<String> newRoles = roleService.checkAndRemoveOldRole(spaceId, uid, Arrays.asList(roleCode), true);
             // 3. 逐个授权
             if (newRoles.size() > 0) {
                 boolean success;
