@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @author mickey
@@ -13,17 +14,17 @@ import java.io.Serializable;
 @Getter
 @Setter
 @ToString
-public class AssetAuthToUser implements Serializable {
+public class AssetAuthBatchToUser implements Serializable {
 
     private String uid;
 
-    private String asset_id;
+    private String asset_ids;
 
     private Boolean authorized_children;
 
-    public AssetAuthToUser(String uid, String asset_id, Boolean authorized_children) {
+    public AssetAuthBatchToUser(String uid, String asset_ids, Boolean authorized_children) {
         this.uid = uid;
-        this.asset_id = asset_id;
+        this.asset_ids = asset_ids;
         this.authorized_children = authorized_children;
     }
 }
