@@ -202,6 +202,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public List<String> checkAndRemoveOldRole(String spaceId, String uid, List<String> roleCodes, boolean removeOld) {
         List<IdaasRole> userRoles = roleAbility.queryRolesByUser(spaceId, uid);
+        //code->name
         Map<String, String> roleMap = new HashMap<>();
         if (!CollectionUtils.isEmpty(userRoles)) {
             for (IdaasRole userRole : userRoles) {
@@ -226,7 +227,7 @@ public class RoleServiceImpl implements RoleService {
         }
         if (removeOld) {
             //去除原来的角色
-            roleMap.values().stream().forEach(e -> {
+            roleMap.keySet().stream().forEach(e -> {
                 Boolean removeRole = grantAbility.revokeRoleFromUser(spaceId, e, uid);
                 if (removeRole) {
                     log.info("移除了uid={} 的角色roleCode={}", uid, e);
