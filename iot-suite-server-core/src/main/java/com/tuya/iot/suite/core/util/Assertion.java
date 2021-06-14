@@ -14,7 +14,7 @@ public class Assertion {
     }
 
     public static void isTrue(boolean b, ErrorCode code, String message) {
-        if (b) {
+        if (!b) {
             throw new ServiceLogicException(code, message);
         }
     }
