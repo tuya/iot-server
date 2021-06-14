@@ -37,6 +37,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * 将spring.profiles.active=prod改为spring.profiles.active=local
  * 启动项目
  */
+
 @SpringBootApplication(scanBasePackages = "com.tuya.iot.suite")
 @ConnectorScan(basePackages = {"com.tuya.iot.suite.ability.*.connector"})
 public class IotSuiteServerApplication {

@@ -8,6 +8,7 @@ import com.tuya.iot.suite.service.asset.AssetService;
 import com.tuya.iot.suite.service.dto.AssetConvertor;
 import com.tuya.iot.suite.service.dto.AssetVO;
 import com.tuya.iot.suite.service.dto.DeviceDTO;
+import com.tuya.iot.suite.web.config.ProjectProperties;
 import com.tuya.iot.suite.web.model.convert.DeviceInfoConvert;
 import com.tuya.iot.suite.web.model.criteria.AssetCriteria;
 import com.tuya.iot.suite.web.model.request.asset.AssetAuths;
@@ -36,12 +37,14 @@ public class AssetController {
 
     @Resource
     private AssetService assetService;
+    @Resource
+    private ProjectProperties projectProperties;
 
     @ApiOperation(value = "添加资产")
     @PostMapping
     @RequiresPermissions("1002")
     public Response addAsset(@RequestBody AssetCriteria criteria) {
-        return assetService.addAsset(criteria.getAsset_name(), criteria.getParent_asset_id(), ContextUtil.getUserId());
+        return assetService.addAsset(projectProperties.getPermissionSpaceId(),criteria.getAsset_name(), criteria.getParent_asset_id(), ContextUtil.getUserId());
     }
 
     @ApiOperation(value = "更新资产信息")

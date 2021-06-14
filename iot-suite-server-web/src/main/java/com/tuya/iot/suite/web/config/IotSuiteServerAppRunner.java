@@ -247,6 +247,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
             }
         }
         adminUserId = userId;
+        projectProperties.setAdminUserId(adminUserId);
         //用户已存在？不存在则创建
         IdaasUser user = idaasUserAbility.getUserByUid(spaceId, adminUserId);
         if (user == null) {

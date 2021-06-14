@@ -25,6 +25,7 @@ public class ProjectProperties {
     String code;
     String name;
     String adminUserName;
+    String adminUserId;
     String adminUserPwd;
     String adminUserCountryCode;
 }

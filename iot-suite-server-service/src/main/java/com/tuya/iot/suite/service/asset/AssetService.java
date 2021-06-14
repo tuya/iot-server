@@ -23,7 +23,7 @@ public interface AssetService {
      * @param parentAssetId
      * @return
      */
-    Response addAsset(String assetName, String parentAssetId, String userId);
+    Response addAsset(String spaceId,String assetName, String parentAssetId, String userId);
 
     /**
      * 更新资产
@@ -77,4 +77,6 @@ public interface AssetService {
     Boolean authAssetToUser(String userId, List<String> assetIds);
 
     Boolean grantAllAsset(String adminUserId);
+
+    Boolean grantAllAssetToAdmin(String spaceId);
 }
