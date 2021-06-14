@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -286,6 +287,19 @@ public class UserServiceImpl implements UserService {
         }).collect(Collectors.toList()));
         result.setTotal(pageResult.getTotalCount());
         return result;
+    }
+
+    @Override
+    public List<IdaasUser> queryAdmins(String spaceId) {
+        IdaasPageResult<IdaasUser> pageResult = idaasUserAbility.queryUserPage(spaceId, IdaasUserPageReq.builder()
+                .roleCode(RoleTypeEnum.admin.name())
+                .pageNum(1)
+                .pageSize(100)
+                .build());
+        if (pageResult != null && pageResult.getTotalCount() > 0) {
+            return pageResult.getResults();
+        }
+        return new ArrayList<>();
     }
 }
 

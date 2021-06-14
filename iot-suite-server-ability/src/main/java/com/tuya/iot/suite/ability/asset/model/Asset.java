@@ -1,6 +1,8 @@
 package com.tuya.iot.suite.ability.asset.model;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.io.Serializable;
 
@@ -10,7 +12,9 @@ import java.io.Serializable;
  * @author Chyern
  * @date 2021/3/9
  */
-@Data
+@Getter
+@Setter
+@ToString
 public class Asset implements Serializable {
 
     private static final long serialVersionUID = 3658227130368171924L;

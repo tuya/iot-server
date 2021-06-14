@@ -7,6 +7,7 @@ import com.tuya.connector.api.exceptions.ConnectorException;
 import com.tuya.connector.open.api.model.PageResult;
 import com.tuya.iot.suite.ability.asset.ability.AssetAbility;
 import com.tuya.iot.suite.ability.asset.model.*;
+import com.tuya.iot.suite.ability.idaas.model.IdaasUser;
 import com.tuya.iot.suite.core.constant.Response;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
 import com.tuya.iot.suite.core.model.PageDataVO;
@@ -16,6 +17,7 @@ import com.tuya.iot.suite.service.device.DeviceService;
 import com.tuya.iot.suite.service.dto.AssetConvertor;
 import com.tuya.iot.suite.service.dto.AssetDTO;
 import com.tuya.iot.suite.service.dto.DeviceDTO;
+import com.tuya.iot.suite.service.user.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pulsar.shade.org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -60,9 +62,11 @@ public class AssetServiceImpl implements AssetService {
 
     @Resource
     private DeviceService deviceService;
+    @Resource
+    private UserService userService;
 
     @Override
-    public Response addAsset(String assetName, String parentAssetId, String userId) {
+    public Response addAsset(String spaceId, String assetName, String parentAssetId, String userId) {
         //Don't need check asset authorization if the parentAssetId is blank
         if (!StringUtils.isEmpty(parentAssetId)) {
             checkAssetAuthOfUser(parentAssetId, userId);
@@ -71,7 +75,7 @@ public class AssetServiceImpl implements AssetService {
         request.setName(assetName);
         request.setParent_asset_id(parentAssetId);
         String assetId = assetAbility.addAsset(request);
-        authorizedAssetWithoutToChildren(assetId, userId);
+        authorizedAssetWithoutToChildren(spaceId, assetId, userId);
         // addAssetToCache(assetId, request, false);
         return new Response(assetId);
     }
@@ -83,7 +87,7 @@ public class AssetServiceImpl implements AssetService {
      * @param assetId
      * @param userId
      */
-    private void authorizedAssetWithoutToChildren(String assetId, String userId) {
+    private void authorizedAssetWithoutToChildren(String spaceId, String assetId, String userId) {
         log.info("开始资产[{}]授权给用户[{}]", assetId, userId);
         AssetAuthorizationRequest assetAuthorizationRequest = new AssetAuthorizationRequest(userId, assetId, false);
         Boolean result = assetAbility.authorized(assetAuthorizationRequest);
@@ -92,6 +96,31 @@ public class AssetServiceImpl implements AssetService {
         } else {
             log.info("资产[{}]授权给用户[{}]成功", assetId, userId);
         }
+        //给系统管理员授权
+        List<IdaasUser> idaasUsers = userService.queryAdmins(spaceId);
+        if (!CollectionUtils.isEmpty(idaasUsers)) {
+            for (IdaasUser idaasUser : idaasUsers) {
+                assetAuthorizationRequest.setUid(idaasUser.getUid());
+                result = result && assetAbility.authorized(assetAuthorizationRequest);
+            }
+        }
+    }
+
+    @Override
+    public Boolean grantAllAssetToAdmin(String spaceId) {
+        boolean result = true;
+        //给系统管理员授权
+        List<IdaasUser> idaasUsers = userService.queryAdmins(spaceId);
+        if (!CollectionUtils.isEmpty(idaasUsers)) {
+            List<Asset> assetList = getChildAssetsBy("-1");
+            if (!CollectionUtils.isEmpty(assetList)) {
+                List<String> assetIds = assetList.stream().map(e -> e.getAsset_id()).collect(Collectors.toList());
+                for (IdaasUser idaasUser : idaasUsers) {
+                    result = result && assetAbility.batchAssetsAuthorizedToUser(idaasUser.getUid(), new AssetAuthBatchToUser(idaasUser.getUid(), String.join(",", assetIds), true));
+                }
+            }
+        }
+        return result;
     }
 
     @Override
@@ -798,6 +827,7 @@ public class AssetServiceImpl implements AssetService {
         }
         return true;
     }
+
 
     private List<AssetDTO> queryAllAssetTree(List<AssetDTO> tree) {
         if (tree == null) {
