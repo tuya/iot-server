@@ -15,7 +15,6 @@ import com.tuya.iot.suite.service.idaas.PermissionService;
 import com.tuya.iot.suite.service.user.UserService;
 import com.tuya.iot.suite.service.user.model.ResetPasswordBo;
 import com.tuya.iot.suite.web.config.ProjectProperties;
-import com.tuya.iot.suite.web.i18n.I18nMessage;
 import com.tuya.iot.suite.web.model.ResetPasswordReq;
 import com.tuya.iot.suite.web.model.request.user.BatchUserGrantRoleReq;
 import com.tuya.iot.suite.web.model.request.user.UserAddReq;
@@ -37,7 +36,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
@@ -74,7 +72,7 @@ public class UserController {
     @PutMapping(value = "/user/password")
     @RequiresPermissions("4005")
     public Response<Boolean> modifyLoginPassword(@RequestBody UserPasswordModifyReq req) {
-        Boolean modifyLoginPassword = userService.modifyLoginPassword(req.getUid(), req.getOldPassword(), req.getNewPassword());
+        Boolean modifyLoginPassword = userService.modifyLoginPassword(ContextUtil.getUserId(), req.getCurrent_password(), req.getNew_password());
         return modifyLoginPassword ? Response.buildSuccess(true) :
                 ResponseI18n.buildFailure(USER_NOT_EXIST);
     }
