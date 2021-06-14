@@ -55,7 +55,7 @@ class GrantAbilitySpec extends BaseSpec {
         grantAbility.setPermissionsToRole(RoleGrantPermissionsReq.builder()
                 .spaceId(spaceId)
                 .roleCode('admin')
-                .permissionCodes(['app'])
+                .permissionCodes(['app','1000'])
                 .build())
     }
 

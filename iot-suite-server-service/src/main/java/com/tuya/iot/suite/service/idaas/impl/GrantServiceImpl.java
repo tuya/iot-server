@@ -1,6 +1,7 @@
 package com.tuya.iot.suite.service.idaas.impl;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.tuya.iot.suite.ability.idaas.ability.GrantAbility;
 import com.tuya.iot.suite.ability.idaas.ability.PermissionAbility;
 import com.tuya.iot.suite.ability.idaas.ability.RoleAbility;
@@ -87,7 +88,36 @@ public class GrantServiceImpl implements GrantService {
     @Override
     public Boolean setPermissionsToRole(String operatorUid, RoleGrantPermissionsReq req) {
         checkForModifyPermissionToRole(req.getSpaceId(), operatorUid, req.getPermissionCodes(), req.getRoleCode());
-        return grantAbility.grantPermissionsToRole(req);
+        Set<String> existsPerms = permissionAbility.queryPermissionsByRoleCodes(req.getSpaceId(),
+                PermissionQueryByRolesReq.builder()
+                .roleCodeList(Lists.newArrayList(req.getRoleCode())).build()
+        )
+                .stream()
+                .flatMap(it -> it.getPermissionList().stream())
+                .map(it -> it.getPermissionCode())
+                .collect(Collectors.toSet());
+        Set<String> permsToSet = req.getPermissionCodes().stream().collect(Collectors.toSet());
+        Set<String> permsToGrant = Sets.difference(permsToSet,existsPerms);
+        Set<String> permsToRevoke = Sets.difference(existsPerms,permsToSet);
+        boolean success = true;
+        if(!permsToRevoke.isEmpty()){
+            success &= grantAbility.revokePermissionsFromRole(RoleRevokePermissionsReq.builder()
+                    .spaceId(req.getSpaceId())
+                    .roleCode(req.getRoleCode())
+                    .permissionCodes(permsToRevoke.stream().collect(Collectors.toList()))
+                    .build());
+        }
+        if(!permsToGrant.isEmpty()){
+            success &= grantAbility.grantPermissionsToRole(RoleGrantPermissionsReq.builder()
+                    .spaceId(req.getSpaceId())
+                    .roleCode(req.getRoleCode())
+                    .permissionCodes(permsToGrant.stream().collect(Collectors.toList()))
+                    .build());
+        }
+
+        return success;
+        //TODO idaas 开放了这个api再改成下面的方式
+        //return grantAbility.setPermissionsToRole(req);
     }
 
     @Override

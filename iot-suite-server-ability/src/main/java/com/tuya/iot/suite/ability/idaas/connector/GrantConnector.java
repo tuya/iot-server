@@ -28,7 +28,10 @@ public interface GrantConnector extends GrantAbility {
     @Override
     Boolean grantPermissionsToRole(@Body RoleGrantPermissionsReq request);
 
-    @POST("/v1.0/iot-03/idaas/role-batch-permission")
+    /**
+     * 暂未提供
+     * */
+    @PUT("/v1.0/iot-03/idaas/role-batch-permission")
     @Override
     Boolean setPermissionsToRole(@Body RoleGrantPermissionsReq request);
 

@@ -150,8 +150,8 @@ public class RoleController {
     @RequiresPermissions("3005")
     public Response<Boolean> rolePermissions(@RequestBody RolePermissionReq req) {
         log.info("角色授权入参:{}",req);
-        Boolean success = grantService.grantPermissionsToRole(ContextUtil.getUserId(), RoleGrantPermissionsReq.builder()
-                .spaceId(projectProperties.getPermissionSpaceId().toString())
+        Boolean success = grantService.setPermissionsToRole(ContextUtil.getUserId(), RoleGrantPermissionsReq.builder()
+                .spaceId(projectProperties.getPermissionSpaceId())
                 .roleCode(req.getRoleCode())
                 .permissionCodes(req.getPermissionCodes())
                 .build());
