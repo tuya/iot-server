@@ -8,15 +8,14 @@ import com.tuya.connector.open.api.model.PageResult;
 import com.tuya.iot.suite.ability.asset.ability.AssetAbility;
 import com.tuya.iot.suite.ability.asset.model.*;
 import com.tuya.iot.suite.core.constant.Response;
-import com.tuya.iot.suite.core.constant.RoleType;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
+import com.tuya.iot.suite.core.model.PageDataVO;
 import com.tuya.iot.suite.core.util.SimpleConvertUtil;
 import com.tuya.iot.suite.service.asset.AssetService;
 import com.tuya.iot.suite.service.device.DeviceService;
 import com.tuya.iot.suite.service.dto.AssetConvertor;
 import com.tuya.iot.suite.service.dto.AssetDTO;
 import com.tuya.iot.suite.service.dto.DeviceDTO;
-import com.tuya.iot.suite.core.model.PageDataVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pulsar.shade.org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -754,10 +753,40 @@ public class AssetServiceImpl implements AssetService {
 
     @Override
     public Boolean authAssetToUser(String userId, List<String> assetIds) {
-        if (CollectionUtils.isEmpty(assetIds)) {
-            return false;
+        List<String> authIds = listAuthorizedAssetIds(userId);
+        Map<String, String> authMap = new HashMap<>();
+        Map<String, String> grantMap = new HashMap<>();
+        if (!CollectionUtils.isEmpty(authIds)) {
+            authMap = authIds.stream().collect(Collectors.toMap(e -> e, e -> e));
         }
-        return assetAbility.batchAssetsAuthorizedToUser(userId, new AssetAuthToUser(assetIds, false));
+        if (!CollectionUtils.isEmpty(assetIds)) {
+            grantMap = assetIds.stream().collect(Collectors.toMap(e -> e, e -> e));
+        }
+        List<String> grantIds = new ArrayList<>();
+        List<String> cancelIds = new ArrayList<>();
+        //取出本次被取消的权限
+        for (String assetId : authMap.keySet()) {
+            if (!grantMap.containsKey(assetId)) {
+                cancelIds.add(assetId);
+            }
+        }
+        //取出已经被授权的，不重复授权
+        for (String assetId : grantMap.keySet()) {
+            if (!authMap.containsKey(assetId)) {
+                grantIds.add(assetId);
+            }
+        }
+
+        boolean opres = true;
+        if (!CollectionUtils.isEmpty(cancelIds)) {
+            opres = opres && assetAbility.batchAssetsUnAuthorizedToUser(userId, new AssetAuthBatchToUser(userId, String.join(",", cancelIds), false));
+        }
+        if (!CollectionUtils.isEmpty(grantIds)) {
+            opres = opres && assetAbility.batchAssetsAuthorizedToUser(userId, new AssetAuthBatchToUser(userId, String.join(",", grantIds), false));
+        }
+
+
+        return opres;
     }
 
     @Override
@@ -765,7 +794,7 @@ public class AssetServiceImpl implements AssetService {
         List<Asset> assetList = getChildAssetsBy("-1");
         if (!CollectionUtils.isEmpty(assetList)) {
             List<String> assetIds = assetList.stream().map(e -> e.getAsset_id()).collect(Collectors.toList());
-            return assetAbility.batchAssetsAuthorizedToUser(adminUserId, new AssetAuthToUser(assetIds, true));
+            return assetAbility.batchAssetsAuthorizedToUser(adminUserId, new AssetAuthBatchToUser(adminUserId, String.join(",", assetIds), true));
         }
         return true;
     }

@@ -69,10 +69,24 @@ public interface AssetAbility {
     /**
      * 批量给资产授权
      * @param userId
+     * @param assetAuthBatchToUser
+     * @return
+     */
+    Boolean batchAssetsAuthorizedToUser(String userId, AssetAuthBatchToUser assetAuthBatchToUser);
+    /**
+     * 批量取消给资产授权
+     * @param userId
+     * @param assetAuthBatchToUser
+     * @return
+     */
+    Boolean batchAssetsUnAuthorizedToUser(String userId, AssetAuthBatchToUser assetAuthBatchToUser);
+    /**
+     * 取消给资产授权
+     * @param userId
      * @param assetAuthToUser
      * @return
      */
-    Boolean batchAssetsAuthorizedToUser(String userId, AssetAuthToUser assetAuthToUser);
+    Boolean assetsUnAuthorizedToUser(String userId, AssetAuthToUser assetAuthToUser);
 
     PageResultWithTotal<AuthorizedAsset> pageListAuthorizedAssets(String uid, int pageNo, int pageSize);
 }
