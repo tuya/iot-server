@@ -83,7 +83,7 @@ public class RoleController {
     public Response<PageVO<RoleVO>> listRoles(Integer pageNo, Integer pageSize, String roleCode, String roleName) {
         PageVO<IdaasRole> pageVO = roleService.queryRolesPagination(projectProperties.getPermissionSpaceId(),
                 RolesPaginationQueryReq.builder()
-                        .pageNum(pageNo)
+                        .pageNumber(pageNo)
                         .pageSize(pageSize)
                         .roleCode(roleCode)
                         .roleName(roleName)

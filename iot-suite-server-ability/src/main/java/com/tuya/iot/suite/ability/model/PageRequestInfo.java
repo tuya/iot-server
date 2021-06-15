@@ -26,7 +26,7 @@ public class PageRequestInfo implements Serializable {
     /**
      * Integer	当前页码	是
      */
-    @SerializedName("pageNum")
-    private Integer pageNum ;
+    @SerializedName("pageNumber")
+    private Integer pageNumber;
 
 }
