@@ -74,6 +74,13 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
      */
     @Override
     public void run(ApplicationArguments args) throws Exception {
+        try {
+            run0(args);
+        }catch (Exception e){
+            log.error("IotSuiteServerAppRunner error!",e);
+        }
+    }
+    private void run0(ApplicationArguments args) throws Exception {
         log.info("permission-auto-init==>{}", projectProperties.permissionAutoInit);
         if (!StringUtils.isEmpty(projectProperties.getAdminUserName())) {
             adminUserName = projectProperties.getAdminUserName();
