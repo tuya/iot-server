@@ -9,7 +9,7 @@ public interface Todo {
     static <T> T todo(){
         throw new RuntimeException("this method has not implemented!");
     }
-    static <T> T todo(String function){
-        throw new RuntimeException(function+" has not implemented!");
+    static <T> T todo(String desc){
+        throw new RuntimeException(desc);
     }
 }

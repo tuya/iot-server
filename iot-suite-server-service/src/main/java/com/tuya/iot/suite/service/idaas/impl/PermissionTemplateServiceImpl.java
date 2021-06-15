@@ -1,10 +1,8 @@
 package com.tuya.iot.suite.service.idaas.impl;
 
-import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.tuya.iot.suite.core.util.LazyRef;
 import com.tuya.iot.suite.core.util.Tuple2;
 import com.tuya.iot.suite.service.dto.PermissionNodeDTO;
 import com.tuya.iot.suite.service.idaas.PermissionTemplateService;
@@ -12,16 +10,13 @@ import com.tuya.iot.suite.service.enums.RoleTypeEnum;
 import com.tuya.iot.suite.service.util.PermTemplateUtil;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
