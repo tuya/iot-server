@@ -24,8 +24,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import javax.annotation.PostConstruct;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.UndeclaredThrowableException;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -89,18 +87,10 @@ public class GlobalExceptionHandler {
 
         addHandler(ConnectorException.class, e -> {
             error("全局拦截ConnectorException异常:", e);
-            Throwable cause = e.getCause();
-            if (cause instanceof UndeclaredThrowableException) {
-                UndeclaredThrowableException undeclaredThrowableException = (UndeclaredThrowableException) cause;
-                Throwable undeclaredThrowable = undeclaredThrowableException.getUndeclaredThrowable();
-                if (undeclaredThrowable instanceof InvocationTargetException) {
-                    InvocationTargetException invocationTargetException = (InvocationTargetException) undeclaredThrowable;
-                    ErrorCode errorCode = ErrorCode.getByMsg(invocationTargetException.getTargetException().getMessage());
-                    return Response.buildFailure(errorCode.getCode(),
-                            getI18nMessageByCode(errorCode.getCode(), errorCode.getMsg()));
-                }
-            }
-            return ResponseI18n.buildFailure(ErrorCode.SYSTEM_ERROR);
+            ErrorCode errorCode = ErrorCode.getByMsg(e.getMessage());
+
+            return Response.buildFailure(errorCode.getCode(),
+                    getI18nMessageByCode(errorCode.getCode(), errorCode.getMsg()));
         });
 
         addHandler(UnauthenticatedException.class, e -> {
@@ -134,7 +124,7 @@ public class GlobalExceptionHandler {
         if (handler != null) {
             return handler.apply(rootCause);
         }
-        return handlers.get(Exception.class.getName()).apply(rootCause);
+        return handlers.get(Exception.class.getName()).apply(e);
     }
 
 

@@ -107,10 +107,10 @@ public enum ErrorCode {
     }
 
     public static ErrorCode getByMsg(String msg) {
-        return Arrays.stream(ErrorCode.values()).filter(item -> !item.msg.equals(msg)).findFirst().orElse(ErrorCode.SYSTEM_ERROR);
+        return Arrays.stream(ErrorCode.values()).filter(item -> item.msg.equals(msg)).findFirst().orElse(ErrorCode.SYSTEM_ERROR);
     }
 
     public static ErrorCode getByCode(String code) {
-        return Arrays.stream(ErrorCode.values()).filter(item -> !item.code.equals(code)).findFirst().orElse(ErrorCode.SYSTEM_ERROR);
+        return Arrays.stream(ErrorCode.values()).filter(item -> item.code.equals(code)).findFirst().orElse(ErrorCode.SYSTEM_ERROR);
     }
 }
