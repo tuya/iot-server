@@ -1,5 +1,7 @@
 package com.tuya.iot.suite.web.config;
 
+import com.google.common.base.Throwables;
+import com.google.common.collect.Maps;
 import com.tuya.connector.api.error.ErrorInfo;
 import com.tuya.connector.api.exceptions.ConnectorException;
 import com.tuya.connector.api.exceptions.ConnectorResultException;
@@ -21,8 +23,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
+import javax.annotation.PostConstruct;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.UndeclaredThrowableException;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 /**
@@ -40,45 +45,115 @@ public class GlobalExceptionHandler {
     @Autowired
     private I18nMessage i18NMessage;
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseBody
-    public Response MethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        info( e, "全局拦截MethodArgumentNotValidException异常:{}", e.getMessage());
-        return ResponseI18n.buildFailure(ErrorCode.PARAM_ERROR);
+    private Map<String, Function<Throwable, Response>> handlers = Maps.newHashMap();
+
+    private <E extends Throwable> void addHandler(String exceptionClassName, Function<E, Response> handler) {
+        handlers.put(exceptionClassName, (Function<Throwable, Response>) handler);
     }
 
-    @ExceptionHandler(NoHandlerFoundException.class)
-    @ResponseBody
-    public Response handleException(NoHandlerFoundException e) {
-        info( e, "全局拦截NoHandlerFoundException异常:{}", e.getMessage());
-        return ResponseI18n.buildFailure(ErrorCode.NOT_FOUND);
+    private <E extends Throwable> void addHandler(Class<E> exceptionClass, Function<E, Response> handler) {
+        addHandler(exceptionClass.getName(), handler);
     }
 
-    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    @ResponseBody
-    public Response handleException(HttpRequestMethodNotSupportedException e) {
-        info( e, "全局拦截HttpRequestMethodNotSupportedException异常:{}", e.getMessage());
-        return ResponseI18n.buildFailure(ErrorCode.NOT_FOUND);
+    @PostConstruct
+    public void init() {
+        addHandler(MethodArgumentNotValidException.class, e -> {
+            info(e, "全局拦截MethodArgumentNotValidException异常:{}", e.getMessage());
+            return ResponseI18n.buildFailure(ErrorCode.PARAM_ERROR);
+        });
+
+        addHandler(NoHandlerFoundException.class, e -> {
+            info(e, "全局拦截NoHandlerFoundException异常:{}", e.getMessage());
+            return ResponseI18n.buildFailure(ErrorCode.NOT_FOUND);
+        });
+
+        addHandler(HttpRequestMethodNotSupportedException.class, e -> {
+            info(e, "全局拦截HttpRequestMethodNotSupportedException异常:{}", e.getMessage());
+            return ResponseI18n.buildFailure(ErrorCode.NOT_FOUND);
+        });
+
+        addHandler(ServiceLogicException.class, e -> {
+            info(e, "全局拦截ServiceLogicException提示: code={} , message={} ", e.getErrorCode().getCode(), e.getErrorCode().getMsg());
+            String outMsg = StringUtils.isEmpty(e.getOutMsg()) ? "" : "[" + e.getOutMsg() + "]";
+            return Response
+                    .buildFailure(e.getErrorCode().getCode(),
+                            getI18nMessageByCode(e.getErrorCode().getCode(), e.getErrorCode().getMsg()) + outMsg);
+        });
+
+        addHandler(ConnectorResultException.class, e -> {
+            error("全局拦截ConnectorResultException异常:", e);
+            ErrorInfo errorInfo = e.getErrorInfo();
+            String errMsg = fixErrMsgIfNeed(errorInfo.getErrorMsg());
+            return Response.buildFailure(errorInfo.getErrorCode(), getI18nMessageByCode(errorInfo.getErrorCode(), errMsg));
+        });
+
+        addHandler(ConnectorException.class, e -> {
+            error("全局拦截ConnectorException异常:", e);
+            Throwable cause = e.getCause();
+            if (cause instanceof UndeclaredThrowableException) {
+                UndeclaredThrowableException undeclaredThrowableException = (UndeclaredThrowableException) cause;
+                Throwable undeclaredThrowable = undeclaredThrowableException.getUndeclaredThrowable();
+                if (undeclaredThrowable instanceof InvocationTargetException) {
+                    InvocationTargetException invocationTargetException = (InvocationTargetException) undeclaredThrowable;
+                    ErrorCode errorCode = ErrorCode.getByMsg(invocationTargetException.getTargetException().getMessage());
+                    return Response.buildFailure(errorCode.getCode(),
+                            getI18nMessageByCode(errorCode.getCode(), errorCode.getMsg()));
+                }
+            }
+            return ResponseI18n.buildFailure(ErrorCode.SYSTEM_ERROR);
+        });
+
+        addHandler(UnauthenticatedException.class, e -> {
+            info(e, "全局拦截UnauthenticatedException异常:{}", e.getMessage());
+            return ResponseI18n.buildFailure(ErrorCode.NO_LOGIN);
+        });
+
+        addHandler(UnauthorizedException.class, e -> {
+            info(e, "全局拦截UnauthorizedException异常:{}", e.getMessage());
+            return ResponseI18n.buildFailure(ErrorCode.USER_NOT_AUTH);
+        });
+
+        addHandler(Exception.class, e -> {
+            error("全局拦截Exception异常:", e);
+            return ResponseI18n.buildFailure(ErrorCode.SYSTEM_ERROR);
+        });
+
+        addHandler(Throwable.class, e -> {
+            error("全局拦截Exception异常:", e);
+            return ResponseI18n.buildFailure(ErrorCode.SYSTEM_ERROR);
+        });
     }
 
-    @ExceptionHandler(ServiceLogicException.class)
+
+    @ExceptionHandler(Exception.class)
     @ResponseBody
-    public Response handleServiceLogicException(ServiceLogicException e) {
-        info( e, "全局拦截ServiceLogicException提示: code={} , message={} ", e.getErrorCode().getCode(), e.getErrorCode().getMsg());
-        String outMsg = StringUtils.isEmpty(e.getOutMsg()) ? "" : "[" + e.getOutMsg() + "]";
-        return Response
-                .buildFailure(e.getErrorCode().getCode(),
-                        getI18nMessageByCode(e.getErrorCode().getCode(), e.getErrorCode().getMsg()) + outMsg);
+    public Response handleException(Exception e) {
+        //比如shiro认证异常，要获取其rootCause
+        Throwable rootCause = Throwables.getRootCause(e);
+        Function<Throwable, Response> handler = handlers.get(rootCause.getClass().getName());
+        if (handler != null) {
+            return handler.apply(rootCause);
+        }
+        return handlers.get(Exception.class.getName()).apply(rootCause);
     }
 
 
-    @ExceptionHandler(ConnectorResultException.class)
-    @ResponseBody
-    public Response handleException(ConnectorResultException e) {
-        error("全局拦截ConnectorResultException异常:", e);
-        ErrorInfo errorInfo = e.getErrorInfo();
-        String errMsg = fixErrMsgIfNeed(errorInfo.getErrorMsg());
-        return Response.buildFailure(errorInfo.getErrorCode(), getI18nMessageByCode(errorInfo.getErrorCode(), errMsg));
+    private void info(Throwable e, String msg, Object... args) {
+        LogUtil.info(log, e, msg, args);
+    }
+
+    private void error(String msg, Throwable e) {
+        log.error(msg, e);
+    }
+
+    /***
+     *
+     * @param errorCode
+     * @param defaultMessage
+     * @return the message
+     */
+    private String getI18nMessageByCode(String errorCode, String defaultMessage) {
+        return i18NMessage.getMessage(errorCode, defaultMessage);
     }
 
     /**
@@ -90,67 +165,6 @@ public class GlobalExceptionHandler {
             return errMsgFixPattern.matcher(errorMsg).replaceFirst("");
         }
         return errorMsg;
-    }
-
-    @ExceptionHandler(ConnectorException.class)
-    @ResponseBody
-    public Response handleException(ConnectorException e) {
-        error("全局拦截ConnectorException异常:", e);
-        Throwable cause = e.getCause();
-        if (cause instanceof UndeclaredThrowableException) {
-            UndeclaredThrowableException undeclaredThrowableException = (UndeclaredThrowableException) cause;
-            Throwable undeclaredThrowable = undeclaredThrowableException.getUndeclaredThrowable();
-            if (undeclaredThrowable instanceof InvocationTargetException) {
-                InvocationTargetException invocationTargetException = (InvocationTargetException) undeclaredThrowable;
-                ErrorCode errorCode = ErrorCode.getByMsg(invocationTargetException.getTargetException().getMessage());
-                return Response.buildFailure(errorCode.getCode(),
-                        getI18nMessageByCode(errorCode.getCode(), errorCode.getMsg()));
-            }
-        }
-        return ResponseI18n.buildFailure(ErrorCode.SYSTEM_ERROR);
-    }
-
-    @ExceptionHandler(Exception.class)
-    @ResponseBody
-    public Response handleException(Exception e) {
-        error("全局拦截Exception异常:", e);
-        return ResponseI18n.buildFailure(ErrorCode.SYSTEM_ERROR);
-    }
-
-    /**
-     * 未登陆
-     */
-    @ExceptionHandler(UnauthenticatedException.class)
-    @ResponseBody
-    public Response handleException(UnauthenticatedException e) {
-        info( e, "全局拦截UnauthenticatedException异常:{}", e.getMessage());
-        return ResponseI18n.buildFailure(ErrorCode.NO_LOGIN);
-    }
-
-    /**
-     * 未授权
-     */
-    @ExceptionHandler(UnauthorizedException.class)
-    @ResponseBody
-    public Response handleException(UnauthorizedException e) {
-        info( e, "全局拦截UnauthorizedException异常:{}", e.getMessage());
-        return ResponseI18n.buildFailure(ErrorCode.USER_NOT_AUTH);
-    }
-    private void info(Exception e, String msg, Object... args){
-        LogUtil.info(log,e,msg,args);
-    }
-    private void error(String msg,Exception e){
-        log.error(msg,e);
-    }
-
-    /***
-     *
-     * @param errorCode
-     * @param defaultMessage
-     * @return the message
-     */
-    private String getI18nMessageByCode(String errorCode, String defaultMessage) {
-        return i18NMessage.getMessage(errorCode, defaultMessage);
     }
 
 }
