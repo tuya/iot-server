@@ -70,7 +70,7 @@ public class UserController {
     @ApiOperation(value = "修改密码")
     @SneakyThrows
     @PutMapping(value = "/user/password")
-    @RequiresPermissions("4005")
+    //@RequiresPermissions("4005")
     public Response<Boolean> modifyLoginPassword(@RequestBody UserPasswordModifyReq req) {
         Boolean modifyLoginPassword = userService.modifyLoginPassword(ContextUtil.getUserId(), req.getCurrent_password(), req.getNew_password());
         return modifyLoginPassword ? Response.buildSuccess(true) :
