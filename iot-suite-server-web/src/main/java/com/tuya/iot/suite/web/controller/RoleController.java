@@ -86,7 +86,7 @@ public class RoleController {
         log.info("查询角色列表入参:pageNo={},pageSize={},roleCode={},roleName={}",pageNo,pageSize,roleCode,roleName);
         PageVO<IdaasRole> pageVO = roleService.queryRolesPagination(projectProperties.getPermissionSpaceId(),
                 RolesPaginationQueryReq.builder()
-                        .pageNum(pageNo)
+                        .pageNumber(pageNo)
                         .pageSize(pageSize)
                         .roleCode(roleCode)
                         .roleName(roleName)

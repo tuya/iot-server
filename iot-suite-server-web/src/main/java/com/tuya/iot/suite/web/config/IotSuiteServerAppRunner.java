@@ -2,7 +2,6 @@ package com.tuya.iot.suite.web.config;
 
 import com.google.common.collect.Lists;
 import com.tuya.connector.api.exceptions.ConnectorResultException;
-import com.tuya.iot.suite.ability.asset.ability.AssetAbility;
 import com.tuya.iot.suite.ability.idaas.ability.*;
 import com.tuya.iot.suite.ability.idaas.model.*;
 import com.tuya.iot.suite.ability.user.ability.UserAbility;
@@ -269,7 +268,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
             }
         }
         //用户已关联角色？没关联则进行关联
-        IdaasPageResult<IdaasUser> pageResult = idaasUserAbility.queryUserPage(spaceId, IdaasUserPageReq.builder().roleCode(roleCode).pageNum(1).pageSize(100).build());
+        IdaasPageResult<IdaasUser> pageResult = idaasUserAbility.queryUserPage(spaceId, IdaasUserPageReq.builder().roleCode(roleCode).pageNumber(1).pageSize(100).build());
         if (pageResult.getTotalCount() > 0) {
             long count = pageResult.getResults().stream().map(it -> it.getUid()).filter(it -> it.equals(adminUserId)).count();
             if (count > 0) {

@@ -271,7 +271,7 @@ public class UserServiceImpl implements UserService {
                 .roleCode(roleCode)
                 .username(searchKey)
                 .pageSize(pageSize)
-                .pageNum(pageNo)
+                .pageNumber(pageNo)
                 .build());
         PageVO<UserBaseInfo> result = new PageVO<>();
         result.setPageNo(pageResult.getPageNumber());
@@ -293,7 +293,7 @@ public class UserServiceImpl implements UserService {
     public List<IdaasUser> queryAdmins(String spaceId) {
         IdaasPageResult<IdaasUser> pageResult = idaasUserAbility.queryUserPage(spaceId, IdaasUserPageReq.builder()
                 .roleCode(RoleTypeEnum.admin.name())
-                .pageNum(1)
+                .pageNumber(1)
                 .pageSize(100)
                 .build());
         if (pageResult != null && pageResult.getTotalCount() > 0) {
