@@ -90,6 +90,7 @@ public class RoleController {
                         .pageSize(pageSize)
                         .roleCode(roleCode)
                         .roleName(roleName)
+                        .gmtModifiedAsc(true)
                         .build());
         PageVO<RoleVO> pageVo = PageVO.builder().pageNo(pageVO.getPageNo())
                 .pageSize(pageVO.getPageSize())
