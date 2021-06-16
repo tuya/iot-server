@@ -54,9 +54,6 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
     @Autowired
     PermissionAbility permissionAbility;
 
-
-    Integer authentication = 3;
-
     String adminUserName = "admin@tuya.com";
     String adminUserId = "superAdmin";
     String adminUserPwd = Sha256Utils.getSHA256("Test123456");
@@ -319,7 +316,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
         spaceId = spaceAbility.applySpace(SpaceApplyReq.builder()
                 .spaceGroup(projectProperties.getPermissionGroup())
                 .spaceCode(projectProperties.getPermissionSpaceCode())
-                .authentication(authentication)
+                .authentication(projectProperties.getPermissionSpaceAuthentication())
                 .remark(projectProperties.getName())
                 .owner(projectProperties.getPermissionSpaceOwner()).build()
         );

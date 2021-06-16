@@ -20,6 +20,7 @@ public class ProjectProperties {
     String permissionSpaceId;
     String permissionGroup;
     String permissionSpaceCode;
+    Integer permissionSpaceAuthentication;
     String permissionSpaceOwner;
     Boolean permissionAutoInit;
     String code;
