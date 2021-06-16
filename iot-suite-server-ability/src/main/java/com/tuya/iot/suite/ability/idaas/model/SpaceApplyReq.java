@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
+
 /**
  * @description:
  * @author: benguan.zhou@tuya.com
@@ -45,6 +47,6 @@ public class SpaceApplyReq {
     /**
      * 拥有者
      */
-    String owner;
+    List<String> ownerList;
 
 }
