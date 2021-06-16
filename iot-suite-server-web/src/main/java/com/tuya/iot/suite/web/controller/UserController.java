@@ -150,7 +150,7 @@ public class UserController {
 
     @ApiOperation("修改用户")
     @PutMapping("/users")
-    @RequiresPermissions("4003")
+    @RequiresPermissions("4008")
     public Response<Boolean> updateUserName(@RequestBody UserEditReq req) {
         String spaceId = projectProperties.getPermissionSpaceId();
         return Response.buildSuccess(userService.updateUser(spaceId,ContextUtil.getUserId(), req.getUserId(), req.getNickName(), req.getRoleCodes()));
@@ -158,14 +158,14 @@ public class UserController {
 
     @ApiOperation("修改用户密码")
     @PutMapping("/users/pwd")
-    @RequiresPermissions("4005")
+    @RequiresPermissions("4008")
     public Response<Boolean> updateUserPwd(@RequestBody UserPwdReq req) {
         return Response.buildSuccess(userService.updateUserPassword(req.getUserName(), req.getNewPwd()));
     }
 
     @ApiOperation("删除用户")
     @DeleteMapping("/users/{userId}")
-    @RequiresPermissions("4004")
+    @RequiresPermissions("4008")
     public Response<Boolean> updateUserPwd(@PathVariable("userId") String userId) {
         String spaceId = projectProperties.getPermissionSpaceId();
         return Response.buildSuccess(userService.deleteUser(spaceId, userId));
