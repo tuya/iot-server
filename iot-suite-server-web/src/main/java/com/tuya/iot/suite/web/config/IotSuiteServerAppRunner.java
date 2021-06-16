@@ -62,8 +62,10 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
     String adminRoleCode = "admin";
 
     String managerRoleCode = "manager-1000";
+    String managerRoleName = "管理员";
 
     String normalRoleCode = "normal-1000";
+    String normalRoleName = "普通用户";
 
     /**
      *
@@ -72,10 +74,11 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
     public void run(ApplicationArguments args) throws Exception {
         try {
             run0(args);
-        }catch (Exception e){
-            log.error("IotSuiteServerAppRunner error!",e);
+        } catch (Exception e) {
+            log.error("IotSuiteServerAppRunner error!", e);
         }
     }
+
     private void run0(ApplicationArguments args) throws Exception {
         log.info("permission-auto-init==>{}", projectProperties.permissionAutoInit);
         if (!StringUtils.isEmpty(projectProperties.getAdminUserName())) {
@@ -104,15 +107,15 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
         }
 
         //admin
-        initFromTemplate(adminRoleCode, adminUserName);
-        initFromTemplate(managerRoleCode, null);
-        initFromTemplate(normalRoleCode, null);
+        initFromTemplate(adminRoleCode, adminUserName, adminRoleCode);
+        initFromTemplate(managerRoleCode, null, managerRoleName);
+        initFromTemplate(normalRoleCode, null, normalRoleName);
 
         log.info("permission data has been initialized successful!");
     }
 
-    private void initFromTemplate(String roleCode, String userName) {
-        if (!initRole(roleCode)) {
+    private void initFromTemplate(String roleCode, String userName, String roleName) {
+        if (!initRole(roleCode,roleName)) {
             log.error("init role({}) failure!", roleCode);
             return;
         }
@@ -244,7 +247,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
                     log.info("openAPI admin user pwd changed ！init fail ==》 userName={}", userName);
                 }
                 return false;
-            }catch (Exception e) {
+            } catch (Exception e) {
                 log.info("openAPI createUser uid={},username={} failure!", adminUserId, userName);
                 return false;
             }
@@ -283,7 +286,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
         return grant;
     }
 
-    private boolean initRole(String roleCode) {
+    private boolean initRole(String roleCode, String roleName) {
         String spaceId = projectProperties.getPermissionSpaceId();
         IdaasRole adminRole = roleAbility.getRole(spaceId, roleCode);
         if (adminRole != null) {
@@ -291,8 +294,8 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
         }
         return roleAbility.createRole(spaceId, IdaasRoleCreateReq.builder()
                 .roleCode(roleCode)
-                .roleName(roleCode)
-                .remark(roleCode)
+                .roleName(roleName)
+                .remark(roleName)
                 .build()
         );
     }
