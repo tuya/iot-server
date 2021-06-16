@@ -118,9 +118,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     @ResponseBody
     public Response handleException(Exception e) {
-        //比如shiro认证异常，要获取其rootCause
+        //对于一些第三方库，比如shiro，UnauthorizedException并不是rootCause，而是topCause
+        Function<Throwable, Response> handler = handlers.get(e.getClass().getName());
+        if(handler!=null){
+            return handler.apply(e);
+        }
+        //有些异常会被wrap，我们需要根据rootCause确定到底是什么异常
         Throwable rootCause = Throwables.getRootCause(e);
-        Function<Throwable, Response> handler = handlers.get(rootCause.getClass().getName());
+        handler = handlers.get(rootCause.getClass().getName());
         if (handler != null) {
             return handler.apply(rootCause);
         }
