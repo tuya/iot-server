@@ -51,7 +51,9 @@ class IdaasUserAbilitySpec extends BaseSpec {
     void "测试查询用户分页"() {
         when:
         idaasUserAbility.queryUserPage(spaceId, IdaasUserPageReq.builder()
-                .roleCode('normal-1000')
+                .roleCode('admin')
+        .pageNumber(2)
+        .pageSize(2)
                 .build())
         then:
         noExceptionThrown()

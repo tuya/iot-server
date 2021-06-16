@@ -233,21 +233,6 @@
             "admin"
           ],
           "remark": "Role authorize"
-        },
-        {
-          "permissionName": "View role permission",
-          "permissionType": "api",
-          "permissionCode": "3006",
-          "parentCode": "3000",
-          "order": "5",
-          "dependencies": [
-            "3001"
-          ],
-          "authorizable": true,
-          "authRoleTypes": [
-            "admin","manager"
-          ],
-          "remark": "View role permission"
         }
       ]
     },
@@ -296,73 +281,6 @@
           "remark": "Create usesr"
         },
         {
-          "permissionName": "Edit usesr",
-          "permissionType": "api",
-          "permissionCode": "4003",
-          "parentCode": "4000",
-          "order": "3",
-          "dependencies": [
-            "4001",
-            "4008"
-          ],
-          "authorizable": true,
-          "authRoleTypes": [
-            "admin",
-            "manager"
-          ],
-          "remark": "Edit usesr"
-        },
-        {
-          "permissionName": "Delete usesr",
-          "permissionType": "api",
-          "permissionCode": "4004",
-          "parentCode": "4000",
-          "order": "4",
-          "dependencies": [
-            "4001",
-            "4008"
-          ],
-          "authorizable": true,
-          "authRoleTypes": [
-            "admin",
-            "manager"
-          ],
-          "remark": "Delete usesr"
-        },
-        {
-          "permissionName": "Change password",
-          "permissionType": "api",
-          "permissionCode": "4005",
-          "parentCode": "4000",
-          "order": "5",
-          "dependencies": [
-            "4001",
-            "4008"
-          ],
-          "authorizable": true,
-          "authRoleTypes": [
-            "admin",
-            "manager"
-          ],
-          "remark": "Change password"
-        },
-        {
-          "permissionName": "Modify role",
-          "permissionType": "api",
-          "permissionCode": "4006",
-          "parentCode": "4000",
-          "order": "6",
-          "dependencies": [
-            "4001"
-          ],
-          "authorizable": true,
-          "authRoleTypes": [
-            "admin",
-            "manager"
-          ],
-          "remark": "Modify role"
-        },
-        {
           "permissionName": "Asset authorize",
           "permissionType": "api",
           "permissionCode": "4007",
@@ -392,7 +310,76 @@
             "admin",
             "manager"
           ],
-          "remark": "More operations"
+          "remark": "More operations",
+          "children": [
+            {
+              "permissionName": "Change password",
+              "permissionType": "api",
+              "permissionCode": "4005",
+              "parentCode": "4008",
+              "order": "1",
+              "dependencies": [
+                "4001",
+                "4008"
+              ],
+              "authorizable": true,
+              "authRoleTypes": [
+                "admin",
+                "manager"
+              ],
+              "remark": "Change password"
+            },
+            {
+              "permissionName": "Modify role",
+              "permissionType": "api",
+              "permissionCode": "4006",
+              "parentCode": "4008",
+              "order": "2",
+              "dependencies": [
+                "4001"
+              ],
+              "authorizable": true,
+              "authRoleTypes": [
+                "admin",
+                "manager"
+              ],
+              "remark": "Modify role"
+            },
+            {
+              "permissionName": "Edit usesr",
+              "permissionType": "api",
+              "permissionCode": "4003",
+              "parentCode": "4008",
+              "order": "3",
+              "dependencies": [
+                "4001",
+                "4008"
+              ],
+              "authorizable": true,
+              "authRoleTypes": [
+                "admin",
+                "manager"
+              ],
+              "remark": "Edit usesr"
+            },
+            {
+              "permissionName": "Delete usesr",
+              "permissionType": "api",
+              "permissionCode": "4004",
+              "parentCode": "4008",
+              "order": "4",
+              "dependencies": [
+                "4001",
+                "4008"
+              ],
+              "authorizable": true,
+              "authRoleTypes": [
+                "admin",
+                "manager"
+              ],
+              "remark": "Delete usesr"
+            }
+          ]
         },
         {
           "permissionName": "Batch operation",
@@ -427,22 +414,6 @@
       "remark": "Account Settings",
       "dependencies": [],
       "children": [
-        {
-          "permissionName": "Account Settings",
-          "permissionType": "api",
-          "permissionCode": "6001",
-          "parentCode": "6000",
-          "order": "1",
-          "dependencies": [
-            "6002"
-          ],
-          "authorizable": true,
-          "authRoleTypes": [
-            "admin",
-            "manager"
-          ],
-          "remark": "Account Settings"
-        },
         {
           "permissionName": "View Account Settings",
           "permissionType": "api",

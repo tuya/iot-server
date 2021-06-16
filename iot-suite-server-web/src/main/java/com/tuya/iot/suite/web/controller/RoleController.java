@@ -171,7 +171,7 @@ public class RoleController {
 
     @ApiOperation("查角色拥有的授权")
     @GetMapping("/roles/permissions")
-    @RequiresPermissions("3006")
+    @RequiresPermissions("3001")
     public Response<List<PermissionDto>> getRolePermissions(@RequestParam String roleCode) {
         log.info("查角色拥有的授权入参:roleCode={}",roleCode);
         List<PermissionDto> list = permissionService.queryPermissionsByRoleCodes(
