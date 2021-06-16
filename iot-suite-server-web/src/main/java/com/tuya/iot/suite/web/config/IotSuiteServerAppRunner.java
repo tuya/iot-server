@@ -23,7 +23,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -76,6 +81,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
             log.error("IotSuiteServerAppRunner error!",e);
         }
     }
+
     private void run0(ApplicationArguments args) throws Exception {
         log.info("permission-auto-init==>{}", projectProperties.permissionAutoInit);
         if (!StringUtils.isEmpty(projectProperties.getAdminUserName())) {
@@ -180,7 +186,8 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
 
     private boolean grantPermissionsToRole(String roleCode, List<PermissionCreateReq> perms) {
         String spaceId = projectProperties.getPermissionSpaceId();
-        List<PermissionQueryByRolesRespItem> existsPermList = permissionAbility.queryPermissionsByRoleCodes(spaceId, PermissionQueryByRolesReq.builder()
+        List<PermissionQueryByRolesRespItem>
+                existsPermList = permissionAbility.queryPermissionsByRoleCodes(spaceId, PermissionQueryByRolesReq.builder()
                 .roleCodeList(Lists.newArrayList(roleCode)).build());
         Set<String> allPerms = perms.stream().map(it -> it.getPermissionCode()).collect(Collectors.toSet());
         Set<String> existsPerms = existsPermList.stream().flatMap(it -> it.getPermissionList().stream().map(p -> p.getPermissionCode())).collect(

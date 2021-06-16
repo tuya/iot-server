@@ -65,12 +65,12 @@ public class UserController {
     private PermissionService permissionService;
 
     /**
-     * @return
+     * 神逻辑：用户改自己密码还需要权限？
      */
     @ApiOperation(value = "修改密码")
     @SneakyThrows
     @PutMapping(value = "/user/password")
-    //@RequiresPermissions("4005")
+    @RequiresPermissions("6002")
     public Response<Boolean> modifyLoginPassword(@RequestBody UserPasswordModifyReq req) {
         Boolean modifyLoginPassword = userService.modifyLoginPassword(ContextUtil.getUserId(), req.getCurrent_password(), req.getNew_password());
         return modifyLoginPassword ? Response.buildSuccess(true) :
