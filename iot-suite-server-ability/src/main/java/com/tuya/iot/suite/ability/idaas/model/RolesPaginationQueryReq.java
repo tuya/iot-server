@@ -30,4 +30,7 @@ public class RolesPaginationQueryReq extends PageRequestInfo {
     @SerializedName("roleName")
     String roleName;
 
+    @SerializedName("gmtModifiedAsc")
+    Boolean gmtModifiedAsc;
+
 }

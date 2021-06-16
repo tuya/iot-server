@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
  * @author benguan.zhou@tuya.com
  * @description
@@ -17,6 +19,6 @@ import lombok.NoArgsConstructor;
 public class IdaasSpace {
     String spaceGroup;
     String spaceId;
-    String owner;
+    List<String> ownerList;
     String spaceCode;
 }

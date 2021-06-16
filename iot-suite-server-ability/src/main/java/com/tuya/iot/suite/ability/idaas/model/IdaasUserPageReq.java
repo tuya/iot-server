@@ -34,4 +34,8 @@ public class IdaasUserPageReq extends PageRequestInfo {
     @SerializedName("roleCode")
     String roleCode;
 
+
+    @SerializedName("gmtModifiedAsc")
+    Boolean gmtModifiedAsc;
+
 }

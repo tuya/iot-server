@@ -327,7 +327,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
                 .spaceCode(projectProperties.getPermissionSpaceCode())
                 .authentication(projectProperties.getPermissionSpaceAuthentication())
                 .remark(projectProperties.getName())
-                .owner(projectProperties.getPermissionSpaceOwner()).build()
+                .ownerList(Arrays.asList(projectProperties.getPermissionSpaceOwner().split(","))).build()
         );
         if (!StringUtils.isEmpty(spaceId)) {
             projectProperties.setPermissionSpaceId(spaceId);
