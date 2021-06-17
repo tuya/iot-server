@@ -53,7 +53,7 @@ class IdaasUserAbilitySpec extends BaseSpec {
         idaasUserAbility.queryUserPage(spaceId, IdaasUserPageReq.builder()
                 .roleCode('')
         .pageNumber(1)
-        .pageSize(20)
+        .pageSize(200)
                 .build())
         then:
         noExceptionThrown()

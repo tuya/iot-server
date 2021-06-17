@@ -1,5 +1,6 @@
 package com.tuya.iot.suite.service.user.impl;
 
+import com.tuya.connector.api.exceptions.ConnectorResultException;
 import com.tuya.iot.suite.ability.idaas.ability.GrantAbility;
 import com.tuya.iot.suite.ability.idaas.ability.IdaasUserAbility;
 import com.tuya.iot.suite.ability.idaas.ability.RoleAbility;
@@ -28,6 +29,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.tuya.iot.suite.core.constant.ErrorCode.*;
@@ -172,10 +174,24 @@ public class UserServiceImpl implements UserService {
     @Override
     public Boolean createUser(String spaceId, UserRegisteredRequest req, List<String> roleCodes) {
         //1、向云端注册用户得到用户id
-        User user = userAbility.registeredUser(req);
+        //
+        String uid;
+        try {
+            UserToken token = userAbility.loginUser(req);
+            uid = token.getUid();
+        }catch (ConnectorResultException e){
+            if(Objects.equals(e.getErrorInfo().getErrorCode(),ErrorCode.USER_ALREADY_EXIST.getCode())){
+                log.info("查询用户失败{}",e.getErrorInfo());
+                User user = userAbility.registeredUser(req);
+                uid = user.getUser_id();
+            }else{
+                throw e;
+            }
+        }
+
         //2、向基础服务注册用户
         Boolean res = idaasUserAbility.createUser(spaceId, IdaasUserCreateReq.builder()
-                .uid(user.getUser_id())
+                .uid(uid)
                 .username(req.getUsername())
                 .remark("").build());
         if (!res) {
@@ -185,14 +201,14 @@ public class UserServiceImpl implements UserService {
         Boolean auth = grantAbility.setRolesToUser(UserGrantRolesReq.builder()
                 .spaceId(spaceId)
                 .roleCodeList(roleCodes)
-                .uid(user.getUser_id()).build());
+                .uid(uid).build());
         if (!auth) {
             throw new ServiceLogicException(USER_CREATE_FAIL);
         }
         //授权资产
-        RoleTypeEnum roleTypeEnum = roleService.userOperateRole(spaceId, user.getUser_id(), roleCodes);
+        RoleTypeEnum roleTypeEnum = roleService.userOperateRole(spaceId, uid, roleCodes);
         if (RoleTypeEnum.normal.lt(roleTypeEnum)) {
-            auth = auth && assetService.grantAllAsset(user.getUser_id());
+            auth = auth && assetService.grantAllAsset(uid);
         }
         return res && auth;
     }
