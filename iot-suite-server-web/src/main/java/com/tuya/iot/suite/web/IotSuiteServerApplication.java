@@ -38,14 +38,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * 启动项目
  *
  *
- * 忠告！！！
- * 忠告！！！
- * 忠告！！！
- * 如果有任务需要在启动的时候做，一定要catch住异常！！！
- * 否则会导致应用启动失败。这样会被当成部署失败！！次数多了会通知到领导。
- * 但是实际上并不是真的部署的问题，而是其他任务（比如openapi调用超时）影响了部署，导致误判。
- * 所以为了不被误判为部署失败，一定要catch住异常，然后在部署成功之后
- * 通过重启或其他操作重试任务。
  */
 
 @SpringBootApplication(scanBasePackages = "com.tuya.iot.suite")
