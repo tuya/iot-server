@@ -180,13 +180,9 @@ public class UserServiceImpl implements UserService {
             UserToken token = userAbility.loginUser(req);
             uid = token.getUid();
         }catch (ConnectorResultException e){
-            if(Objects.equals(e.getErrorInfo().getErrorCode(),ErrorCode.USER_ALREADY_EXIST.getCode())){
-                log.info("查询用户失败{}",e.getErrorInfo());
-                User user = userAbility.registeredUser(req);
-                uid = user.getUser_id();
-            }else{
-                throw e;
-            }
+            log.info("查询用户失败{}",e.getErrorInfo());
+            User user = userAbility.registeredUser(req);
+            uid = user.getUser_id();
         }
 
         //2、向基础服务注册用户
