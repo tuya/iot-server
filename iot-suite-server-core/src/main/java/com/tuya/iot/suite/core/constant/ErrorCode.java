@@ -32,6 +32,8 @@ public enum ErrorCode {
      */
     NOT_FOUND("404", "not_found"),
 
+    /**注册新用户时*/
+    USER_ALREADY_EXIST("909","用户已存在"),
     /**
      * WITHOUT_PERMISSION
      */

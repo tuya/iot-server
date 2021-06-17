@@ -28,7 +28,7 @@ class SpaceAbilitySpec extends BaseSpec{
         .spaceGroup(projectProperties.permissionGroup)
         .spaceCode(projectProperties.permissionSpaceCode)
         .authentication(3)
-        .owner(projectProperties.permissionSpaceOwner)
+        .ownerList([projectProperties.permissionSpaceOwner])
         .remark('test')
                 .build())
         then:
@@ -47,10 +47,10 @@ class SpaceAbilitySpec extends BaseSpec{
         //{"result":{"gmt_create":1622802733234,"gmt_modified":1622802733234,"owner":"wujun","space_code":"wujunCode","space_group":"wujunGroup","space_id":1400762304747802670},"success":true,"t":1623074279971}
         where:
         spaceGroup|spaceCode|expected
-        'wujunGroup'|'wujunCode'| Success
-        'tuya-iot'|'benguanCode'|Success
-        'tuya-iot'|'benguan'|NullPointerException
-        'tuya-iot'|'iot-app-smart-office'|Success
+        //'wujunGroup'|'wujunCode'| Success
+        'tuya-iot'|'benguanTest'|Success
+        //'tuya-iot'|'benguan'|NullPointerException
+        //'tuya-iot'|'iot-app-smart-office'|Success
     }
 
 }
