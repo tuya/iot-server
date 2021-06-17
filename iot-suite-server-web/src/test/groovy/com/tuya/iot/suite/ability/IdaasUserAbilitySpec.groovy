@@ -60,7 +60,10 @@ class IdaasUserAbilitySpec extends BaseSpec {
     }
 
     void "测试删除用户"() {
+        given:
+        def uid = 'bsh1623898588066Dx8a'
+        //uid = 'bsh1623052900346u8pQ'
         expect:
-        idaasUserAbility.deleteUser(spaceId, 'bsh1623052900346u8pQ')
+        idaasUserAbility.deleteUser(spaceId, uid)
     }
 }
