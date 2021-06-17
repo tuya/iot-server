@@ -62,7 +62,8 @@ class RoleAbilitySpec extends BaseSpec {
     void "测试查询角色分页"() {
         when:
         def page = roleAbility.queryRolesPagination(spaceId, RolesPaginationQueryReq.builder()
-                .roleCodes(['admin'])
+        .gmtModifiedAsc(true)
+                .roleCodes(['admin','normal-1000'])
                 .build())
         then:
         page.totalCount == 1
