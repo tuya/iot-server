@@ -38,8 +38,8 @@ class UserAbilitySpec extends BaseSpec {
     void "测试注册用户"(){
         when:
         def res = userAbility.registeredUser(UserRegisteredRequest.builder()
-                .username('xxx')
-                .password(Hashing.sha256().hashString("xxx", StandardCharsets.UTF_8).toString())
+                .username('15262900902')
+                .password(Hashing.sha256().hashString("ty1198094110", StandardCharsets.UTF_8).toString())
                 .country_code("86")
                 .build()
         )

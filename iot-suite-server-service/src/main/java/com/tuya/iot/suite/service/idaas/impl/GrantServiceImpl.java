@@ -61,13 +61,6 @@ public class GrantServiceImpl implements GrantService {
         // 0. target operatorRole cannot be admin
         Assert.isTrue(!RoleTypeEnum.fromRoleCode(roleCode).isAdmin(), "can not grant permission to a admin operatorRole!");
         List<IdaasPermission> perms = permissionAbility.queryPermissionsByUser(spaceId, operatorUid);
-        List<IdaasRole> roles = roleAbility.queryRolesByUser(spaceId, operatorUid);
-        Assert.isTrue(roles.size() == 1, "a user can at most have one operatorRole!");
-        IdaasRole operatorRole = roles.get(0);
-        // 1. 操作者角色更高级
-        if (RoleTypeEnum.valueOf(operatorRole.getRoleCode()).lt(roleCode)) {
-            throw new ServiceLogicException(ErrorCode.NO_DATA_PERMISSION);
-        }
         // 2. 操作者拥有该权限
         if (!perms.stream().map(it -> it.getPermissionCode()).collect(Collectors.toList()).containsAll(permissionCodes)) {
             throw new ServiceLogicException(ErrorCode.NO_DATA_PERMISSION);
@@ -147,22 +140,10 @@ public class GrantServiceImpl implements GrantService {
         roleCodes.forEach(roleCode ->
                 Assert.isTrue(!RoleTypeEnum.fromRoleCode(roleCode).isAdmin(), "can not grant permission to a admin role!")
         );
-        List<IdaasRole> roles = roleAbility.queryRolesByUser(spaceId, operatorUid);
-        Assert.isTrue(roles.size() == 1, "a user can at most have one role!");
-        IdaasRole operatorRole = roles.get(0);
-        //操作者角色更高级
-        roleCodes.forEach(roleCode -> {
-            if (RoleTypeEnum.valueOf(operatorRole.getRoleCode()).lt(roleCode)) {
-                throw new ServiceLogicException(ErrorCode.NO_DATA_PERMISSION);
-            }
-        });
-        //被操作的用户不能是系统管理员
         List<IdaasRole> userRoles = roleAbility.queryRolesByUser(spaceId, uid);
-        userRoles.forEach(userRole -> {
-            if (RoleTypeEnum.valueOf(operatorRole.getRoleCode()).lt(userRole.getRoleCode())) {
-                throw new ServiceLogicException(ErrorCode.NO_DATA_PERMISSION);
-            }
-        });
+        userRoles.forEach(it->
+                Assert.isTrue(!RoleTypeEnum.fromRoleCode(it.getRoleCode()).isAdmin(), "can not change a admin user to other roles!")
+        );
     }
 
     @Override
@@ -188,10 +169,6 @@ public class GrantServiceImpl implements GrantService {
         // 0. 不能把系统管理员角色设置给用户
         Assertion.isTrue(!RoleTypeEnum.fromRoleCode(roleCode).isAdmin(), "can not set 'admin' role to any users!");
         // 1. 操作者有更高级的角色（或相同的角色），才可以把这个角色设置给用户
-        RoleTypeEnum operatorRoleType = roleService.userOperateRole(spaceId, operatorUid);
-        if (operatorRoleType.lt(RoleTypeEnum.fromRoleCode(roleCode))) {
-            throw new ServiceLogicException(ErrorCode.NO_DATA_PERMISSION);
-        }
         for (int i = uidList.size() - 1; i >= 0; i--) {
             String uid = uidList.get(i);
             List<String> newRoles = roleService.checkAndRemoveOldRole(spaceId, uid, Arrays.asList(roleCode), true);

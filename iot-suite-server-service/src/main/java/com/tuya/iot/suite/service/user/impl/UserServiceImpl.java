@@ -203,7 +203,7 @@ public class UserServiceImpl implements UserService {
         }
         //授权资产
         RoleTypeEnum roleTypeEnum = roleService.userOperateRole(spaceId, uid, roleCodes);
-        if (RoleTypeEnum.normal.lt(roleTypeEnum)) {
+        if (!RoleTypeEnum.isNormalRoleType(roleTypeEnum.name())) {
             auth = auth && assetService.grantAllAsset(uid);
         }
         return res && auth;
@@ -219,12 +219,6 @@ public class UserServiceImpl implements UserService {
             return true;
         }
         //修改角色
-        RoleTypeEnum operatorRoleType = roleService.userOperateRole(spaceId, operatUserId);
-        for (String roleCode : roleCodes) {
-            if (operatorRoleType.lt(RoleTypeEnum.fromRoleCode(roleCode))) {
-                throw new ServiceLogicException(ErrorCode.NO_DATA_PERMISSION);
-            }
-        }
         roleCodes = roleService.checkAndRemoveOldRole(spaceId, uid, roleCodes, true);
         if (roleCodes.size() > 0) {
             Boolean auth = grantAbility.setRolesToUser(UserGrantRolesReq.builder()
