@@ -27,7 +27,6 @@ import io.swagger.annotations.ApiParam;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
@@ -46,6 +45,12 @@ import java.util.stream.Collectors;
 
 
 /**
+ *  广志：
+ *  角色其实是没有类型的，一开始的从管理员模版创建还是普通用户创建可以理解成一个快速生成角色的模版，每一个角色其实都是完整独立的
+ *
+ *  有修改用户角色的权限：普通用户只有授予了这个功能才能修改权限，授予这个功能也是上面的系统管理员操作的，所以这个场景是用户自己清楚才操作的
+ *
+ *
  * @author benguan.zhou@tuya.com
  * @date 2021/05/28
  */
@@ -68,12 +73,15 @@ public class RoleController {
     @PostMapping("/roles")
     @RequiresPermissions("3002")
     public Response<Boolean> createRole(@RequestBody RoleAddReq req) {
+        log.info("创建角色入参:{}",req);
         String uid = ContextUtil.getUserId();
         Boolean res = roleService.createRole(projectProperties.getPermissionSpaceId(), RoleCreateReqDTO.builder()
                 .roleCode(RoleCodeGenerator.generate(req.getRoleType()))
                 .roleName(req.getRoleName())
+                .remark(req.getRoleRemark())
                 .uid(uid)
                 .build());
+        log.info("创建角色出参:{}",res);
         return Response.buildSuccess(res);
     }
 
@@ -81,6 +89,7 @@ public class RoleController {
     @GetMapping("/roles")
     @RequiresPermissions("3001")
     public Response<PageVO<RoleVO>> listRoles(Integer pageNo, Integer pageSize, String roleCode, String roleName) {
+        log.info("查询角色列表入参:pageNo={},pageSize={},roleCode={},roleName={}",pageNo,pageSize,roleCode,roleName);
         PageVO<IdaasRole> pageVO = roleService.queryRolesPagination(projectProperties.getPermissionSpaceId(),
                 RolesPaginationQueryReq.builder()
                         .pageNumber(pageNo)
@@ -89,26 +98,33 @@ public class RoleController {
                         .roleName(roleName)
                         .gmtModifiedAsc(true)
                         .build());
-        return Response.buildSuccess(PageVO.builder().pageNo(pageVO.getPageNo())
+        PageVO<RoleVO> pageVo = PageVO.builder().pageNo(pageVO.getPageNo())
                 .pageSize(pageVO.getPageSize())
                 .total(pageVO.getTotal())
                 .data((List) pageVO.getData().stream().map(
                         it ->
                                 RoleVO.builder()
-                        .roleCode(it.getRoleCode())
-                        .roleName(it.getRoleName())
-                        .build()
-                ).collect(Collectors.toList())).build());
+                                        .roleCode(it.getRoleCode())
+                                        .roleName(it.getRoleName())
+                                        .remark(it.getRemark())
+                                        .build()
+                ).collect(Collectors.toList())).build();
+        log.info("查询角色列表出参:total={},data.size={}",pageVo.getTotal(),pageVo.getData().size());
+        return Response.buildSuccess(pageVo);
     }
 
     @ApiOperation("修改角色")
     @PutMapping("/roles")
     @RequiresPermissions("3003")
     public Response<Boolean> updateRoleName(@RequestBody RoleEditReq req) {
+        log.info("修改角色入参:{}",req);
         Boolean res = roleService.updateRole(projectProperties.getPermissionSpaceId(),
                 ContextUtil.getUserId(),
                 req.getRoleCode(),
-                RoleUpdateReq.builder().roleName(req.getRoleName()).build());
+                RoleUpdateReq.builder().roleName(req.getRoleName())
+                        .remark(req.getRoleRemark())
+                        .build());
+        log.info("修改角色出参:{}",res);
         return Response.buildSuccess(res);
     }
 
@@ -117,8 +133,10 @@ public class RoleController {
     @RequiresPermissions("3004")
     public Response<Boolean> batchDeleteRole(@ApiParam(value = "角色编码列表，逗号分隔", required = true)
                                              @RequestParam("roleCodeList") String roleCodeList) {
+        log.info("批量删除角色入参:roleCodeList={}",roleCodeList);
         Set<String> roleCodes = StringUtils.commaDelimitedListToSet(roleCodeList);
         boolean success = roleService.deleteRoles(projectProperties.getPermissionSpaceId(), ContextUtil.getUserId(), roleCodes);
+        log.info("批量删除角色出参:{}", success);
         return Response.buildSuccess(success);
     }
 
@@ -126,9 +144,11 @@ public class RoleController {
     @DeleteMapping("/roles/{roleCode}")
     @RequiresPermissions("3004")
     public Response<Boolean> deleteRole(@PathVariable String roleCode) {
+        log.info("删除角色入参:roleCode={}",roleCode);
         Boolean success = roleService.deleteRole(projectProperties.getPermissionSpaceId(),
                 ContextUtil.getUserId(),
                 roleCode);
+        log.info("删除角色出参:{}",success);
         return Response.buildSuccess(success);
     }
 
@@ -136,11 +156,13 @@ public class RoleController {
     @PutMapping("/roles/permissions")
     @RequiresPermissions("3005")
     public Response<Boolean> rolePermissions(@RequestBody RolePermissionReq req) {
-        Boolean success = grantService.grantPermissionsToRole(ContextUtil.getUserId(), RoleGrantPermissionsReq.builder()
-                .spaceId(projectProperties.getPermissionSpaceId().toString())
+        log.info("角色授权入参:{}",req);
+        Boolean success = grantService.setPermissionsToRole(ContextUtil.getUserId(), RoleGrantPermissionsReq.builder()
+                .spaceId(projectProperties.getPermissionSpaceId())
                 .roleCode(req.getRoleCode())
                 .permissionCodes(req.getPermissionCodes())
                 .build());
+        log.info("角色授权出参:{}",success);
         return Response.buildSuccess(success);
     }
 
@@ -148,7 +170,9 @@ public class RoleController {
     @PutMapping("/roles/permissions/reset")
     @RequiresPermissions("3005")
     public Response<Boolean> resetRolePermissionsFromTemplate(@ApiParam(value = "角色编码",required = true) @RequestParam String roleCode) {
+        log.info("角色权限重置入参:roleCode={}",roleCode);
         Boolean success = roleService.resetRolePermissionsFromTemplate(projectProperties.getPermissionSpaceId(),ContextUtil.getUserId(),roleCode);
+        log.info("角色权限重置入参:{}",success);
         return Response.buildSuccess(success);
     }
 
@@ -156,6 +180,7 @@ public class RoleController {
     @GetMapping("/roles/permissions")
     @RequiresPermissions("3001")
     public Response<List<PermissionDto>> getRolePermissions(@RequestParam String roleCode) {
+        log.info("查角色拥有的授权入参:roleCode={}",roleCode);
         List<PermissionDto> list = permissionService.queryPermissionsByRoleCodes(
                 projectProperties.getPermissionSpaceId(),
                 PermissionQueryByRolesReq.builder()
@@ -173,6 +198,7 @@ public class RoleController {
                                                 .parentCode(p.getParentCode())
                                                 .build())
                 ).collect(Collectors.toList());
+        log.info("查角色拥有的授权出参:list.size={}",list.size());
         return Response.buildSuccess(list);
     }
 }

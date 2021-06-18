@@ -1,7 +1,5 @@
 package com.tuya.iot.suite.service.enums;
 
-import java.util.List;
-
 /**
  * @author benguan.zhou@tuya.com
  * @description
@@ -11,30 +9,19 @@ public enum RoleTypeEnum {
     /**
      * 系统管理员
      */
-    admin(null),
+    admin,
     /**
      * 管理员
      */
-    manager(admin),
+    manager,
     /**
      * 普通用户
      */
-    normal(manager);
+    normal;
 
     public static final String SEPARATOR = "-";
 
-    /**
-     * 上级角色
-     */
-    RoleTypeEnum parent;
 
-    RoleTypeEnum(RoleTypeEnum parent) {
-        this.parent = parent;
-    }
-
-    public RoleTypeEnum getParent() {
-        return parent;
-    }
 
     public static RoleTypeEnum fromRoleCode(String roleCode) {
         int pos = roleCode.indexOf(SEPARATOR);
@@ -43,53 +30,6 @@ public enum RoleTypeEnum {
         }
         String name = roleCode.substring(0, pos);
         return RoleTypeEnum.valueOf(name);
-    }
-
-    /**
-     * 小于等于目标角色类型
-     */
-    public boolean ltEq(RoleTypeEnum target) {
-        return lt(this, target) || eq(this, target);
-    }
-
-    /**
-     * 是否小于等于目标角色类型
-     */
-    public boolean ltEq(String roleCode) {
-        RoleTypeEnum target = RoleTypeEnum.fromRoleCode(roleCode);
-        return lt(this, target) || eq(this, target);
-    }
-
-    /**
-     * 是否大于等于所有目标角色
-     */
-    public boolean gtEqAll(List<String> roleCodes) {
-        return roleCodes.stream().allMatch(it -> gtEq(it));
-    }
-
-    public boolean gt(String roleCode) {
-        return gt(this, RoleTypeEnum.fromRoleCode(roleCode));
-    }
-
-    public boolean gt(RoleTypeEnum target) {
-        return gt(this, target);
-    }
-
-    public boolean gtEq(String roleCode) {
-        RoleTypeEnum target = RoleTypeEnum.fromRoleCode(roleCode);
-        return gt(this, target) || eq(this, target);
-    }
-
-    public boolean gtEq(RoleTypeEnum target) {
-        return gt(this, target) || eq(this, target);
-    }
-
-    public boolean lt(String roleCode) {
-        return lt(this, RoleTypeEnum.fromRoleCode(roleCode));
-    }
-
-    public boolean lt(RoleTypeEnum target) {
-        return lt(this, target);
     }
 
     public boolean isAdmin() {
@@ -131,40 +71,4 @@ public enum RoleTypeEnum {
     public static boolean isValidRoleCode(String roleCode) {
         return isAdminRoleCode(roleCode) || isManagerRoleCode(roleCode) || isNormalRoleCode(roleCode);
     }
-
-    /**
-     * 是否大于目标角色类型
-     */
-    public static boolean gt(RoleTypeEnum source, RoleTypeEnum target) {
-        RoleTypeEnum type = target.parent;
-        while (type != null) {
-            if (type.equals(source)) {
-                return true;
-            }
-            type = type.parent;
-        }
-        return false;
-    }
-
-    /**
-     * 是否小于目标角色类型
-     */
-    public static boolean lt(RoleTypeEnum source, RoleTypeEnum target) {
-        RoleTypeEnum type = source.parent;
-        while (type != null) {
-            if (type.equals(target)) {
-                return true;
-            }
-            type = type.parent;
-        }
-        return false;
-    }
-
-    /**
-     * 是否等于目标角色类型
-     */
-    public static boolean eq(RoleTypeEnum roleType1, RoleTypeEnum roleType2) {
-        return roleType1.equals(roleType2);
-    }
-
 }

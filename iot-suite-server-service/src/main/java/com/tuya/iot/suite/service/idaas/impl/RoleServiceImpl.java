@@ -75,33 +75,11 @@ public class RoleServiceImpl implements RoleService {
     private void checkRoleWritePermission(String spaceId, String operatorUid, String targetRoleCode) {
         Assert.isTrue(!RoleTypeEnum.fromRoleCode(targetRoleCode).isAdmin(), "can not write a 'admin' role!");
         //数据权限校验，校验操作者自己是否为更高的角色。
-        //比如有从高到低低角色 a->b->c->d->e。当前用户有角色 a、e，修改角色c，由于当前用户存在比c高级低角色a，所以该操作是允许的。
-        roleAbility.queryRolesByUser(spaceId, operatorUid).stream().filter(
-                it -> RoleTypeEnum.fromRoleCode(targetRoleCode).ltEq(RoleTypeEnum.fromRoleCode(it.getRoleCode()))
-        ).findAny().orElseThrow(() -> new ServiceLogicException(ErrorCode.NO_DATA_PERMISSION));
     }
 
     private void checkRoleWritePermission(String spaceId, String operatorUid, Collection<String> targetRoleCodes) {
         targetRoleCodes.forEach(targetRoleCode ->
                 Assert.isTrue(!RoleTypeEnum.fromRoleCode(targetRoleCode).isAdmin(), "can not write a 'admin' role!"));
-        //数据权限校验，校验操作者自己是否为更高的角色。
-        List<IdaasRole> roles = roleAbility.queryRolesByUser(spaceId, operatorUid);
-        for (String targetRoleCode : targetRoleCodes) {
-            for (IdaasRole myRole : roles) {
-                boolean enabled =
-                        RoleTypeEnum.fromRoleCode(targetRoleCode).ltEq(RoleTypeEnum.fromRoleCode(myRole.getRoleCode()));
-                if (!enabled) {
-                    throw new ServiceLogicException(ErrorCode.NO_DATA_PERMISSION);
-                }
-            }
-        }
-    }
-
-    private void checkRoleReadPermission(String spaceId, String operatorUid, String targetRoleCode) {
-        //数据权限校验，校验操作者自己是否为更高的角色。
-        roleAbility.queryRolesByUser(spaceId, operatorUid).stream().filter(
-                it -> RoleTypeEnum.fromRoleCode(targetRoleCode).ltEq(RoleTypeEnum.fromRoleCode(it.getRoleCode()))
-        ).findAny().orElseThrow(() -> new ServiceLogicException(ErrorCode.NO_DATA_PERMISSION));
     }
 
     @Override
@@ -248,16 +226,18 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public RoleTypeEnum userOperateRole(String spaceId, String operatUserId, List<String> roleCodes) {
-        RoleTypeEnum roleType = RoleTypeEnum.normal;
-        if (!CollectionUtils.isEmpty(roleCodes)) {
-            for (String roleCode : roleCodes) {
-                RoleTypeEnum roleTypeEnum = RoleTypeEnum.fromRoleCode(roleCode);
-                if (roleType.lt(roleTypeEnum)) {
-                    roleType = roleTypeEnum;
+        if(roleCodes!=null){
+            Set<RoleTypeEnum> types = roleCodes.stream().map(it->
+                    RoleTypeEnum.fromRoleCode(it)
+            ).collect(Collectors.toSet());
+            RoleTypeEnum[] orderedTypes = new RoleTypeEnum[]{RoleTypeEnum.admin,RoleTypeEnum.manager,RoleTypeEnum.normal};
+            for(RoleTypeEnum type: orderedTypes){
+                if(types.contains(type)){
+                    return type;
                 }
             }
         }
-        return roleType;
+        return RoleTypeEnum.normal;
     }
 
 }
