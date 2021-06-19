@@ -1,5 +1,7 @@
 package com.tuya.iot.suite.service.idaas.impl;
 
+import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.FileNotFoundException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -98,6 +101,7 @@ public class PermissionTemplateServiceImpl implements PermissionTemplateService 
 
     @SneakyThrows
     private Map<String, List<PermissionNodeDTO>> getPermTreesMap(String lang) {
+        lang = parseLang(lang);
         Map<String, List<PermissionNodeDTO>> permTreesMap = permTreesMapCache.get(lang);
         if (permTreesMap.isEmpty()) {
             permTreesMap = permTreesMapCache.get(defaultLang);
@@ -114,6 +118,7 @@ public class PermissionTemplateServiceImpl implements PermissionTemplateService 
 
     @SneakyThrows
     private Map<String, List<PermissionNodeDTO>> getPermFlattenListMap(String lang) {
+        lang = parseLang(lang);
         Map<String, List<PermissionNodeDTO>> permFlattenListMap = permFlattenListMapCache.get(lang);
         if (permFlattenListMap.isEmpty()) {
             permFlattenListMap = permFlattenListMapCache.get(defaultLang);
@@ -121,5 +126,14 @@ public class PermissionTemplateServiceImpl implements PermissionTemplateService 
         return permFlattenListMap;
     }
 
+    /**
+     * eg: en-US=>en
+     */
+    public String parseLang(String lang){
+        if(lang == null){
+            return defaultLang;
+        }
+        return Locale.forLanguageTag(lang).getLanguage();
+    }
 
 }
