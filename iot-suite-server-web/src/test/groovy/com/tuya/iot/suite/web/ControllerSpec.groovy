@@ -21,6 +21,9 @@ import spock.lang.Shared
 import spock.lang.Specification
 
 import javax.servlet.http.Cookie
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
 
 /**
  * @description
@@ -38,8 +41,19 @@ class ControllerSpec extends Specification {
     @Autowired
     ProjectProperties projectProperties
     String token
+    static final tokenExpireSecond = 10 * 60
 
     void setup() {
+        def tokenFile = new File('~/.tmp/iot-suite-server.token')
+        if (!tokenFile.exists()) {
+            tokenFile.parentFile.mkdirs()
+        }
+        def instant = Instant.ofEpochMilli(tokenFile.lastModified())
+        def expired = LocalDateTime.now().minusSeconds(tokenExpireSecond).isAfter(LocalDateTime.ofInstant(instant, ZoneId.systemDefault()))
+        if (!expired) {
+            token = tokenFile.text
+            return
+        }
         def data = LoginReq.builder().country_code(projectProperties.adminUserCountryCode)
                 .user_name(projectProperties.adminUserName)
                 .login_password(Sha256Util.encryption(projectProperties.adminUserPwd))
@@ -52,6 +66,7 @@ class ControllerSpec extends Specification {
                 .andReturn()
         def result = JSONObject.parseObject(mvcResult.response.contentAsString)
         token = result.get('result').get('token')
+        tokenFile.text = token
     }
 
     void "测试查询用户列表"() {
@@ -96,7 +111,7 @@ class ControllerSpec extends Specification {
         when:
         def mvcResult = mvc.perform(MockMvcRequestBuilders.get("/permission-template/role")
                 .cookie(new Cookie('token', token))
-            .header("Accept-Language","zh")
+        //.header("Accept-Language","zh-CN")
                 .contentType("application/json")
                 .param('roleCode', 'admin')
         ).andExpect(MockMvcResultMatchers.status().isOk()).andReturn()
@@ -110,7 +125,7 @@ class ControllerSpec extends Specification {
         when:
         def mvcResult = mvc.perform(MockMvcRequestBuilders.put("/users/roles")
                 .cookie(new Cookie('token', token))
-                .header("Accept-Language","zh")
+                .header("Accept-Language", "zh")
                 .contentType("application/json")
                 .content("""
 {
