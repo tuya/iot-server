@@ -2,25 +2,22 @@ package com.tuya.iot.suite.web.controller;
 
 import com.tuya.iot.suite.ability.idaas.model.PermissionTypeEnum;
 import com.tuya.iot.suite.ability.user.model.MobileCountries;
+import com.tuya.iot.suite.ability.user.model.UserBaseInfo;
 import com.tuya.iot.suite.ability.user.model.UserRegisteredRequest;
+import com.tuya.iot.suite.core.constant.ErrorCode;
 import com.tuya.iot.suite.core.constant.Response;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
-import com.tuya.iot.suite.ability.user.model.UserBaseInfo;
+import com.tuya.iot.suite.core.model.PageVO;
 import com.tuya.iot.suite.core.util.ContextUtil;
 import com.tuya.iot.suite.core.util.LibPhoneNumberUtil;
 import com.tuya.iot.suite.core.util.MixUtil;
 import com.tuya.iot.suite.service.idaas.GrantService;
-import com.tuya.iot.suite.core.model.PageVO;
 import com.tuya.iot.suite.service.idaas.PermissionService;
 import com.tuya.iot.suite.service.user.UserService;
 import com.tuya.iot.suite.service.user.model.ResetPasswordBo;
 import com.tuya.iot.suite.web.config.ProjectProperties;
 import com.tuya.iot.suite.web.model.ResetPasswordReq;
-import com.tuya.iot.suite.web.model.request.user.BatchUserGrantRoleReq;
-import com.tuya.iot.suite.web.model.request.user.UserAddReq;
-import com.tuya.iot.suite.web.model.request.user.UserEditReq;
-import com.tuya.iot.suite.web.model.request.user.UserPasswordModifyReq;
-import com.tuya.iot.suite.web.model.request.user.UserPwdReq;
+import com.tuya.iot.suite.web.model.request.user.*;
 import com.tuya.iot.suite.web.model.response.permission.PermissionDto;
 import com.tuya.iot.suite.web.model.response.role.RoleDto;
 import com.tuya.iot.suite.web.model.response.user.UserDto;
@@ -140,6 +137,15 @@ public class UserController {
         if (CollectionUtils.isEmpty(req.getRoleCodes())) {
             throw new ServiceLogicException(PARAM_LOST);
         }
+        //判断是何种登录方式
+        if (!StringUtils.isEmpty(req.getCountryCode())) {
+            //校验手机号码合法性
+            if (!LibPhoneNumberUtil.doValid(req.getUserName(), req.getCountryCode())) {
+                log.info("telephone format error! =>{}{}", req.getCountryCode(), req.getUserName());
+                return ResponseI18n.buildFailure(ErrorCode.TELEPHONE_FORMAT_ERROR);
+            }
+        }
+
         return Response.buildSuccess(userService.createUser(spaceId, UserRegisteredRequest.builder()
                 .username(req.getUserName())
                 .password(req.getPassword())
