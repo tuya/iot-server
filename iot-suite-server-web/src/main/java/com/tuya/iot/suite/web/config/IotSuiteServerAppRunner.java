@@ -121,7 +121,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
     }
 
     private void initFromTemplate(String roleCode, String userName, String roleName) {
-        if (!initRole(roleCode,roleName)) {
+        if (!initRole(roleCode, roleName)) {
             log.error("init role({}) failure!", roleCode);
             return;
         }
@@ -288,7 +288,11 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
                 .roleCode(roleCode)
                 .uid(adminUserId)
                 .build());
-        assetService.grantAllAsset(adminUserId);
+        try {
+            assetService.grantAllAsset(adminUserId);
+        } catch (Exception e) {
+            log.error("给超管授权失败：", e);
+        }
 
         return grant;
     }
