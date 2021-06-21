@@ -18,8 +18,10 @@ import com.tuya.iot.suite.service.dto.AssetConvertor;
 import com.tuya.iot.suite.service.dto.AssetDTO;
 import com.tuya.iot.suite.service.dto.DeviceDTO;
 import com.tuya.iot.suite.service.user.UserService;
+import com.tuya.iot.suite.service.util.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pulsar.shade.org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StopWatch;
@@ -64,6 +66,8 @@ public class AssetServiceImpl implements AssetService {
     private DeviceService deviceService;
     @Resource
     private UserService userService;
+    @Value("${asset.auth.size:50}")
+    private Integer assetAuthSize;
 
     @Override
     public Response addAsset(String spaceId, String assetName, String parentAssetId, String userId) {
@@ -116,7 +120,7 @@ public class AssetServiceImpl implements AssetService {
             if (!CollectionUtils.isEmpty(assetList)) {
                 List<String> assetIds = assetList.stream().map(e -> e.getAsset_id()).collect(Collectors.toList());
                 for (IdaasUser idaasUser : idaasUsers) {
-                    result = result && assetAbility.batchAssetsAuthorizedToUser(idaasUser.getUid(), new AssetAuthBatchToUser(idaasUser.getUid(), String.join(",", assetIds), true));
+                    result = result && batchAssetsAuthorizedToUser(idaasUser.getUid(), assetIds, true);
                 }
             }
         }
@@ -805,17 +809,27 @@ public class AssetServiceImpl implements AssetService {
                 grantIds.add(assetId);
             }
         }
-
         boolean opres = true;
         if (!CollectionUtils.isEmpty(cancelIds)) {
-            opres = opres && assetAbility.batchAssetsUnAuthorizedToUser(userId, new AssetAuthBatchToUser(userId, String.join(",", cancelIds), false));
+            opres = opres && batchAssetsUnAuthorizedToUser(userId, cancelIds, false);
+
         }
         if (!CollectionUtils.isEmpty(grantIds)) {
-            opres = opres && assetAbility.batchAssetsAuthorizedToUser(userId, new AssetAuthBatchToUser(userId, String.join(",", grantIds), false));
+            opres = opres && batchAssetsAuthorizedToUser(userId, grantIds, false);
         }
-
-
         return opres;
+    }
+
+    private boolean batchAssetsUnAuthorizedToUser(String userId, List<String> cancelIds, boolean authorized_children) {
+        return PageHelper.doListBySize(assetAuthSize, cancelIds, (ids) ->
+                assetAbility.batchAssetsUnAuthorizedToUser(userId, new AssetAuthBatchToUser(userId, String.join(",", ids), authorized_children))
+        );
+    }
+
+    private boolean batchAssetsAuthorizedToUser(String userId, List<String> grantIds, boolean authorized_children) {
+        return PageHelper.doListBySize(assetAuthSize, grantIds, (ids) ->
+                assetAbility.batchAssetsUnAuthorizedToUser(userId, new AssetAuthBatchToUser(userId, String.join(",", ids), authorized_children))
+        );
     }
 
     @Override
