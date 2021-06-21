@@ -66,6 +66,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
     String adminUserCountryCode = "86";
 
     String adminRoleCode = "admin";
+    String adminRoleName = "Owner";
 
     String managerRoleCode = "manager-1000";
     String managerRoleName = "管理员";
@@ -113,7 +114,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
         }
 
         //admin
-        initFromTemplate(adminRoleCode, adminUserName, adminRoleCode);
+        initFromTemplate(adminRoleCode, adminUserName, adminRoleName);
         initFromTemplate(managerRoleCode, null, managerRoleName);
         initFromTemplate(normalRoleCode, null, normalRoleName);
 
