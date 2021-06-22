@@ -877,8 +877,19 @@ public class AssetServiceImpl implements AssetService {
 
 
     private boolean batchAssetsUnAuthorizedToUser(String userId, List<String> cancelIds, boolean authorized_children) {
-        return PageHelper.doListBySize(assetAuthSize, cancelIds, (ids) ->
-                assetAbility.batchAssetsUnAuthorizedToUser(userId, new AssetAuthBatchToUser(userId, String.join(",", ids), authorized_children))
+        return PageHelper.doListBySize(assetAuthSize, cancelIds, (ids) -> {
+                    boolean result = false;
+                    int b = 0;
+                    while (!result && b < 2) {
+                        try {
+                            result = assetAbility.batchAssetsUnAuthorizedToUser(userId, new AssetAuthBatchToUser(userId, String.join(",", ids), authorized_children));
+                        } catch (Exception e) {
+                            b++;
+                            result = false;
+                        }
+                    }
+                    return result;
+                }
         );
     }
 
