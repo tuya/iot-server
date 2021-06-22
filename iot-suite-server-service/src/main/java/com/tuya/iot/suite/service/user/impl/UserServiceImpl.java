@@ -179,8 +179,8 @@ public class UserServiceImpl implements UserService {
         try {
             UserToken token = userAbility.loginUser(req);
             uid = token.getUid();
-        }catch (ConnectorResultException e){
-            log.info("查询用户失败{}",e.getErrorInfo());
+        } catch (ConnectorResultException e) {
+            log.info("查询用户失败{}", e.getErrorInfo());
             User user = userAbility.registeredUser(req);
             uid = user.getUser_id();
         }
@@ -204,7 +204,12 @@ public class UserServiceImpl implements UserService {
         //授权资产
         RoleTypeEnum roleTypeEnum = roleService.userOperateRole(spaceId, uid, roleCodes);
         if (!RoleTypeEnum.isNormalRoleType(roleTypeEnum.name())) {
-            auth = auth && assetService.grantAllAsset(uid);
+            List<IdaasUser> idaasUsers = queryAdmins(spaceId);
+            String adminUserId = null;
+            if (!CollectionUtils.isEmpty(idaasUsers)) {
+                adminUserId = idaasUsers.get(0).getUid();
+            }
+            auth = auth && assetService.grantAllAssetByAdmin(adminUserId,uid);
         }
         return res && auth;
     }
