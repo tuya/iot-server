@@ -79,4 +79,6 @@ public interface AssetService {
     Boolean grantAllAsset(String adminUserId);
 
     Boolean grantAllAssetToAdmin(String spaceId);
+
+    boolean grantAllAssetByAdmin(String adminUserId, String uid);
 }

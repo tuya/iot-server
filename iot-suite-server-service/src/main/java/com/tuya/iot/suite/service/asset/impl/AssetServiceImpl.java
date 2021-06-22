@@ -125,8 +125,7 @@ public class AssetServiceImpl implements AssetService {
 
 
     @Override
-    public Response
-    updateAsset(String userId, String assetId, String assetName) {
+    public Response updateAsset(String userId, String assetId, String assetName) {
         checkAssetAuthOfUser(assetId, userId);
         AssetModifyRequest request = new AssetModifyRequest();
         request.setName(assetName);
@@ -818,22 +817,46 @@ public class AssetServiceImpl implements AssetService {
     }
 
 
+    @Override
+    public boolean grantAllAssetByAdmin(String adminUserId, String userId) {
+        List<String> adminAuthIds = listAuthorizedAssetIds(adminUserId);
+        List<String> authorizedAssetIds = listAuthorizedAssetIds(userId);
+        Map<String, String> authMap = new HashMap();
+        if (!CollectionUtils.isEmpty(authorizedAssetIds)) {
+            authMap = authorizedAssetIds.stream().collect(Collectors.toMap(e -> e, e -> e));
+        }
+        List<String> needGrantIds = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(authorizedAssetIds)) {
+            for (String adminAuthId : adminAuthIds) {
+                if (!authMap.containsKey(adminAuthId)) {
+                    needGrantIds.add(adminAuthId);
+                }
+            }
+        }
+        if (!CollectionUtils.isEmpty(needGrantIds)) {
+           return  batchAssetsAuthorizedToUser(userId, needGrantIds, false);
+        }
+        return false;
+    }
+
+
 
     @Override
     public Boolean grantAllAsset(String adminUserId) {
-        List<String> notAuthIds = findNotAutAssetIdsByUser(adminUserId);
+        List<String> notAuthIds = findNotAuthAssetIdsByUser(adminUserId);
         if (!CollectionUtils.isEmpty(notAuthIds)) {
             return batchAssetsAuthorizedToUser(adminUserId,notAuthIds,false);
         }
         return true;
     }
 
-    private List<String> findNotAutAssetIdsByUser(String adminUserId) {
-        List<String> authorizedAssetIds = listAuthorizedAssetIds(adminUserId);
+    private List<String> findNotAuthAssetIdsByUser(String userId) {
+        List<String> authorizedAssetIds = listAuthorizedAssetIds(userId);
         Map<String, String> authMap = new HashMap();
         if (!CollectionUtils.isEmpty(authorizedAssetIds)) {
             authMap = authorizedAssetIds.stream().collect(Collectors.toMap(e -> e, e -> e));
         }
+
         return findNotAutAssetIds("-1", authMap, 0);
     }
 
