@@ -826,7 +826,7 @@ public class AssetServiceImpl implements AssetService {
             authMap = authorizedAssetIds.stream().collect(Collectors.toMap(e -> e, e -> e));
         }
         List<String> needGrantIds = new ArrayList<>();
-        if (!CollectionUtils.isEmpty(authorizedAssetIds)) {
+        if (!CollectionUtils.isEmpty(adminAuthIds)) {
             for (String adminAuthId : adminAuthIds) {
                 if (!authMap.containsKey(adminAuthId)) {
                     needGrantIds.add(adminAuthId);
