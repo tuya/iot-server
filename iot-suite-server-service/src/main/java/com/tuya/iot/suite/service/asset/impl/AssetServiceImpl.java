@@ -66,7 +66,7 @@ public class AssetServiceImpl implements AssetService {
     private DeviceService deviceService;
     @Resource
     private UserService userService;
-    @Value("${asset.auth.size:50}")
+    @Value("${asset.auth.size:40}")
     private Integer assetAuthSize;
 
     @Override
@@ -116,16 +116,13 @@ public class AssetServiceImpl implements AssetService {
         //给系统管理员授权
         List<IdaasUser> idaasUsers = userService.queryAdmins(spaceId);
         if (!CollectionUtils.isEmpty(idaasUsers)) {
-            List<Asset> assetList = getChildAssetsBy("-1");
-            if (!CollectionUtils.isEmpty(assetList)) {
-                List<String> assetIds = assetList.stream().map(e -> e.getAsset_id()).collect(Collectors.toList());
-                for (IdaasUser idaasUser : idaasUsers) {
-                    result = result && batchAssetsAuthorizedToUser(idaasUser.getUid(), assetIds, true);
-                }
+            for (IdaasUser idaasUser : idaasUsers) {
+                result = result && grantAllAsset(idaasUser.getUid());
             }
         }
         return result;
     }
+
 
     @Override
     public Response
@@ -820,6 +817,44 @@ public class AssetServiceImpl implements AssetService {
         return opres;
     }
 
+
+
+    @Override
+    public Boolean grantAllAsset(String adminUserId) {
+        List<String> notAuthIds = findNotAutAssetIdsByUser(adminUserId);
+        if (!CollectionUtils.isEmpty(notAuthIds)) {
+            return batchAssetsAuthorizedToUser(adminUserId,notAuthIds,false);
+        }
+        return true;
+    }
+
+    private List<String> findNotAutAssetIdsByUser(String adminUserId) {
+        List<String> authorizedAssetIds = listAuthorizedAssetIds(adminUserId);
+        Map<String, String> authMap = new HashMap();
+        if (!CollectionUtils.isEmpty(authorizedAssetIds)) {
+            authMap = authorizedAssetIds.stream().collect(Collectors.toMap(e -> e, e -> e));
+        }
+        return findNotAutAssetIds("-1", authMap, 0);
+    }
+
+    private List<String> findNotAutAssetIds(String assetId, Map<String, String> authMap, int level) {
+        List<String> needGrantIds = new ArrayList<>();
+        if (level > 4) {
+            return needGrantIds;
+        }
+        List<Asset> assetList = getChildAssetsBy(assetId);
+        while (!CollectionUtils.isEmpty(assetList)) {
+            for (Asset asset : assetList) {
+                if (!authMap.containsKey(asset.getAsset_id())) {
+                    needGrantIds.add(asset.getAsset_id());
+                }
+                needGrantIds.addAll(findNotAutAssetIds(asset.getAsset_id(), authMap, level+1));
+            }
+        }
+        return needGrantIds;
+    }
+
+
     private boolean batchAssetsUnAuthorizedToUser(String userId, List<String> cancelIds, boolean authorized_children) {
         return PageHelper.doListBySize(assetAuthSize, cancelIds, (ids) ->
                 assetAbility.batchAssetsUnAuthorizedToUser(userId, new AssetAuthBatchToUser(userId, String.join(",", ids), authorized_children))
@@ -831,58 +866,4 @@ public class AssetServiceImpl implements AssetService {
                 assetAbility.batchAssetsUnAuthorizedToUser(userId, new AssetAuthBatchToUser(userId, String.join(",", ids), authorized_children))
         );
     }
-
-    @Override
-    public Boolean grantAllAsset(String adminUserId) {
-        List<Asset> assetList = getChildAssetsBy("-1");
-        if (!CollectionUtils.isEmpty(assetList)) {
-            List<String> assetIds = assetList.stream().map(e -> e.getAsset_id()).collect(Collectors.toList());
-            return assetAbility.batchAssetsAuthorizedToUser(adminUserId, new AssetAuthBatchToUser(adminUserId, String.join(",", assetIds), true));
-        }
-        return true;
-    }
-
-
-    private List<AssetDTO> queryAllAssetTree(List<AssetDTO> tree) {
-        if (tree == null) {
-            tree = getTree("-1");
-        }
-        if (!CollectionUtils.isEmpty(tree)) {
-            tree.stream().forEach(e -> {
-                e.setIs_authorized(true);
-                if (!CollectionUtils.isEmpty(e.getSubAssets())) {
-                    queryAllAssetTree(e.getSubAssets());
-                }
-            });
-        }
-        return tree;
-    }
-
-    /**
-     * 将list整合为树
-     *
-     * @param resList
-     * @return
-     */
-    private List<AssetDTO> buildTree(List<AssetDTO> resList, String topId) {
-        List<AssetDTO> targetList = new ArrayList<>();
-        if (!CollectionUtils.isEmpty(resList)) {
-            Map<String, AssetDTO> assetDTOMap = resList.stream().collect(Collectors.toMap(AssetDTO::getAsset_id, e -> e));
-            for (AssetDTO assetDTO : resList) {
-                if (assetDTOMap.containsKey(assetDTO.getParent_asset_id())) {
-                    AssetDTO parent = assetDTOMap.get(assetDTO.getParent_asset_id());
-                    parent.getSubAssets().add(assetDTO);
-                    parent.setChild_asset_count(parent.getChild_asset_count() + 1);
-                }
-            }
-            for (String assetId : assetDTOMap.keySet()) {
-                AssetDTO assetDTO = assetDTOMap.get(assetId);
-                if (assetDTO.getParent_asset_id().equals(topId)) {
-                    targetList.add(assetDTO);
-                }
-            }
-        }
-        return targetList;
-    }
-
 }
