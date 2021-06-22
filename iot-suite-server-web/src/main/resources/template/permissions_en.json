@@ -111,7 +111,7 @@
           "remark": "Device list"
         },
         {
-          "permissionName": "Create device",
+          "permissionName": "Add device",
           "permissionType": "api",
           "permissionCode": "2002",
           "parentCode": "2000",
@@ -125,10 +125,10 @@
             "manager",
             "normal"
           ],
-          "remark": "Create device"
+          "remark": "Add device"
         },
         {
-          "permissionName": "Device operate",
+          "permissionName": "Operate device ",
           "permissionType": "button",
           "permissionCode": "2003",
           "parentCode": "2000",
@@ -147,7 +147,7 @@
       ]
     },
     {
-      "permissionName": "Role",
+      "permissionName": "Role Permission",
       "permissionType": "menu",
       "permissionCode": "3000",
       "parentCode": null,
@@ -157,11 +157,11 @@
         "admin",
         "manager"
       ],
-      "remark": "Role ability",
+      "remark": "Role Permission",
       "dependencies": [],
       "children": [
         {
-          "permissionName": "View Role ",
+          "permissionName": "View role",
           "permissionType": "api",
           "permissionCode": "3001",
           "parentCode": "3000",
@@ -237,7 +237,7 @@
       ]
     },
     {
-      "permissionName": "Usesr",
+      "permissionName": "User",
       "permissionType": "menu",
       "permissionCode": "4000",
       "parentCode": null,
@@ -251,7 +251,7 @@
       "dependencies": [],
       "children": [
         {
-          "permissionName": "View usesr",
+          "permissionName": "View user",
           "permissionType": "api",
           "permissionCode": "4001",
           "parentCode": "4000",
@@ -265,7 +265,7 @@
           "remark": "Usesr list"
         },
         {
-          "permissionName": "Create usesr",
+          "permissionName": "Create user",
           "permissionType": "api",
           "permissionCode": "4002",
           "parentCode": "4000",
@@ -278,10 +278,10 @@
             "admin",
             "manager"
           ],
-          "remark": "Create usesr"
+          "remark": "Create user"
         },
         {
-          "permissionName": "Asset authorize",
+          "permissionName": "Authorize asset",
           "permissionType": "api",
           "permissionCode": "4007",
           "parentCode": "4000",
