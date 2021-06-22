@@ -12,18 +12,21 @@ public class PageHelper {
 
     public static <T> boolean doListBySize(int size, List<T> ids, ListLoopFunction function) {
         boolean res = true;
-        int tart = 0;
-        int end = size;
-        List<T> tempList = ids.subList(tart, end);
-        while (tempList.size() > 0) {
-            res = res && function.doListLoop(tempList);
-            tart = end;
+        int start = 0;
+        int end = 0;
+        List<T> tempList;
+        do{
+            start = end;
             end += size;
+            if (start >= ids.size()) {
+                break;
+            }
             if (end > ids.size()) {
                 end = ids.size();
             }
-            tempList = ids.subList(tart, end);
-        }
+            tempList= ids.subList(start, end);
+            res = res && function.doListLoop(tempList);
+        } while (tempList.size() > 0);
         return res;
     }
 }
