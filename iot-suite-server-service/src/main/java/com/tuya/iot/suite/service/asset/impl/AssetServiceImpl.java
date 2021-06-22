@@ -883,8 +883,19 @@ public class AssetServiceImpl implements AssetService {
     }
 
     private boolean batchAssetsAuthorizedToUser(String userId, List<String> grantIds, boolean authorized_children) {
-        return PageHelper.doListBySize(assetAuthSize, grantIds, (ids) ->
-                assetAbility.batchAssetsAuthorizedToUser(userId, new AssetAuthBatchToUser(userId, String.join(",", ids), authorized_children))
+        return PageHelper.doListBySize(assetAuthSize, grantIds, (ids) -> {
+                    boolean result = false;
+                    int b = 0;
+                    while (!result && b < 2) {
+                        try {
+                            result = assetAbility.batchAssetsAuthorizedToUser(userId, new AssetAuthBatchToUser(userId, String.join(",", ids), authorized_children));
+                        } catch (Exception e) {
+                            b++;
+                            result = false;
+                        }
+                    }
+                    return result;
+                }
         );
     }
 }
