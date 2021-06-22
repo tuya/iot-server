@@ -209,7 +209,11 @@ public class UserServiceImpl implements UserService {
             if (!CollectionUtils.isEmpty(idaasUsers)) {
                 adminUserId = idaasUsers.get(0).getUid();
             }
-            auth = auth && assetService.grantAllAssetByAdmin(adminUserId,uid);
+            try {
+                auth = auth && assetService.grantAllAssetByAdmin(adminUserId, uid);
+            } catch (Exception e) {
+                log.error("给管理员授权失败：", e);
+            }
         }
         return res && auth;
     }
