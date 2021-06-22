@@ -834,18 +834,17 @@ public class AssetServiceImpl implements AssetService {
             }
         }
         if (!CollectionUtils.isEmpty(needGrantIds)) {
-           return  batchAssetsAuthorizedToUser(userId, needGrantIds, false);
+            return batchAssetsAuthorizedToUser(userId, needGrantIds, false);
         }
         return false;
     }
-
 
 
     @Override
     public Boolean grantAllAsset(String adminUserId) {
         List<String> notAuthIds = findNotAuthAssetIdsByUser(adminUserId);
         if (!CollectionUtils.isEmpty(notAuthIds)) {
-            return batchAssetsAuthorizedToUser(adminUserId,notAuthIds,false);
+            return batchAssetsAuthorizedToUser(adminUserId, notAuthIds, false);
         }
         return true;
     }
@@ -857,21 +856,20 @@ public class AssetServiceImpl implements AssetService {
             authMap = authorizedAssetIds.stream().collect(Collectors.toMap(e -> e, e -> e));
         }
 
-        return findNotAutAssetIds("-1", authMap, 0);
+        return findNotAutAssetIds("-1", authMap);
     }
 
-    private List<String> findNotAutAssetIds(String assetId, Map<String, String> authMap, int level) {
+    private List<String> findNotAutAssetIds(String assetId, Map<String, String> authMap) {
         List<String> needGrantIds = new ArrayList<>();
-        if (level > 4) {
-            return needGrantIds;
-        }
         List<Asset> assetList = getChildAssetsBy(assetId);
-        while (!CollectionUtils.isEmpty(assetList)) {
+        if (!CollectionUtils.isEmpty(assetList)) {
             for (Asset asset : assetList) {
                 if (!authMap.containsKey(asset.getAsset_id())) {
                     needGrantIds.add(asset.getAsset_id());
                 }
-                needGrantIds.addAll(findNotAutAssetIds(asset.getAsset_id(), authMap, level+1));
+                if (asset.getLevel() < 4) {
+                    needGrantIds.addAll(findNotAutAssetIds(asset.getAsset_id(), authMap));
+                }
             }
         }
         return needGrantIds;
@@ -886,7 +884,7 @@ public class AssetServiceImpl implements AssetService {
 
     private boolean batchAssetsAuthorizedToUser(String userId, List<String> grantIds, boolean authorized_children) {
         return PageHelper.doListBySize(assetAuthSize, grantIds, (ids) ->
-                assetAbility.batchAssetsUnAuthorizedToUser(userId, new AssetAuthBatchToUser(userId, String.join(",", ids), authorized_children))
+                assetAbility.batchAssetsAuthorizedToUser(userId, new AssetAuthBatchToUser(userId, String.join(",", ids), authorized_children))
         );
     }
 }
