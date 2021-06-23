@@ -23,6 +23,13 @@ then
   base_param=${base_param}" -Dcaptcha.notice.resetPassword.sms.templateId.cn"=$SMS_TEMPLATEID_CN
 fi
 
+if [ "$IN18_HTTP_HEADER_NAME" != "" ]
+then
+  base_param=${base_param}" -Din18.http.header.name"=$IN18_HTTP_HEADER_NAME
+else
+    base_param=${base_param}" -Din18.http.header.name=Accept-Language"
+fi
+
 if [ "$SMS_TEMPLATEID_EN" != "" ]
 then
   base_param=${base_param}" -Dcaptcha.notice.resetPassword.sms.templateId.en"=$SMS_TEMPLATEID_EN
@@ -37,6 +44,68 @@ if [ "$MAIL_TEMPLATEID_EN" != "" ]
 then
   base_param=${base_param}" -Dcaptcha.notice.resetPassword.mail.templateId.en"=$MAIL_TEMPLATEID_EN
 fi
+
+if [ "$PERMISSION_SPACE_OWNER" != "" ]
+then
+  base_param=${base_param}" -Dproject.permissionSpaceOwner"=$PERMISSION_SPACE_OWNER
+else
+    base_param=${base_param}" -Dproject.permissionSpaceOwner=tuya-iot"
+fi
+
+if [ "$PERMISSION_SPACE_ID" != "" ]
+then
+  base_param=${base_param}" -Dproject.permission-space-id"=$PERMISSION_SPACE_ID
+fi
+
+if [ "$PERMISSION_SPACE_GROUP" != "" ]
+then
+  base_param=${base_param}" -Dproject.permission-group"=$PERMISSION_SPACE_GROUP
+else
+    base_param=${base_param}" -Dproject.permission-group=tuya-iot-prod"
+fi
+
+if [ "$PERMISSION_SPACE_CODE" != "" ]
+then
+  base_param=${base_param}" -Dproject.permission-space-code"=$PERMISSION_SPACE_CODE
+else
+    base_param=${base_param}" -Dproject.permission-space-code=iot-app-smart-office"
+fi
+
+if [ "$PERMISSION_AUTO_INIT" != "" ]
+then
+  base_param=${base_param}" -Dproject.permission-auto-init"=$PERMISSION_AUTO_INIT
+else
+    base_param=${base_param}" -Dproject.permission-auto-init=true"
+fi
+
+if [ "$PERMISSION_SPACE_AUTHENTICATION" != "" ]
+then
+  base_param=${base_param}" -Dproject.permission-space-authentication"=$PERMISSION_SPACE_AUTHENTICATION
+else
+    base_param=${base_param}" -Dproject.permission-space-authentication=2"
+fi
+
+if [ "$SPRING_REDIS_NAMESPACE" != "" ]
+then
+  base_param=${base_param}" -Dspring.session.redis.namespace"=$SPRING_REDIS_NAMESPACE
+else
+    base_param=${base_param}" -Dspring.session.redis.namespace=iot-suite-server"
+fi
+
+if [ "$SERVER_SESSION_TIMEOUT" != "" ]
+then
+  base_param=${base_param}" -Dserver.session.timeout"=$SERVER_SESSION_TIMEOUT
+else
+    base_param=${base_param}" -Dserver.session.timeout=7200"
+fi
+
+if [ "$ASSET_AUTH_SIZE" != "" ]
+then
+  base_param=${base_param}" -Dasset.auth.size"=$ASSET_AUTH_SIZE
+else
+    base_param=${base_param}" -Dasset.auth.size=50"
+fi
+
 
 echo $base_param
 
