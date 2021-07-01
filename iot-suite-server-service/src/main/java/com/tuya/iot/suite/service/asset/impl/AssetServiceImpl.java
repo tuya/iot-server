@@ -7,17 +7,21 @@ import com.tuya.connector.api.exceptions.ConnectorException;
 import com.tuya.connector.open.api.model.PageResult;
 import com.tuya.iot.suite.ability.asset.ability.AssetAbility;
 import com.tuya.iot.suite.ability.asset.model.*;
+import com.tuya.iot.suite.ability.idaas.model.IdaasUser;
 import com.tuya.iot.suite.core.constant.Response;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
+import com.tuya.iot.suite.core.model.PageDataVO;
 import com.tuya.iot.suite.core.util.SimpleConvertUtil;
 import com.tuya.iot.suite.service.asset.AssetService;
 import com.tuya.iot.suite.service.device.DeviceService;
 import com.tuya.iot.suite.service.dto.AssetConvertor;
 import com.tuya.iot.suite.service.dto.AssetDTO;
 import com.tuya.iot.suite.service.dto.DeviceDTO;
-import com.tuya.iot.suite.service.model.PageDataVO;
+import com.tuya.iot.suite.service.user.UserService;
+import com.tuya.iot.suite.service.util.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pulsar.shade.org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StopWatch;
@@ -60,9 +64,13 @@ public class AssetServiceImpl implements AssetService {
 
     @Resource
     private DeviceService deviceService;
+    @Resource
+    private UserService userService;
+    @Value("${asset.auth.size:40}")
+    private Integer assetAuthSize;
 
     @Override
-    public Response addAsset(String assetName, String parentAssetId, String userId) {
+    public Response addAsset(String spaceId, String assetName, String parentAssetId, String userId) {
         //Don't need check asset authorization if the parentAssetId is blank
         if (!StringUtils.isEmpty(parentAssetId)) {
             checkAssetAuthOfUser(parentAssetId, userId);
@@ -71,7 +79,7 @@ public class AssetServiceImpl implements AssetService {
         request.setName(assetName);
         request.setParent_asset_id(parentAssetId);
         String assetId = assetAbility.addAsset(request);
-        authorizedAssetWithoutToChildren(assetId, userId);
+        authorizedAssetWithoutToChildren(spaceId, assetId, userId);
         // addAssetToCache(assetId, request, false);
         return new Response(assetId);
     }
@@ -83,7 +91,7 @@ public class AssetServiceImpl implements AssetService {
      * @param assetId
      * @param userId
      */
-    private void authorizedAssetWithoutToChildren(String assetId, String userId) {
+    private void authorizedAssetWithoutToChildren(String spaceId, String assetId, String userId) {
         log.info("开始资产[{}]授权给用户[{}]", assetId, userId);
         AssetAuthorizationRequest assetAuthorizationRequest = new AssetAuthorizationRequest(userId, assetId, false);
         Boolean result = assetAbility.authorized(assetAuthorizationRequest);
@@ -92,11 +100,32 @@ public class AssetServiceImpl implements AssetService {
         } else {
             log.info("资产[{}]授权给用户[{}]成功", assetId, userId);
         }
+        //给系统管理员授权
+        List<IdaasUser> idaasUsers = userService.queryAdmins(spaceId);
+        if (!CollectionUtils.isEmpty(idaasUsers)) {
+            for (IdaasUser idaasUser : idaasUsers) {
+                assetAuthorizationRequest.setUid(idaasUser.getUid());
+                result = result && assetAbility.authorized(assetAuthorizationRequest);
+            }
+        }
     }
 
     @Override
-    public Response
-    updateAsset(String userId, String assetId, String assetName) {
+    public Boolean grantAllAssetToAdmin(String spaceId) {
+        boolean result = true;
+        //给系统管理员授权
+        List<IdaasUser> idaasUsers = userService.queryAdmins(spaceId);
+        if (!CollectionUtils.isEmpty(idaasUsers)) {
+            for (IdaasUser idaasUser : idaasUsers) {
+                result = result && grantAllAsset(idaasUser.getUid());
+            }
+        }
+        return result;
+    }
+
+
+    @Override
+    public Response updateAsset(String userId, String assetId, String assetName) {
         checkAssetAuthOfUser(assetId, userId);
         AssetModifyRequest request = new AssetModifyRequest();
         request.setName(assetName);
@@ -274,18 +303,6 @@ public class AssetServiceImpl implements AssetService {
     @Override
     public List<AssetDTO> getAssetByName(String assetName, String userId) {
         // TODO 云端API暂时未能提供接口，目前从缓存获取
-        /*List<Asset> assets = new ArrayList<>();
-        final Integer pageSize = 100;
-        boolean hasNext = true;
-        String lastRowKey = "";
-        while (hasNext) {
-            PageResult<Asset> childAssetsBy = assetAbility.selectAssets("", assetName, lastRowKey, pageSize);
-            hasNext = childAssetsBy.getHas_next();
-            lastRowKey = childAssetsBy.getLast_row_key();
-            assets.addAll(childAssetsBy.getList());
-        }
-        List<AssetDTO> result = SimpleConvertUtil.convert(assets, AssetDTO.class);
-        setAssetChildInfo(result);*/
         List<String> authorizedAssetIds = listAuthorizedAssetIds(userId);
         List<AssetDTO> result = new ArrayList<>();
         getAssetByName(assetName, ASSET_CACHE.get("-1"), result, authorizedAssetIds);
@@ -366,21 +383,7 @@ public class AssetServiceImpl implements AssetService {
             return new ArrayList<>();
         }
         return assetAbility.selectAssets(String.join(",", assetIds));
-        // List<Asset> list = new ArrayList<>();
-        // StringBuilder assetIdParam = new StringBuilder();
-        // int i = 0;
-        // for (String assetId : assetIds) {
-        //     i++;
-        //     assetIdParam.append(",").append(assetId);
-        //     if (i % 20 == 0) {
-        //         PageResult<Asset> pageResult = assetAbility.selectAssets(assetIdParam.toString(), "", "", 20);
-        //         if (!CollectionUtils.isEmpty(pageResult.getList())) {
-        //             list.addAll(pageResult.getList());
-        //         }
-        //         assetIdParam = new StringBuilder();
-        //     }
-        // }
-        // return list;
+
     }
 
     /**
@@ -430,7 +433,7 @@ public class AssetServiceImpl implements AssetService {
         }
         // 从底层向上补全资产树
         Map<Integer, List<AssetDTO>> levelMap = assetList.stream().collect(Collectors.groupingBy(AssetDTO::getLevel)); // TODO 是否包含-1
-        int targetLevel = "-1".equals(targetAssetId) ? 0 : assetMap.get(targetAssetId).getLevel() ;
+        int targetLevel = "-1".equals(targetAssetId) ? 0 : assetMap.get(targetAssetId).getLevel();
         for (int i = maxLevel; i > targetLevel; i--) {
             List<AssetDTO> assetDTOS = levelMap.get(i);
             if (CollectionUtils.isEmpty(assetDTOS)) {
@@ -767,4 +770,143 @@ public class AssetServiceImpl implements AssetService {
         return assetDTO.getSubAssets();
     }
 
+    @Override
+    public List<AssetDTO> getTreeByUser(String userId) {
+        List<AuthorizedAsset> authorizedAssets = listAuthorizedAssets(userId);
+        if (CollectionUtils.isEmpty(authorizedAssets)) {
+            return new ArrayList<>();
+        }
+        AssetDTO assetDTO = buildAuthedAssetTree(authorizedAssets, "-1", false);
+        return assetDTO != null ? assetDTO.getSubAssets() : new ArrayList<>();
+    }
+
+    @Override
+    public Boolean authAssetToUser(String userId, List<String> assetIds) {
+        List<String> authIds = listAuthorizedAssetIds(userId);
+        Map<String, String> authMap = new HashMap<>();
+        Map<String, String> grantMap = new HashMap<>();
+        if (!CollectionUtils.isEmpty(authIds)) {
+            authMap = authIds.stream().collect(Collectors.toMap(e -> e, e -> e));
+        }
+        if (!CollectionUtils.isEmpty(assetIds)) {
+            grantMap = assetIds.stream().collect(Collectors.toMap(e -> e, e -> e));
+        }
+        List<String> grantIds = new ArrayList<>();
+        List<String> cancelIds = new ArrayList<>();
+        //取出本次被取消的权限
+        for (String assetId : authMap.keySet()) {
+            if (!grantMap.containsKey(assetId)) {
+                cancelIds.add(assetId);
+            }
+        }
+        //取出已经被授权的，不重复授权
+        for (String assetId : grantMap.keySet()) {
+            if (!authMap.containsKey(assetId)) {
+                grantIds.add(assetId);
+            }
+        }
+        boolean opres = true;
+        if (!CollectionUtils.isEmpty(cancelIds)) {
+            opres = opres && batchAssetsUnAuthorizedToUser(userId, cancelIds, false);
+
+        }
+        if (!CollectionUtils.isEmpty(grantIds)) {
+            opres = opres && batchAssetsAuthorizedToUser(userId, grantIds, false);
+        }
+        return opres;
+    }
+
+
+    @Override
+    public boolean grantAllAssetByAdmin(String adminUserId, String userId) {
+        List<String> adminAuthIds = listAuthorizedAssetIds(adminUserId);
+        List<String> authorizedAssetIds = listAuthorizedAssetIds(userId);
+        Map<String, String> authMap = new HashMap();
+        if (!CollectionUtils.isEmpty(authorizedAssetIds)) {
+            authMap = authorizedAssetIds.stream().collect(Collectors.toMap(e -> e, e -> e));
+        }
+        List<String> needGrantIds = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(adminAuthIds)) {
+            for (String adminAuthId : adminAuthIds) {
+                if (!authMap.containsKey(adminAuthId)) {
+                    needGrantIds.add(adminAuthId);
+                }
+            }
+        }
+        if (!CollectionUtils.isEmpty(needGrantIds)) {
+            return batchAssetsAuthorizedToUser(userId, needGrantIds, false);
+        }
+        return false;
+    }
+
+
+    @Override
+    public Boolean grantAllAsset(String adminUserId) {
+        List<String> notAuthIds = findNotAuthAssetIdsByUser(adminUserId);
+        if (!CollectionUtils.isEmpty(notAuthIds)) {
+            return batchAssetsAuthorizedToUser(adminUserId, notAuthIds, false);
+        }
+        return true;
+    }
+
+    private List<String> findNotAuthAssetIdsByUser(String userId) {
+        List<String> authorizedAssetIds = listAuthorizedAssetIds(userId);
+        Map<String, String> authMap = new HashMap();
+        if (!CollectionUtils.isEmpty(authorizedAssetIds)) {
+            authMap = authorizedAssetIds.stream().collect(Collectors.toMap(e -> e, e -> e));
+        }
+
+        return findNotAutAssetIds("-1", authMap);
+    }
+
+    private List<String> findNotAutAssetIds(String assetId, Map<String, String> authMap) {
+        List<String> needGrantIds = new ArrayList<>();
+        List<Asset> assetList = getChildAssetsBy(assetId);
+        if (!CollectionUtils.isEmpty(assetList)) {
+            for (Asset asset : assetList) {
+                if (!authMap.containsKey(asset.getAsset_id())) {
+                    needGrantIds.add(asset.getAsset_id());
+                }
+                if (asset.getLevel() < 4) {
+                    needGrantIds.addAll(findNotAutAssetIds(asset.getAsset_id(), authMap));
+                }
+            }
+        }
+        return needGrantIds;
+    }
+
+
+    private boolean batchAssetsUnAuthorizedToUser(String userId, List<String> cancelIds, boolean authorized_children) {
+        return PageHelper.doListBySize(assetAuthSize, cancelIds, (ids) -> {
+                    boolean result = false;
+                    int b = 0;
+                    while (!result && b < 2) {
+                        try {
+                            result = assetAbility.batchAssetsUnAuthorizedToUser(userId, new AssetAuthBatchToUser(userId, String.join(",", ids), authorized_children));
+                        } catch (Exception e) {
+                            b++;
+                            result = false;
+                        }
+                    }
+                    return result;
+                }
+        );
+    }
+
+    private boolean batchAssetsAuthorizedToUser(String userId, List<String> grantIds, boolean authorized_children) {
+        return PageHelper.doListBySize(assetAuthSize, grantIds, (ids) -> {
+                    boolean result = false;
+                    int b = 0;
+                    while (!result && b < 2) {
+                        try {
+                            result = assetAbility.batchAssetsAuthorizedToUser(userId, new AssetAuthBatchToUser(userId, String.join(",", ids), authorized_children));
+                        } catch (Exception e) {
+                            b++;
+                            result = false;
+                        }
+                    }
+                    return result;
+                }
+        );
+    }
 }

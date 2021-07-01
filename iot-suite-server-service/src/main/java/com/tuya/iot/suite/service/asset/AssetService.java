@@ -4,7 +4,7 @@ package com.tuya.iot.suite.service.asset;
 import com.tuya.iot.suite.core.constant.Response;
 import com.tuya.iot.suite.service.dto.AssetDTO;
 import com.tuya.iot.suite.service.dto.DeviceDTO;
-import com.tuya.iot.suite.service.model.PageDataVO;
+import com.tuya.iot.suite.core.model.PageDataVO;
 
 import java.util.List;
 
@@ -23,7 +23,7 @@ public interface AssetService {
      * @param parentAssetId
      * @return
      */
-    Response addAsset(String assetName, String parentAssetId, String userId);
+    Response addAsset(String spaceId,String assetName, String parentAssetId, String userId);
 
     /**
      * 更新资产
@@ -71,4 +71,14 @@ public interface AssetService {
     void refreshTree();
 
     List<AssetDTO> getTreeFast(String assetId, String userId);
+
+    List<AssetDTO> getTreeByUser(String userId);
+
+    Boolean authAssetToUser(String userId, List<String> assetIds);
+
+    Boolean grantAllAsset(String adminUserId);
+
+    Boolean grantAllAssetToAdmin(String spaceId);
+
+    boolean grantAllAssetByAdmin(String adminUserId, String uid);
 }

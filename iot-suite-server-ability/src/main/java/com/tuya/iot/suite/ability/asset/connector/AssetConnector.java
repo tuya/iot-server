@@ -55,6 +55,17 @@ public interface AssetConnector extends AssetAbility {
     @POST("/v1.0/iot-03/assets/actions/user-authorized")
     Boolean authorized(@Body AssetAuthorizationRequest assetAuthorizationRequest);
 
+    @Override
+    @POST("/v1.0/iot-03/users/{uid}/actions/batch-assets-authorized")
+    Boolean batchAssetsAuthorizedToUser(@Path("uid") String userId, @Body AssetAuthBatchToUser assetAuthBatchToUser);
+
+    @Override
+    @POST("/v1.0/iot-03/users/{uid}/actions/batch-assets-unauthorized")
+    Boolean batchAssetsUnAuthorizedToUser(@Path("uid")String userId, @Body AssetAuthBatchToUser assetAuthBatchToUser);
+
+    @Override
+    @POST("/v1.0/iot-03/users/{uid}/actions/assets-unauthorized")
+    Boolean assetsUnAuthorizedToUser(@Path("uid")String userId,@Body AssetAuthToUser assetAuthToUser);
 
     @Override
     @GET("/v1.0/iot-03/users/{uid}/assets")

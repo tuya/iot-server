@@ -14,11 +14,13 @@ import java.util.Objects;
  */
 public class ContextUtil {
 
-    private static final ThreadLocal<Map<String, Object>> MAP = new ThreadLocal<>();
+    private static final ThreadLocal<Map<String, Object>> MAP = new InheritableThreadLocal<>();
 
     private static final String KEY_TOKEN = "token";
 
     private static final String KEY_LANGUAGE = "language";
+
+    private static final String DEFAULT_LANG = "zh";
 
 
     private static Map<String, Object> getLocalMap() {
@@ -71,8 +73,16 @@ public class ContextUtil {
         }
         return null;
     }
+    public static String getLanguageOrDefault() {
+        Object o = getLocalMap().get(KEY_LANGUAGE);
+        if (Objects.nonNull(o)) {
+            return (String) o;
+        }
+        return DEFAULT_LANG;
+    }
 
     public static void remove() {
         MAP.remove();
     }
+
 }

@@ -3,12 +3,14 @@ package com.tuya.iot.suite.web.config.session;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tuya.iot.suite.web.util.SessionContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.session.config.annotation.web.http.EnableSpringHttpSession;
 
@@ -16,7 +18,7 @@ import org.springframework.session.config.annotation.web.http.EnableSpringHttpSe
 @EnableSpringHttpSession
 public class HttpSessionConfig {
 
-    @Value("${iot-suite-server.session.timeout:7200}")
+    @Value("${server.session.timeout}")
     private Integer timeout;
 
     /**
@@ -27,7 +29,7 @@ public class HttpSessionConfig {
      */
     @Bean
     public HttpSessionStrategy httpSessionStrategy() {
-        return new HttpSessionStrategy("token");
+        return new HttpSessionStrategy(SessionContext.USER_TOKEN_ATTR_NAME);
     }
 
     @Bean
@@ -43,7 +45,8 @@ public class HttpSessionConfig {
         jackson2JsonRedisSerializer.setObjectMapper(objectMapper);
 
         // 设置key和value的序列化规则
-        template.setValueSerializer(jackson2JsonRedisSerializer);
+        //template.setValueSerializer(jackson2JsonRedisSerializer);
+        template.setValueSerializer(new JdkSerializationRedisSerializer());
         template.setKeySerializer(new StringRedisSerializer());
         template.afterPropertiesSet();
 

@@ -1,8 +1,6 @@
 package com.tuya.iot.suite.ability.asset.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
 
@@ -11,7 +9,9 @@ import java.io.Serializable;
  * @auther: Medivh.chen@tuya.com
  * @date: 2021/04/20
  **/
-@Data
+@Getter
+@Setter
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 public class AssetAuthorizationRequest implements Serializable {

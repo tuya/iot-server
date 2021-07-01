@@ -1,34 +1,48 @@
 package com.tuya.iot.suite.web.controller;
 
+import com.tuya.iot.suite.ability.idaas.model.PermissionTypeEnum;
 import com.tuya.iot.suite.ability.user.model.MobileCountries;
+import com.tuya.iot.suite.ability.user.model.UserBaseInfo;
+import com.tuya.iot.suite.ability.user.model.UserRegisteredRequest;
+import com.tuya.iot.suite.core.constant.ErrorCode;
 import com.tuya.iot.suite.core.constant.Response;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
-import com.tuya.iot.suite.core.model.UserToken;
+import com.tuya.iot.suite.core.model.PageVO;
 import com.tuya.iot.suite.core.util.ContextUtil;
 import com.tuya.iot.suite.core.util.LibPhoneNumberUtil;
 import com.tuya.iot.suite.core.util.MixUtil;
+import com.tuya.iot.suite.service.idaas.GrantService;
+import com.tuya.iot.suite.service.idaas.PermissionService;
 import com.tuya.iot.suite.service.user.UserService;
-import com.tuya.iot.suite.service.user.model.CaptchaPushBo;
 import com.tuya.iot.suite.service.user.model.ResetPasswordBo;
-import com.tuya.iot.suite.web.i18n.I18nMessage;
+import com.tuya.iot.suite.web.config.ProjectProperties;
 import com.tuya.iot.suite.web.model.ResetPasswordReq;
-import com.tuya.iot.suite.web.model.criteria.UserCriteria;
+import com.tuya.iot.suite.web.model.request.user.*;
+import com.tuya.iot.suite.web.model.response.permission.PermissionDto;
+import com.tuya.iot.suite.web.model.response.role.RoleDto;
+import com.tuya.iot.suite.web.model.response.user.UserDto;
+import com.tuya.iot.suite.web.util.ResponseI18n;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.tuya.iot.suite.core.constant.ErrorCode.*;
 
 
 /**
- * @author bade
+ * @author bade, benguan
  */
 @RestController
 @Slf4j
@@ -37,84 +51,32 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
     @Autowired
-    private HttpSession session;
+    private ProjectProperties projectProperties;
+
     @Autowired
-    private I18nMessage i18nMessage;
+    private GrantService grantService;
+
+    @Autowired
+    private PermissionService permissionService;
 
     /**
-     * 账号密码登录
-     *
-     * @param criteria 参数
-     * @return
-     */
-    @ApiOperation(value = "用户登录")
-    @SneakyThrows
-    @PostMapping(value = "/login")
-    public Response login(@RequestBody UserCriteria criteria) {
-        //判断是何种登录方式
-        String username = criteria.getUser_name();
-        String password = criteria.getLogin_password();
-        if (StringUtils.isEmpty(criteria.getUser_name())) {
-            //用户名为空，采用手机登录
-            //校验手机号码合法性
-            if (!LibPhoneNumberUtil.doValid(criteria.getTelephone(), criteria.getCountry_code())) {
-                log.info("telephone format error! =>{}{}", criteria.getCountry_code(), criteria.getTelephone());
-                return Response.buildFailure(TELEPHONE_FORMAT_ERROR.getCode(),
-                        i18nMessage.getMessage(TELEPHONE_FORMAT_ERROR.getCode(), TELEPHONE_FORMAT_ERROR.getMsg()));
-            }
-            username = criteria.getTelephone();
-        }
-        String userId = userService.login(username, password).getUid();
-        UserToken userToken = new UserToken(userId, username, session.getId(), 1);
-        session.setAttribute("token", userToken);
-        return new Response(userToken);
-    }
-
-    /**
-     * 退出
-     *
-     * @return
-     */
-    @ApiOperation(value = "用户登出")
-    @PostMapping(value = "/logout")
-    public Response<Boolean> logout() {
-        session.invalidate();
-        return Response.buildSuccess(true);
-    }
-
-    /**
-     * 使用会话中的信息
-     *
-     * @return
+     * 神逻辑：用户改自己密码还需要权限？
      */
     @ApiOperation(value = "修改密码")
     @SneakyThrows
     @PutMapping(value = "/user/password")
-    public Response modifyLoginPassword(@RequestBody UserCriteria criteria) {
-        String userName = criteria.getUser_name();
-        String currentPassword = criteria.getCurrent_password();
-        String newPassword = criteria.getNew_password();
-        if (!userName.equals(ContextUtil.getNickName())) {
-            return Response.buildFailure(USER_NOT_EXIST);
-        }
-        Boolean modifyLoginPassword = userService.modifyLoginPassword(ContextUtil.getUserId(), currentPassword, newPassword);
+    @RequiresPermissions("6002")
+    public Response<Boolean> modifyLoginPassword(@RequestBody UserPasswordModifyReq req) {
+        Boolean modifyLoginPassword = userService.modifyLoginPassword(ContextUtil.getUserId(), req.getCurrent_password(), req.getNew_password());
         return modifyLoginPassword ? Response.buildSuccess(true) :
-                Response.buildFailure(USER_NOT_EXIST.getCode(), i18nMessage.getMessage(USER_NOT_EXIST.getCode(), USER_NOT_EXIST.getMsg()));
+                ResponseI18n.buildFailure(USER_NOT_EXIST);
     }
 
-    @ApiOperation(value = "获取密码重置验证码")
-    @PostMapping(value = "/user/password/reset/captcha")
-    public Response<Boolean> restPasswordCaptcha(@RequestBody ResetPasswordReq req) {
-        resetPasswordCheck(req);
-        CaptchaPushBo captchaPushBo = new CaptchaPushBo();
-        captchaPushBo.setLanguage(req.getLanguage());
-        captchaPushBo.setCountryCode(req.getCountryCode());
-        captchaPushBo.setPhone(req.getPhone());
-        captchaPushBo.setMail(req.getMail());
-        return Response.buildSuccess(userService.sendRestPasswordCaptcha(captchaPushBo));
-    }
-
+    /**
+     * 这个还需要吗？要验证码的
+     */
     @ApiOperation(value = "用户密码重置")
     @PostMapping(value = "/user/password/reset")
     public Response<Boolean> resetPassword(@RequestBody @Valid ResetPasswordReq req) {
@@ -144,7 +106,7 @@ public class UserController {
      *
      * @param req
      */
-    public void resetPasswordCheck(ResetPasswordReq req) {
+    private void resetPasswordCheck(ResetPasswordReq req) {
         if (StringUtils.isEmpty(req.getMail())
                 && StringUtils.isEmpty(req.getCountryCode())
                 && StringUtils.isEmpty(req.getPhone())) {
@@ -167,4 +129,130 @@ public class UserController {
         }
     }
 
+    @ApiOperation("创建用户")
+    @PostMapping("/users")
+    @RequiresPermissions("4002")
+    public Response<Boolean> createUser(@RequestBody UserAddReq req) {
+        String spaceId = projectProperties.getPermissionSpaceId();
+        if (CollectionUtils.isEmpty(req.getRoleCodes())) {
+            throw new ServiceLogicException(PARAM_LOST);
+        }
+        //判断是何种登录方式
+        if (!StringUtils.isEmpty(req.getCountryCode())) {
+            //校验手机号码合法性
+            if (!LibPhoneNumberUtil.doValid(req.getUserName(), req.getCountryCode())) {
+                log.info("telephone format error! =>{}{}", req.getCountryCode(), req.getUserName());
+                return ResponseI18n.buildFailure(ErrorCode.TELEPHONE_FORMAT_ERROR);
+            }
+        }
+
+        return Response.buildSuccess(userService.createUser(spaceId, UserRegisteredRequest.builder()
+                .username(req.getUserName())
+                .password(req.getPassword())
+                .country_code(StringUtils.isEmpty(req.getCountryCode()) ? "86" : req.getCountryCode())
+                .nick_name(req.getNickName())
+                .build(), req.getRoleCodes()));
+    }
+
+    @ApiOperation("修改用户")
+    @PutMapping("/users")
+    @RequiresPermissions("4008")
+    public Response<Boolean> updateUserName(@RequestBody UserEditReq req) {
+        String spaceId = projectProperties.getPermissionSpaceId();
+        return Response.buildSuccess(userService.updateUser(spaceId,ContextUtil.getUserId(), req.getUserId(), req.getNickName(), req.getRoleCodes()));
+    }
+
+    @ApiOperation("修改用户密码")
+    @PutMapping("/users/pwd")
+    @RequiresPermissions("4008")
+    public Response<Boolean> updateUserPwd(@RequestBody UserPwdReq req) {
+        return Response.buildSuccess(userService.updateUserPassword(req.getUserName(), req.getNewPwd()));
+    }
+
+    @ApiOperation("删除用户")
+    @DeleteMapping("/users/{userId}")
+    @RequiresPermissions("4008")
+    public Response<Boolean> updateUserPwd(@PathVariable("userId") String userId) {
+        String spaceId = projectProperties.getPermissionSpaceId();
+        return Response.buildSuccess(userService.deleteUser(spaceId, userId));
+    }
+
+    /**
+     * 批量操作，统一按"resources-batch"方式定义路径。（谁有好的建议可以提出来）
+     */
+    @ApiOperation("批量删除用户")
+    @DeleteMapping("/users")
+    @RequiresPermissions("4009")
+    public Response<Boolean> batchDeleteUser(@ApiParam(value = "uid列表，逗号分隔", required = true)
+                                             @RequestParam String userIds) {
+        String spaceId = projectProperties.getPermissionSpaceId();
+        return Response.buildSuccess(userService.batchDeleteUser(spaceId, userIds.split(",")));
+    }
+
+    @ApiOperation("用户列表")
+    @GetMapping("/users")
+    @RequiresPermissions("4001")
+    public Response<PageVO<UserDto>> listUsers(@ApiParam(value = "搜索关键字") @RequestParam(required = false) String searchKey,
+                                               @ApiParam(value = "页码") @RequestParam(required = false) Integer pageNo,
+                                               @ApiParam(value = "角色编码") @RequestParam(required = false) String roleCode,
+                                               @ApiParam(value = "页大小") @RequestParam(required = false) Integer pageSize) {
+        String spaceId = projectProperties.getPermissionSpaceId();
+        if(pageNo == null){
+            pageNo = 1;
+        }
+        if(pageSize == null){
+            pageSize = 20;
+        }
+        PageVO<UserBaseInfo> userBaseInfoPageVO = userService.queryUserByPage(spaceId, searchKey, roleCode, pageNo, pageSize);
+        PageVO<UserDto> result = new PageVO<>();
+        result.setPageNo(userBaseInfoPageVO.getPageNo());
+        result.setPageSize(userBaseInfoPageVO.getPageSize());
+        result.setData(userBaseInfoPageVO.getData().stream().map(e -> {
+                    List<RoleDto> roleDtos = new ArrayList<>();
+                    if (!CollectionUtils.isEmpty(e.getRoles())) {
+                        e.getRoles().stream().forEach(r->{
+                            roleDtos.add(RoleDto.builder()
+                                    .roleCode(r.getRoleCode())
+                                    .roleName(r.getRoleName())
+                                    .remark(r.getRemark())
+                                    .build());
+                        });
+                    }
+                    return UserDto.builder()
+                            .userName(e.getUserName())
+                            .userId(e.getUserId())
+                            .createTime(e.getCreateTime())
+                            .roles(roleDtos)
+                            .build();
+                }
+        ).collect(Collectors.toList()));
+        result.setTotal(userBaseInfoPageVO.getTotal());
+        return Response.buildSuccess(result);
+    }
+
+    @ApiOperation("用户权限列表")
+    @GetMapping("/users/{uid}/permissions")
+    //@RequiresPermissions("4001")
+    public Response<List<PermissionDto>> listUserPermissions(
+            @ApiParam(value = "用户id") @PathVariable String uid) {
+        return Response.buildSuccess(permissionService.queryPermissionsByUser(projectProperties.getPermissionSpaceId(), uid)
+                .stream().map(it -> PermissionDto.builder()
+                        .permissionType(PermissionTypeEnum.fromCode(it.getType()).name())
+                        .permissionName(it.getName())
+                        .permissionCode(it.getPermissionCode())
+                        .remark(it.getRemark())
+                        .order(it.getOrder())
+                        .parentCode(it.getParentCode())
+                        .build()).collect(Collectors.toList())
+        );
+    }
+
+    @ApiOperation("批量给用户授角色")
+    @PutMapping("/users/roles")
+    @RequiresPermissions("4009")
+    public Response<Boolean> grantRole(@RequestBody BatchUserGrantRoleReq req) {
+        String spaceId = projectProperties.getPermissionSpaceId();
+        String uid = ContextUtil.getUserId();
+        return Response.buildSuccess(grantService.setRoleToUsers(spaceId, uid, req.getRoleCode(), req.getUserIds()));
+    }
 }

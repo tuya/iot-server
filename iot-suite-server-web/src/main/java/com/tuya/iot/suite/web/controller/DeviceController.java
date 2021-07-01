@@ -12,6 +12,7 @@ import com.tuya.iot.suite.web.model.criteria.DeviceCommandCriteria;
 import com.tuya.iot.suite.web.model.criteria.DeviceCriteria;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,30 +43,35 @@ public class DeviceController {
 
     @ApiOperation(value = "根据设备ID查询设备信息")
     @RequestMapping(value = "/{device_id}", method = RequestMethod.GET)
+    @RequiresPermissions("2001")
     public Response<DeviceDTO> getDeviceBy(@PathVariable("device_id") String deviceId) {
         return Response.buildSuccess(deviceService.getDeviceBy(deviceId));
     }
 
     @ApiOperation(value = "根据设备ID删除设备")
     @RequestMapping(value = "/{device_id}", method = RequestMethod.DELETE)
+    @RequiresPermissions("2003")
     public Response<Boolean> deleteDeviceBy(@PathVariable("device_id") String deviceId) {
         return Response.buildSuccess(deviceService.deleteDeviceBy(deviceId));
     }
 
     @ApiOperation(value = "根据设备ID修改设备")
     @RequestMapping(value = "/{device_id}", method = RequestMethod.PUT)
+    @RequiresPermissions("2003")
     public Response<Boolean> modifyDeviceBy(@PathVariable("device_id") String deviceId, @RequestBody DeviceCriteria criteria) {
         return Response.buildSuccess(deviceService.modifyDevice(deviceId, SimpleConvertUtil.convert(criteria, DeviceModifyRequest.class)));
     }
 
     @ApiOperation(value = "根据设备ID查询设备指令集")
     @RequestMapping(value = "/specification/{device_id}", method = RequestMethod.GET)
+    @RequiresPermissions("2001")
     public Response<DeviceSpecification> selectDeviceSpecification(@PathVariable("device_id") String deviceId) {
         return Response.buildSuccess(deviceService.selectDeviceSpecification(deviceId));
     }
 
     @ApiOperation(value = "控制设备")
     @RequestMapping(value = "/command/{device_id}", method = RequestMethod.POST)
+    @RequiresPermissions("2003")
     public Response<Boolean> commandDevice(@PathVariable("device_id") String deviceId, @RequestBody List<DeviceCommandCriteria> criteriaList) {
         List<DeviceCommandRequest.Command> convert = SimpleConvertUtil.convert(criteriaList, DeviceCommandRequest.Command.class);
         DeviceCommandRequest request = new DeviceCommandRequest();
@@ -75,6 +81,7 @@ public class DeviceController {
 
     @ApiOperation(value = "设备配网二维码信息")
     @GetMapping(value = "/qrcode")
+    @RequiresPermissions("2002")
     public Response<Map<String, String>> qrcode() {
         Map<String, String> map = new HashMap<>(2);
         map.put("project_name", projectName);

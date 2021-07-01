@@ -1,14 +1,21 @@
 package com.tuya.iot.suite.service.user.impl;
 
+import com.tuya.connector.api.exceptions.ConnectorResultException;
+import com.tuya.iot.suite.ability.idaas.ability.GrantAbility;
+import com.tuya.iot.suite.ability.idaas.ability.IdaasUserAbility;
+import com.tuya.iot.suite.ability.idaas.ability.RoleAbility;
+import com.tuya.iot.suite.ability.idaas.model.*;
 import com.tuya.iot.suite.ability.notice.model.ResetPasswordReq;
 import com.tuya.iot.suite.ability.user.ability.UserAbility;
-import com.tuya.iot.suite.ability.user.model.MobileCountries;
-import com.tuya.iot.suite.ability.user.model.UserModifyRequest;
-import com.tuya.iot.suite.ability.user.model.UserRegisteredRequest;
-import com.tuya.iot.suite.ability.user.model.UserToken;
+import com.tuya.iot.suite.ability.user.model.*;
 import com.tuya.iot.suite.core.constant.CaptchaType;
+import com.tuya.iot.suite.core.constant.ErrorCode;
 import com.tuya.iot.suite.core.constant.NoticeType;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
+import com.tuya.iot.suite.core.model.PageVO;
+import com.tuya.iot.suite.service.asset.AssetService;
+import com.tuya.iot.suite.service.enums.RoleTypeEnum;
+import com.tuya.iot.suite.service.idaas.RoleService;
 import com.tuya.iot.suite.service.notice.template.CaptchaNoticeTemplate;
 import com.tuya.iot.suite.service.user.CaptchaService;
 import com.tuya.iot.suite.service.user.UserService;
@@ -17,7 +24,13 @@ import com.tuya.iot.suite.service.user.model.ResetPasswordBo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static com.tuya.iot.suite.core.constant.ErrorCode.*;
 
@@ -32,9 +45,20 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserAbility userAbility;
+    @Autowired
+    private IdaasUserAbility idaasUserAbility;
+    @Autowired
+    private RoleAbility roleAbility;
+    @Autowired
+    private GrantAbility grantAbility;
 
     @Autowired
     private CaptchaService captchaService;
+
+    @Autowired
+    private RoleService roleService;
+    @Autowired
+    private AssetService assetService;
 
     /**
      * 修改用户密码
@@ -61,12 +85,16 @@ public class UserServiceImpl implements UserService {
      * @return
      */
     @Override
-    public UserToken login(String userName, String password) {
-        UserRegisteredRequest request = new UserRegisteredRequest();
-        request.setUsername(userName);
-        request.setUser_name(userName);
-        request.setPassword(password);
-        return userAbility.loginUser(request);
+    public com.tuya.iot.suite.core.model.UserToken login(String spaceId, String userName, String password) {
+        UserToken loginToken = userAbility.loginUser(UserRegisteredRequest.builder()
+                .username(userName)
+                .password(password)
+                .nick_name(userName).build());
+
+        List<IdaasRole> roles = roleAbility.queryRolesByUser(spaceId, loginToken.getUid());
+        com.tuya.iot.suite.core.model.UserToken userToken =
+                new com.tuya.iot.suite.core.model.UserToken(loginToken.getUid(), userName, null, roles.stream().map(e -> e.getRoleCode()).collect(Collectors.toList()));
+        return userToken;
     }
 
     @Override
@@ -96,7 +124,7 @@ public class UserServiceImpl implements UserService {
             return false;
         }
         bo.setType(type.getCode());
-        // 发送失败，删除缓存的 captcha
+        // 发送失败，删除缓存的captcha
         boolean result = false;
         try {
             result = captchaService.captchaPush(bo, template, code);
@@ -141,6 +169,152 @@ public class UserServiceImpl implements UserService {
         }
         result = userAbility.resetPassword(new ResetPasswordReq(unionId, bo.getPassword()));
         return result;
+    }
+
+    @Override
+    public Boolean createUser(String spaceId, UserRegisteredRequest req, List<String> roleCodes) {
+        //1、向云端注册用户得到用户id
+        //
+        String uid;
+        try {
+            UserToken token = userAbility.loginUser(req);
+            uid = token.getUid();
+        } catch (ConnectorResultException e) {
+            log.info("查询用户失败{}", e.getErrorInfo());
+            User user = userAbility.registeredUser(req);
+            uid = user.getUser_id();
+        }
+
+        //2、向基础服务注册用户
+        Boolean res = idaasUserAbility.createUser(spaceId, IdaasUserCreateReq.builder()
+                .uid(uid)
+                .username(req.getUsername())
+                .remark("").build());
+        if (!res) {
+            throw new ServiceLogicException(USER_CREATE_FAIL);
+        }
+        //3、给用户授权
+        Boolean auth = grantAbility.setRolesToUser(UserGrantRolesReq.builder()
+                .spaceId(spaceId)
+                .roleCodeList(roleCodes)
+                .uid(uid).build());
+        if (!auth) {
+            throw new ServiceLogicException(USER_CREATE_FAIL);
+        }
+        //授权资产
+        RoleTypeEnum roleTypeEnum = roleService.userOperateRole(spaceId, uid, roleCodes);
+        if (!RoleTypeEnum.isNormalRoleType(roleTypeEnum.name())) {
+            List<IdaasUser> idaasUsers = queryAdmins(spaceId);
+            String adminUserId = null;
+            if (!CollectionUtils.isEmpty(idaasUsers)) {
+                adminUserId = idaasUsers.get(0).getUid();
+            }
+            try {
+                auth = auth && assetService.grantAllAssetByAdmin(adminUserId, uid);
+            } catch (Exception e) {
+                log.error("给管理员授权失败：", e);
+            }
+        }
+        return res && auth;
+    }
+
+    @Override
+    public Boolean updateUser(String spaceId, String operatUserId, String uid, String nickName, List<String> roleCodes) {
+        if (!StringUtils.isEmpty(nickName)) {
+            //修改昵称 TODO 等待云端开放
+
+        }
+        if (CollectionUtils.isEmpty(roleCodes)) {
+            return true;
+        }
+        //修改角色
+        roleCodes = roleService.checkAndRemoveOldRole(spaceId, uid, roleCodes, true);
+        if (roleCodes.size() > 0) {
+            Boolean auth = grantAbility.setRolesToUser(UserGrantRolesReq.builder()
+                    .spaceId(spaceId)
+                    .roleCodeList(roleCodes)
+                    .uid(uid).build());
+            if (!auth) {
+                throw new ServiceLogicException(USER_CREATE_FAIL);
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public Boolean deleteUser(String spaceId, String uid) {
+        //向云端删除用户
+        Boolean del = userAbility.destroyUser(uid);
+        if (!del) {
+            throw new ServiceLogicException(USER_DELETE_FAIL, uid);
+        }
+        //向基础服务删除用户
+        del = idaasUserAbility.deleteUser(spaceId, uid);
+        if (!del) {
+            throw new ServiceLogicException(USER_DELETE_FAIL, uid);
+        }
+        return del;
+    }
+
+    @Override
+    public IdaasUser getUserByUid(String spaceId, String uid) {
+        return null;
+    }
+
+    @Override
+    public Boolean updateUserPassword(String userName, String newPwd) {
+        return userAbility.resetPassword(new ResetPasswordReq(userName, newPwd));
+    }
+
+    @Override
+    public Boolean batchDeleteUser(String spaceId, String... userIds) {
+        if (userIds == null || userIds.length < 1) {
+            throw new ServiceLogicException(PARAM_LOST, "userId");
+        }
+        if (userIds.length > 20) {
+            throw new ServiceLogicException(USER_DELETE_COUNT_CAN_NOT_MORE_THAN_20);
+        }
+        for (String userId : userIds) {
+            deleteUser(spaceId, userId);
+        }
+        return true;
+    }
+
+    @Override
+    public PageVO<UserBaseInfo> queryUserByPage(String spaceId, String searchKey, String roleCode, Integer pageNo, Integer pageSize) {
+        IdaasPageResult<IdaasUser> pageResult = idaasUserAbility.queryUserPage(spaceId, IdaasUserPageReq.builder()
+                .roleCode(roleCode)
+                .username(searchKey)
+                .pageSize(pageSize)
+                .pageNumber(pageNo)
+                .build());
+        PageVO<UserBaseInfo> result = new PageVO<>();
+        result.setPageNo(pageResult.getPageNumber());
+        result.setPageSize(pageResult.getPageSize());
+        result.setData(pageResult.getResults().stream().map(e -> {
+            List<IdaasRole> userRoles = roleAbility.queryRolesByUser(spaceId, e.getUid());
+            return UserBaseInfo.builder()
+                    .userName(e.getUsername())
+                    .userId(e.getUid())
+                    .roles(userRoles)
+                    .createTime(e.getGmt_create())
+                    .build();
+        }).collect(Collectors.toList()));
+        result.setTotal(pageResult.getTotalCount());
+        return result;
+    }
+
+    @Override
+    public List<IdaasUser> queryAdmins(String spaceId) {
+        IdaasPageResult<IdaasUser> pageResult = idaasUserAbility.queryUserPage(spaceId, IdaasUserPageReq.builder()
+                .roleCode(RoleTypeEnum.admin.name())
+                .pageNumber(1)
+                .pageSize(100)
+                .build());
+        if (pageResult != null && pageResult.getTotalCount() > 0) {
+            return pageResult.getResults();
+        }
+        return new ArrayList<>();
     }
 }
 

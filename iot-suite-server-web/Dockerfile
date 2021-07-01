@@ -18,4 +18,4 @@ WORKDIR ${target_path}/bin/
 EXPOSE 80
 STOPSIGNAL SIGTERM
 
-CMD bash -C endpoint.sh ${AK} ${SK} ${PC} ${REGION}
+CMD bash -C endpoint.sh
