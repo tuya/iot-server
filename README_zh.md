@@ -4,9 +4,9 @@
 
 # 统一管理平台
 ## 介绍
-统一管理平台是实现云端行业能力，能灵活集成、扩展IoT的统一管控台应用。
+统一管理平台是实现云端行业能力，能灵活集成、扩展 IoT 的统一管控台应用。
 
-该统一管理平台与云开发平台项目的projectCode做关联，需要使用projectCode对应的用户信息登录，主要包括以下内容：
+该统一管理平台与云开发平台项目的 projectCode 做关联，需要使用 projectCode 对应的用户信息登录，主要包括以下内容：
 
 账号管理：修改密码、重置密码
 
@@ -14,25 +14,38 @@
 
 设备管理：增加设备、移除设备、编辑设备、控制设备
 ## 启动项目
-1. 将项目代码导入到IDE，在./iot-suite-server-web/src/main/resources/application.properties文件中配置云开发平台应用的账号
-   
-   //在云开发平台申请的Access ID/Client ID
-   
+### 1. 拉取项目代码, 并导入IDE。
+   > git clone https://github.com/tuya/iot-suite-server.git
+### 2. 参数配置
+   #### 项目账号参数
+   在 iot-suite-server-web 下的 `application.properties` 文件中配置开发者自己的云开发平台应用的账号
+   ```properties
+   # 在云开发平台申请的Access ID/Client ID/Project Code
    connector.ak=
-   
-   \# 在云开发平台申请的Access Secret/Client Secret
-   
    connector.sk=
-   
-   \# 在云开发平台申请的Project Code
-   
    project.code=
-
-2. 以Spring Boot Starter 方式启动项目，执行main方法，或者用Maven
-
-   $ ./mvn package
+   # 自定义项目名称
+   project.name=
+   ```
+   #### redis 
+   项目依赖了 redis 持久化功能，需要开发者自行提供 redis 资源。
    
-   $ java -jar iot-suite-server-web/target/*.jar
+   在 iot-suite-server-web 下的 `application.properties` 配置 redis 参数
+   ```properties
+   spring.redis.database=
+   spring.redis.host=
+   spring.redis.port=
+   spring.redis.password=
+   ......
+   ```
+   
+### 3. 构建项目
+   执行如下命令构建可运行 jar 包，输出路径在 `iot-suite-server-web/target`
+   > mvn clean install -U -Dmaven.test.skip=true
+
+###4. 运行项目
+   
+   > java -jar iot-suite-server-web/target/iot-suite-server-{version}.jar
 
 ### 如何获得技术支持
 
