@@ -40,7 +40,7 @@
    ```
 
    #### 模板 ID
-   找回密码功能中使用到短信和邮件的推送，需要开发者提前申请模板
+   找回密码功能中使用到<b>短信</b>和<b>邮件</b>的推送，需要开发者提前申请模板
    * 邮件模板申请：[https://developer.tuya.com/cn/docs/cloud/3f377cbcd3?id=Kagouv5mzqgdb](https://developer.tuya.com/cn/docs/cloud/3f377cbcd3?id=Kagouv5mzqgdb)
    * 短信模板申请：[https://developer.tuya.com/cn/docs/cloud/7a37355b05?id=Kagp29so0orah](https://developer.tuya.com/cn/docs/cloud/7a37355b05?id=Kagp29so0orah)
 
@@ -59,6 +59,11 @@ captcha.notice.resetPassword.mail.templateId.en=
 * 模板申请参数格式为 `{"code": "%s","timeLimit": "%d"}`
 * 如果不使用找回密码功能，无需申请模板
 
+#### 角色权限
+项目中配置带有默认的权限配置初始化模板 `template/permissions_en.json、permission_zh.json`，启动的时候会初始化角色的权限信息。
+
+开发者可根据其固定的格式，自行配置所需的权限。
+    
 
    
 ### 3. 构建项目
