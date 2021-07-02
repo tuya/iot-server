@@ -60,9 +60,29 @@ captcha.notice.resetPassword.mail.templateId.en=
 * 如果不使用找回密码功能，无需申请模板
 
 #### 角色权限
-项目中配置带有默认的权限配置初始化模板 `template/permissions_en.json、permission_zh.json`，启动的时候会初始化角色的权限信息。
+项目的角色权限功能底层使用 [行业通用权限管理](https://developer.tuya.com/cn/docs/cloud/74307a3c31?id=Kaoix8k0ymzq0) 来实现
 
-开发者可根据其固定的格式，自行配置所需的权限。
+```properties
+# 空间的拥有者名称
+project.permissionSpaceOwner = tuya-iot
+# 空间分组
+project.permission-group = tuya-iot
+# 空间标识
+project.permission-space-code = iot-suite-server
+
+# 新增空间使用到，鉴权扩展字段，1.iotuid； 2.projectCode； 3.clientId
+project.permission-space-authentication = 2
+```
+关于空间的 API 具体可参考：https://developer.tuya.com/cn/docs/cloud/9ee65316bd?id=Kaoivxaf6qi4q
+
+项目中配置带有默认的权限配置初始化模板 `template/permissions_en.json、permission_zh.json`，开发者可根据其固定的格式，自行配置所需的权限。
+
+启动的时候默认会初始化角色的权限信息，可在配置中控制是否自动初始化
+```properties
+# 是否初始化
+project.permission-auto-init = true
+```
+
     
 
    
