@@ -155,14 +155,14 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
                     .build();
         }).collect(Collectors.toList());
         Map<String, PermissionCreateReq> allPerms = permissionNodeDTOList.stream().collect(Collectors.toMap(it -> it.getPermissionCode(), it -> it));
-        List<String> permissionCodes = permissionNodeDTOList.stream().map(e -> e.getPermissionCode()).collect(Collectors.toList());
+        List<String> permissionCodes = permissionNodeDTOList.stream().map(PermissionCreateReq::getPermissionCode).collect(Collectors.toList());
         List<IdaasPermission> permissionQueryReq = permissionAbility.queryPermissionsByCodes(spaceId, PermissionQueryReq.builder().permissionCodeList(permissionCodes).build());
         List<PermissionCreateReq> toAdd = new ArrayList<>();
         Map<String, String> existCodes = new HashMap<>(16);
         if (!CollectionUtils.isEmpty(permissionQueryReq)) {
-            permissionQueryReq.stream().forEach(e -> existCodes.put(e.getPermissionCode(), "exist"));
+            permissionQueryReq.forEach(e -> existCodes.put(e.getPermissionCode(), "exist"));
         }
-        permissionCodes.stream().forEach(e -> {
+        permissionCodes.forEach(e -> {
             if (!existCodes.containsKey(e)) {
                 toAdd.add(allPerms.get(e));
             }

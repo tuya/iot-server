@@ -1,20 +1,15 @@
 package com.tuya.iot.suite.web.config.shiro;
 
 import com.alibaba.fastjson.JSON;
-import com.tuya.iot.suite.ability.idaas.ability.PermissionAbility;
-import com.tuya.iot.suite.ability.idaas.ability.PermissionCheckAbility;
-import com.tuya.iot.suite.ability.idaas.model.IdaasPermission;
 import com.tuya.iot.suite.core.constant.ErrorCode;
 import com.tuya.iot.suite.core.constant.Response;
 import com.tuya.iot.suite.core.model.UserToken;
-import com.tuya.iot.suite.service.idaas.PermissionCheckService;
 import com.tuya.iot.suite.web.i18n.I18nMessage;
 import com.tuya.iot.suite.web.util.WebUtils;
 import lombok.Setter;
 import org.apache.shiro.authz.UnauthenticatedException;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.authz.AuthorizationFilter;
-import org.springframework.data.redis.cache.RedisCache;
 import org.springframework.util.StringUtils;
 
 import javax.servlet.ServletRequest;
@@ -22,10 +17,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author benguan

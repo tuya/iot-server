@@ -1,5 +1,7 @@
 package com.tuya.iot.suite.service.user.impl;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.tuya.iot.suite.core.constant.NoticeType;
 import com.tuya.iot.suite.core.exception.ServiceLogicException;
 import com.tuya.iot.suite.core.util.LocalDateTimeUtil;
@@ -13,7 +15,6 @@ import com.tuya.iot.suite.service.user.model.CaptchaCache;
 import com.tuya.iot.suite.service.user.model.CaptchaPushBo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -38,11 +39,22 @@ public class CaptchaServiceImpl implements CaptchaService {
 
     public static final int CAPTCHA_NUMBER = 6;
 
+
+    private Cache<String, CaptchaCache> CACHE = Caffeine.newBuilder()
+            .expireAfterWrite(300, TimeUnit.SECONDS)
+            .maximumSize(100)
+            .build();
+
+    private Cache<String, Integer> CACHE_COUNT = Caffeine.newBuilder()
+            .expireAfterWrite(24, TimeUnit.HOURS)
+            .maximumSize(100)
+            .build();
+
     @Autowired
     private NoticeService noticeService;
 
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
+    //@Autowired
+    //private RedisTemplate<String, Object> redisTemplate;
 
     private String getCaptchaKey(String type, String unionId) {
         return CAPTCHA_PREFIX + ":" + type + ":" + unionId;
@@ -53,11 +65,12 @@ public class CaptchaServiceImpl implements CaptchaService {
         String key = getCaptchaKey(type, unionId);
         String code = RandomUtil.getStringWithNumber(CAPTCHA_NUMBER);
         CaptchaCache captchaCache = new CaptchaCache(code, type, LocalDateTime.now());
-        if (timeout > 0) {
+        CACHE.put(key, captchaCache);
+        /*if (timeout > 0) {
             redisTemplate.opsForValue().set(key, captchaCache, timeout, TimeUnit.SECONDS);
         }else {
             redisTemplate.opsForValue().set(key, captchaCache);
-        }
+        }*/
         return code;
     }
 
@@ -85,8 +98,10 @@ public class CaptchaServiceImpl implements CaptchaService {
 
     @Override
     public CaptchaCache getCaptcha(String type, String unionId) {
+        return CACHE.getIfPresent(type);
+        /*
         Object object = redisTemplate.opsForValue().get(getCaptchaKey(type, unionId));
-        return Objects.isNull(object) ? null : (CaptchaCache) object;
+        return Objects.isNull(object) ? null : (CaptchaCache) object;*/
     }
 
     @Override
@@ -101,35 +116,47 @@ public class CaptchaServiceImpl implements CaptchaService {
 
     @Override
     public void removeCaptchaFromCache(String type, String unionId) {
-        redisTemplate.delete(getCaptchaKey(type, unionId));
+        CACHE.invalidate(getCaptchaKey(type, unionId));
+        //redisTemplate.delete(getCaptchaKey(type, unionId));
     }
 
     @Override
     public void captchaValidateErrorIncr(String unionId) {
         String key = CAPTCHA_LIMIT_PREFIX + unionId;
-        if (redisTemplate.hasKey(key)) {
+        Integer count = CACHE_COUNT.getIfPresent(key);
+        if (Objects.isNull(count)) {
+            count = 1;
+        }else {
+            count += 1;
+        }
+        CACHE_COUNT.put(key, count);
+        /*if (redisTemplate.hasKey(key)) {
             redisTemplate.opsForValue().increment(key, 1);
         }else {
             redisTemplate.opsForValue().increment(key, 1);
             redisTemplate.expire(key, 24, TimeUnit.HOURS);
-        }
+        }*/
     }
 
     @Override
     public boolean captchaValidateLimit(String unionId, int limit) {
         String key = CAPTCHA_LIMIT_PREFIX + unionId;
-        if (redisTemplate.hasKey(key)) {
+        Integer count = CACHE_COUNT.getIfPresent(key);
+        count = count == null ? 0 : count;
+        return count < limit;
+       /* if (redisTemplate.hasKey(key)) {
             return (int) redisTemplate.opsForValue().get(key) < limit;
         }
-        return true;
+        return true;*/
     }
 
     @Override
     public void captchaValidateErrorClear(String unionId) {
         String key = CAPTCHA_LIMIT_PREFIX + unionId;
-        if (redisTemplate.hasKey(key)) {
+        CACHE_COUNT.invalidate(key);
+        /*if (redisTemplate.hasKey(key)) {
             redisTemplate.delete(key);
-        }
+        }*/
     }
 
     @Override

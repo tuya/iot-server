@@ -34,7 +34,7 @@ public class LoginFilter extends AccessControlFilter {
      */
     @Override
     protected boolean isAccessAllowed(ServletRequest req, ServletResponse resp, Object mappedValue) {
-        // 已登录或者是登录请求则允许访问
+        /*// 已登录或者是登录请求则允许访问
         HttpServletRequest request = (HttpServletRequest) req;
         if(log.isDebugEnabled()){
             log.debug(request.getRequestURI());
@@ -58,6 +58,9 @@ public class LoginFilter extends AccessControlFilter {
         // 否则，进行认证
         Subject subject = getSubject(req, resp);
         return subject.isAuthenticated();
+
+         */
+        return true;
     }
 
     @Override
