@@ -17,7 +17,7 @@
 ### 1. 拉取项目代码, 并导入IDE
    > git clone https://github.com/tuya/iot-suite-server.git
 ### 2. 参数配置
-   #### 云项目账号
+   #### 云项目账号（必填）
    在 iot-suite-server-web 下的 `application.properties` 文件中配置开发者自己的云开发平台应用的账号
    ```properties
    # 在云开发平台申请的Access ID/Client ID/Project Code
@@ -27,7 +27,7 @@
    # 自定义项目名称
    project.name=
    ```
-   #### redis 
+   #### redis （必填）
    项目依赖了 redis 持久化功能，需要开发者自行提供 redis 资源。
    
    在 iot-suite-server-web 下的 `application.properties` 配置 redis 参数
@@ -39,7 +39,7 @@
    ......
    ```
 
-   #### 模板 ID
+   #### 模板 ID（非必填）
    找回密码功能中使用到<b>短信</b>和<b>邮件</b>的推送，需要开发者提前申请模板
    * 邮件模板申请：[https://developer.tuya.com/cn/docs/cloud/3f377cbcd3?id=Kagouv5mzqgdb](https://developer.tuya.com/cn/docs/cloud/3f377cbcd3?id=Kagouv5mzqgdb)
    * 短信模板申请：[https://developer.tuya.com/cn/docs/cloud/7a37355b05?id=Kagp29so0orah](https://developer.tuya.com/cn/docs/cloud/7a37355b05?id=Kagp29so0orah)
