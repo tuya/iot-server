@@ -27,7 +27,7 @@
    # 自定义项目名称
    project.name=
    ```
-   #### redis （必填）
+   #### Redis （必填）
    项目依赖了 redis 持久化功能，需要开发者自行提供 redis 资源。
    
    在 iot-suite-server-web 下的 `application.properties` 配置 redis 参数
