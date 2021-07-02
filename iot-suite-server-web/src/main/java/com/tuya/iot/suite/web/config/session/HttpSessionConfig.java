@@ -18,7 +18,7 @@ import org.springframework.session.config.annotation.web.http.EnableSpringHttpSe
 @EnableSpringHttpSession
 public class HttpSessionConfig {
 
-    @Value("${server.session.timeout}")
+    @Value("${server.session.timeout:7200}")
     private Integer timeout;
 
     /**

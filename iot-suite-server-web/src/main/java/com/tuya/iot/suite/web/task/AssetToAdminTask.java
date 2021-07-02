@@ -21,12 +21,13 @@ public class AssetToAdminTask {
     private AssetService assetService;
     @Autowired
     private ProjectProperties projectProperties;
+
     /**
      * 系统管理员授权临时方案
      * @author mickey
      * @date 2021/6/14 18:19
      */
-    @Scheduled(cron = "0 */1  * * * ?  ")
+    @Scheduled(cron = "0 */30  * * * ?  ")
     public void grantAssetToAllAdmin() {
         try {
             Boolean result = assetService.grantAllAssetToAdmin(projectProperties.getPermissionSpaceId());

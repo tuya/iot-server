@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Slf4j
 public class RedisSessionRepository implements SessionRepository<RedisSession> {
-    @Value("${spring.session.redis.namespace}")
+    @Value("${spring.session.redis.namespace:iot-suite}")
     private String prefix;
 
     private RedisTemplate<String, Object> redisTemplate;
