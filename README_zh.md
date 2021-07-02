@@ -59,7 +59,7 @@ captcha.notice.resetPassword.mail.templateId.en=
 * 模板申请参数格式为 `{"code": "%s","timeLimit": "%d"}`
 * 如果不使用找回密码功能，无需申请模板
 
-#### 角色权限
+#### 角色权限（非必填）
 项目的角色权限功能底层使用 [行业通用权限管理](https://developer.tuya.com/cn/docs/cloud/74307a3c31?id=Kaoix8k0ymzq0) 来实现
 
 ```properties
