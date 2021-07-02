@@ -35,7 +35,7 @@ public class DeviceController {
     @Resource
     private DeviceService deviceService;
 
-    @Value("${project.name}")
+    @Value("${project.name:ProjectName}")
     private String projectName;
 
     @Value("${project.code}")
