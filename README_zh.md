@@ -27,17 +27,6 @@
    # 自定义项目名称
    project.name=
    ```
-   #### Redis （必填）
-   项目依赖了 redis 持久化功能，需要开发者自行提供 redis 资源。
-   
-   在 iot-suite-server-web 下的 `application.properties` 配置 redis 参数
-   ```properties
-   spring.redis.database=
-   spring.redis.host=
-   spring.redis.port=
-   spring.redis.password=
-   ......
-   ```
 
    #### 模板 ID（非必填）
    找回密码功能中使用到<b>短信</b>和<b>邮件</b>的推送，需要开发者提前申请模板
