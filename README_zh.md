@@ -12,7 +12,10 @@
 
 资产管理：创建资产、修改资产、删除资产等
 
-设备管理：增加设备、移除设备、编辑设备、控制设备
+设备管理：增加设备、移除设备、编辑设备、控制设备  
+
+前端项目地址 [iot-portal](https://github.com/tuya/iot-portal)
+
 ## 启动项目
 ### 1. 拉取项目代码, 并导入IDE
    > git clone https://github.com/tuya/iot-suite-server.git
@@ -24,8 +27,6 @@
    connector.ak=
    connector.sk=
    project.code=
-   # 自定义项目名称
-   project.name=
    ```
 
    #### 模板 ID（非必填）
@@ -48,33 +49,6 @@ captcha.notice.resetPassword.mail.templateId.en=
 * 模板申请参数格式为 `{"code": "%s","timeLimit": "%d"}`
 * 如果不使用找回密码功能，无需申请模板
 
-#### 角色权限（非必填）
-项目的角色权限功能底层使用 [行业通用权限管理](https://developer.tuya.com/cn/docs/cloud/74307a3c31?id=Kaoix8k0ymzq0) 来实现
-
-```properties
-# 空间的拥有者名称
-project.permissionSpaceOwner = tuya-iot
-# 空间分组
-project.permission-group = tuya-iot
-# 空间标识
-project.permission-space-code = iot-suite-server
-
-# 新增空间使用到，鉴权扩展字段，1.iotuid； 2.projectCode； 3.clientId
-project.permission-space-authentication = 2
-```
-关于空间的 API 具体可参考：https://developer.tuya.com/cn/docs/cloud/9ee65316bd?id=Kaoivxaf6qi4q
-
-项目中配置带有默认的权限配置初始化模板 `template/permissions_en.json、permission_zh.json`，开发者可根据其固定的格式，自行配置所需的权限。
-
-启动的时候默认会初始化角色的权限信息，可在配置中控制是否自动初始化
-```properties
-# 是否初始化
-project.permission-auto-init = true
-```
-
-    
-
-   
 ### 3. 构建项目
    执行如下命令构建可运行 jar 包，输出路径在 `iot-suite-server-web/target`
    > mvn clean install -U -Dmaven.test.skip=true
