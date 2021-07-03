@@ -3,7 +3,7 @@
 # General Management Portal
 ## Overview
 
-General Management Portal implements the industry capabilities of the cloud, flexibly integrates and extends the IoT applications. 
+General Management Portal is a general management applications that implements the industry capabilities of the cloud, flexibly integrates and extends the IoT applications.
 
 This portal is linked with `projectCode` of projects on the [Cloud Development Platform](https://iot.tuya.com/cloud/). You need to log in with the user information corresponding to the `projectCode`, including the following items:
 
@@ -12,6 +12,10 @@ This portal is linked with `projectCode` of projects on the [Cloud Development P
 - Asset management: Create, modify, and delete assets.
   
 - Device management: Add, remove, edit, and control devices.
+
+Front-end project address: [iot-portal](https://github.com/tuya/iot-portal)
+
+
 
 ## Start project
 
