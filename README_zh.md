@@ -16,6 +16,8 @@
 
 前端项目地址 [iot-portal](https://github.com/tuya/iot-portal)
 
+![quick start](iot-suite-server.gif)
+
 ## 启动项目
 ### 1. 拉取项目代码, 并导入IDE
    > git clone https://github.com/tuya/iot-suite-server.git
@@ -28,6 +30,7 @@
    connector.sk=
    project.code=
    ```
+![config](img.png)
 
    #### 模板 ID（非必填）
    找回密码功能中使用到<b>短信</b>和<b>邮件</b>的推送，需要开发者提前申请模板
