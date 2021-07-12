@@ -45,7 +45,7 @@ captcha.notice.resetPassword.sms.templateId.cn=
 captcha.notice.resetPassword.sms.templateId.en=
 #邮件中文模板
 captcha.notice.resetPassword.mail.templateId.cn=
-#邮件中文模板
+#邮件英文模板
 captcha.notice.resetPassword.mail.templateId.en=
    ```
 注：

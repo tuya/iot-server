@@ -1,67 +1,72 @@
-[English](README.md) | [中文版](README_zh.md)
+
+[中文版](README_zh.md) | [English](README.md)
+
 
 # General Management Portal
 ## Overview
 
-General Management Portal is a general management applications that implements the industry capabilities of the cloud, flexibly integrates and extends the IoT applications.
+General Management Portal implements the industry capabilities of the cloud, flexibly integrates and extends the IoT applications.
 
-This portal is linked with `projectCode` of projects on the [Cloud Development Platform](https://iot.tuya.com/cloud/). You need to log in with the user information corresponding to the `projectCode`, including the following items:
+This portal is linked with `projectCode` of projects on the [Cloud Development Platform](https://iot.tuya.com/cloud/). You need to log in with the user information corresponding to the `projectCode`. The following features are supported
 
 - Account management: Modify and reset passwords.
-  
+
 - Asset management: Create, modify, and delete assets.
-  
-- Device management: Add, remove, edit, and control devices.
 
-Front-end project address: [iot-portal](https://github.com/tuya/iot-portal)
+- Device management: Add, edit, control, and remove devices.
 
-![quick start](iot-suite-server.gif)
+- Front-end project address: [iot-portal](https://github.com/tuya/iot-portal)
 
+![Quick start](iot-suite-server.gif)
 
-## Start Project
-### 1. pull the project from github and import it into the ide.
-> git clone https://github.com/tuya/iot-suite-server.git
+## Start a project
+### 1. Pull the project code and import it into the IDE.
 
-### 2. Parameter Setting
-#### Project cCnfiguration（required）
-Developer have to configure the account of the Cloud Development Platform in `application.properties` file under the module of `iot-suite-server-web`.
-   ```properties
-   # Access ID/Client ID/Project Code
-   connector.ak=
-   connector.sk=
-   project.code=
-   ```
-![config](img.png)
+    > git clone https://github.com/tuya/iot-suite-server.git
 
-#### Template ID（Not required）
+### 2. Configure parameters
+#### Account of the Cloud Development Platform (required)
+    Configure the account of the Cloud Development Platform application in the `application.properties` file under `iot-suite-server-web`.
 
-The function of 'reset password' would be relied on the notification of sms & mial. Developer have to apply fot the templates before use the function of 'reset password'.
+    ```properties
+    # The Access ID/Client ID/Project Code that you have applied for and obtained on the Cloud Development Platform
+    connector.ak=
+    connector.sk=
+    project.code=
+    ```
+![Config.png](https://airtake-public-data-1254153901.cos.ap-shanghai.myqcloud.com/content-platform/hestia/1625642228a9c1cb190dd.png)
 
-* Template for mail：[https://developer.tuya.com/cn/docs/cloud/3f377cbcd3?id=Kagouv5mzqgdb](https://developer.tuya.com/cn/docs/cloud/3f377cbcd3?id=Kagouv5mzqgdb)
-* Template for sms：[https://developer.tuya.com/cn/docs/cloud/7a37355b05?id=Kagp29so0orah](https://developer.tuya.com/cn/docs/cloud/7a37355b05?id=Kagp29so0orah)
+#### Template ID (optional)
 
-在 iot-suite-server-web 下的 `application.properties` 填入申请后的模板ID
-   ```properties
-#短信中文模板
-captcha.notice.resetPassword.sms.templateId.cn=
-#短信英文模板
-captcha.notice.resetPassword.sms.templateId.en=
-#邮件中文模板
-captcha.notice.resetPassword.mail.templateId.cn=
-#邮件中文模板
-captcha.notice.resetPassword.mail.templateId.en=
-   ```
-注：
-* 模板申请参数格式为 `{"code": "%s","timeLimit": "%d"}`
-* 如果不使用找回密码功能，无需申请模板
+To retrieve your password, you need to enable push notifications by <b>SMS</b> and <b>email</b>. You must apply for the template in advance.
+* Apply for the email template: https://developer.tuya.com/en/docs/cloud/3f377cbcd3?id=Kagouv5mzqgdb
+* Apply for the SMS template: https://developer.tuya.com/en/docs/cloud/7a37355b05?id=Kagp29so0orah
 
-### 3. 构建项目
-执行如下命令构建可运行 jar 包，输出路径在 `iot-suite-server-web/target`
-> mvn clean install -U -Dmaven.test.skip=true
+Enter the template ID in `application.properties` under `iot-suite-server-web`.
 
-### 4. 运行项目
+    ```properties
+    # SMS template in Chinese
+    captcha.notice.resetPassword.sms.templateId.cn=
+    # SMS template in English
+    captcha.notice.resetPassword.sms.templateId.en=
+    # Email template in Chinese
+    captcha.notice.resetPassword.mail.templateId.cn=
+    # Email template in English
+    captcha.notice.resetPassword.mail.templateId.en=
+    ```
 
-> java -jar iot-suite-server-web/target/iot-suite-server-{version}.jar
+**Note**:
+* The template application parameter format is `{"code": "%s","timeLimit": "%d"}`.
+* The template is not required if you do not use the password retrieval function.
+
+### 3. Build a project
+Run the following command to build a executable .jar package. The output path is `iot-suite-server-web/target`.
+
+    > mvn clean install -U -Dmaven.test.skip=true
+
+### 4. Run the project
+
+    > java -jar iot-suite-server-web/target/iot-suite-server-{version}.jar
 
 ### Technical support
 
