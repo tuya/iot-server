@@ -60,13 +60,22 @@ Enter the template ID in `application.properties` under `iot-suite-server-web`.
 * The template is not required if you do not use the password retrieval function.
 
 ### 3. Build a project
-Run the following command to build a executable .jar package. The output path is `iot-suite-server-web/target`.
+Run the following command to build a executable .jar package. The output path under the module of `iot-suite-we` in current project:
+`./iot-suite-server/iot-suite-server-web/target`.
 
     > mvn clean install -U -Dmaven.test.skip=true
 
 ### 4. Run the project
 
+    > cd ./iot-suite-server/iot-suite-server-web/target
+    > 
     > java -jar iot-suite-server-web/target/iot-suite-server-{version}.jar
+
+#### Dependencies & Compatibility
+
+| Framework   | Version | Spring-boot Dependencies | 
+| -------------- | ------------- |------------- |
+| iot-suite-server           | 1.0.0 ~ 1.1.2         | 1.x.x |
 
 ### Technical support
 
