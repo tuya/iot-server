@@ -15,29 +15,53 @@ This portal is linked with `projectCode` of projects on the [Cloud Development P
 
 Front-end project address: [iot-portal](https://github.com/tuya/iot-portal)
 
+![quick start](iot-suite-server.gif)
 
 
-## Start project
+## Start Project
+### 1. pull the project from github and import it into the ide.
+> git clone https://github.com/tuya/iot-suite-server.git
 
-1. Import the project code into the IDE, and configure the account of the Cloud Development Platform application in the `./iot-suite-server-web/src/main/resources/application.properties` file.
-   
-    // The Access ID/Client ID that you have applied for and obtained on the Cloud Development Platform
- 
-    connector.ak=
-   
-    // The Access Secret/Client Secret that you have applied for and obtained on the Cloud Development Platform
-   
-    connector.sk=
-   
-    // The Project Code that you have applied for and obtained on the Cloud Development Platform
- 
-    project.code=
+### 2. Parameter Setting
+#### Project cCnfiguration（required）
+Developer have to configure the account of the Cloud Development Platform in `application.properties` file under the module of `iot-suite-server-web`.
+   ```properties
+   # Access ID/Client ID/Project Code
+   connector.ak=
+   connector.sk=
+   project.code=
+   ```
+![config](img.png)
 
-2. Start the project in the mode of Spring Boot Starter, execute the main method, or use Maven.
-   
-    $ ./mvn package
-   
-    $ java -jar iot-suite-server-web/target/*.jar
+#### Template ID（Not required）
+
+The function of 'reset password' would be relied on the notification of sms & mial. Developer have to apply fot the templates before use the function of 'reset password'.
+
+* Template for mail：[https://developer.tuya.com/cn/docs/cloud/3f377cbcd3?id=Kagouv5mzqgdb](https://developer.tuya.com/cn/docs/cloud/3f377cbcd3?id=Kagouv5mzqgdb)
+* Template for sms：[https://developer.tuya.com/cn/docs/cloud/7a37355b05?id=Kagp29so0orah](https://developer.tuya.com/cn/docs/cloud/7a37355b05?id=Kagp29so0orah)
+
+在 iot-suite-server-web 下的 `application.properties` 填入申请后的模板ID
+   ```properties
+#短信中文模板
+captcha.notice.resetPassword.sms.templateId.cn=
+#短信英文模板
+captcha.notice.resetPassword.sms.templateId.en=
+#邮件中文模板
+captcha.notice.resetPassword.mail.templateId.cn=
+#邮件中文模板
+captcha.notice.resetPassword.mail.templateId.en=
+   ```
+注：
+* 模板申请参数格式为 `{"code": "%s","timeLimit": "%d"}`
+* 如果不使用找回密码功能，无需申请模板
+
+### 3. 构建项目
+执行如下命令构建可运行 jar 包，输出路径在 `iot-suite-server-web/target`
+> mvn clean install -U -Dmaven.test.skip=true
+
+### 4. 运行项目
+
+> java -jar iot-suite-server-web/target/iot-suite-server-{version}.jar
 
 ### Technical support
 
