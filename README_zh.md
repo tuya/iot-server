@@ -53,12 +53,22 @@ captcha.notice.resetPassword.mail.templateId.en=
 * 如果不使用找回密码功能，无需申请模板
 
 ### 3. 构建项目
-   执行如下命令构建可运行 jar 包，输出路径在 `iot-suite-server-web/target`
+   执行如下命令构建可运行 jar 包，输出路径为当前项目路径下的 iot-suite-server-web 模块:  
+   `./iot-suite-server/iot-suite-server-web/target`
    > mvn clean install -U -Dmaven.test.skip=true
 
 ### 4. 运行项目
-   
+   > cd ./iot-suite-server/iot-suite-server-web/target
+   >   
    > java -jar iot-suite-server-web/target/iot-suite-server-{version}.jar
+
+#### 依赖和兼容
+
+| 框架   | 版本 | Spring-boot 依赖 | 
+| -------------- | ------------- |------------- |
+| iot-suite-server           | 1.0.0 ~ 1.1.2         | 1.x.x |
+
+ 
 
 ### 如何获得技术支持
 
