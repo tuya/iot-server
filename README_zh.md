@@ -139,3 +139,8 @@ captcha.notice.resetPassword.mail.templateId.en=
 欢迎加入微信群参与讨论分享：
 
 <img src="images/discussion-group.png" width="40%" height="40%" />
+
+
+## Licenses
+
+更多信息，请参考 [LICENSE](LICENSE)  文件。
