@@ -10,10 +10,6 @@ import java.security.NoSuchAlgorithmException;
  */
 public class Sha256Utils {
 
-    public static void main(String[] args) {
-        String str = "Test123456";
-        System.out.println(getSHA256(str));
-    }
     public static String getSHA256(String str) {
         MessageDigest messageDigest;
         String encodeStr = "";

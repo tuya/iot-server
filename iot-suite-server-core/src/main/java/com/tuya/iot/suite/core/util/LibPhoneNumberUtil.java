@@ -36,11 +36,6 @@ public class LibPhoneNumberUtil {
         CHINESE_CARRIER_MAPPER.put("China Telecom", "中国电信");
     }
 
-    public static void main(String[] args) {
-        System.out.println(doGeo("17811981865", "86"));
-        System.out.println(doValid("17811981865", "1268"));
-    }
-
     /**
      * @param phone “+8617717031234 +008617717031234 8617717031234 177-1703-1234”
      * @Author: Jet

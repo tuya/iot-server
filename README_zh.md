@@ -11,49 +11,61 @@ Iot Suite Server 是实现云端行业能力，能灵活集成、扩展 IoT 的�
 该统一管理平台与云开发平台项目的 projectCode 做关联，需要使用 projectCode 对应的用户信息登录，主要包括以下特性功能：
 
 * 账号管理：修改密码、重置密码
-
 * 资产管理：创建资产、修改资产、删除资产等
-
 * 设备管理：增加设备、移除设备、编辑设备、控制设备
+
+
 
 ## 文档
 
-前端项目地址请参阅 [iot-portal](https://github.com/tuya/iot-portal)
-
-关于更多涂鸦云端 openapi 接口可以查看 [文档](https://developer.tuya.com/cn/docs/iot/api-reference?id=Ka7qb7vhber64) 。
+前端项目地址请参阅: [iot-portal](https://github.com/tuya/iot-portal)
 
 iot-suite-server 底层云端对接使用 [tuya-connector]() 实现，你可以参考文档获得更多的信息。
 
-所有最新和长期的通知也可以在这里找到 [Github notice issue](https://github.com/tuya/iot-suite-server/issues)。
+关于更多涂鸦云端 openapi 接口可以查看 [文档](https://developer.tuya.com/cn/docs/iot/api-reference?id=Ka7qb7vhber64) 。
+
+所有最新和长期的通知也可以在这里找到 [Github notice issue](https://github.com/tuya/iot-suite-server/issues) 。
+
+
 
 ## 快速启动
 
-下面是一个简单的演示步骤，指导新用户如何启动项目并基于 iot-suite-server 做二次开发和自定义功能拓展。
+下面是一个简单的演示步骤，指导新用户如何配置并启动项目。
 
-注意： 需要 JDK 1.8 或更高版本。
+注意： 开发预先安装 <b>mavenM</b> 和 <b>jdk</b> 环境（jdk版本需要 1.8 或更高版本）
 
 ### 准备工作
-#### 1. 拉取 git 项目代码, 并导入 IDE
+#### 1. 拉取 git 项目代码
    > git clone https://github.com/tuya/iot-suite-server.git
-   
+
    项目代码结构如下：
 
    ![config](images/code-structure.png)
 
+
+
 #### 2. 创建云项目
-   开发者需要登录[云开发平台](https://iot.tuya.com/cloud/) 创建云项目，如下图步骤所示：
 
-   ![config](images/img.png)
+   开发者需要登录 [云开发平台](https://iot.tuya.com/cloud/) 创建云项目，如下图步骤所示：   
+   ![config](images/project-create.png)
 
-   完整的操作步骤可以参照下面动图所示：
-   ![quick start](images/iot-suite-server.gif)
+   项目创建成功后会弹出项目需要开通的 API 产品页面，开发者需要开通以下产品：
+* 授权管理
+* 行业通用设备注册
+* 行业通用设备管理
+* 行业通用设备状态查询
+* 行业通用设备控制
+* 行业通用用户管理
+* 行业通用资产管理
+
+   ![config](images/auth-prd.png)
 
 ### 参数配置
    #### 1. 云项目账号（必填）
-   开发者需要在 iot-suite-server 中配置上面步骤创建的云项目账号参数
+   开发者需要将上面步骤创建的云项目账号信息填写到项目中，如下图所示:   ![config](images/param-config.png)
 
    配置文件路径为：`iot-suite-server/iot-suite-server-web/application.properties`
-   
+
    ```properties
    # 在云开发平台申请的Access ID/Client ID/Project Code
    connector.ak=
@@ -61,12 +73,12 @@ iot-suite-server 底层云端对接使用 [tuya-connector]() 实现，你可以�
    project.code=
    ```
 
-   #### 2. 模板 ID（非必填）
-   找回密码功能中使用到<b>短信</b>和<b>邮件</b>的推送，如需使用此功能，需要开发者提前申请模板
+   #### 2. 短信邮件推送（非必填）
+   找回密码功能中使用到<b>短信</b>和<b>邮件</b>的推送，如需使用此功能需要开发者提前**申请模板**
    * 邮件模板申请：[https://developer.tuya.com/cn/docs/cloud/3f377cbcd3?id=Kagouv5mzqgdb](https://developer.tuya.com/cn/docs/cloud/3f377cbcd3?id=Kagouv5mzqgdb)
    * 短信模板申请：[https://developer.tuya.com/cn/docs/cloud/7a37355b05?id=Kagp29so0orah](https://developer.tuya.com/cn/docs/cloud/7a37355b05?id=Kagp29so0orah)
 
-   将申请好的模板模板 ID 填入配置文件，配置文件路径为：`iot-suite-server/iot-suite-server-web/application.properties`
+   将申请好的模板 ID 填入配置文件，配置文件路径为：`iot-suite-server/iot-suite-server-web/application.properties`
 
    ```properties
 #短信中文模板
@@ -78,19 +90,31 @@ captcha.notice.resetPassword.mail.templateId.cn=
 #邮件英文模板
 captcha.notice.resetPassword.mail.templateId.en=
    ```
-注：
-* 模板申请参数格式固定为 `{"code": "%s","timeLimit": "%d"}`
+注意：
+* 申请的模板参数格式固定为： `{"code": "%s","timeLimit": "%d"}`
 * 如果不使用找回密码功能，无需申请模板
 
 ### 构建 & 运行
-   执行如下命令，构建并运行项目 `./iot-suite-server`
-   > mvn clean install -U -Dmaven.test.skip=true
-   > 
-   > cd ./iot-suite-server/iot-suite-server-web/target
-   >
-   > java -jar iot-suite-server-web/target/iot-suite-server-{version}.jar
+   执行如下命令，构建并运行项目
 
-### 案例开发
+   > #maven 构建项目
+   > 
+   > cd ./iot-suite-server/iot-suite-server-web
+   >   
+   >  mvn -U clean package spring-boot:repackage -Dmaven.test.skip=true
+   >
+   >
+   >
+   > #执行可运行 jar
+   >
+   > java -jar ./target/iot-suite-server-web-{version}.jar
+
+   等待终端输出如下信息，即服务运行成功，可结合前端项目体验整体系统流程
+   ![quick start](images/deploy-result.png)
+   
+
+   如果开发者使用 idea 导入，可以参照下面动图启动服务：
+   ![quick start](images/iot-suite-server.gif)
 
 
 
@@ -108,10 +132,10 @@ captcha.notice.resetPassword.mail.templateId.en=
 
 可以通过以下链接获得帮助
 
-涂鸦智能帮助中心:[https://support.tuya.com/en/help](https://support.tuya.com/en/help "https://support.tuya.com/en/help")
+* 涂鸦智能帮助中心:[https://support.tuya.com/en/help](https://support.tuya.com/en/help "https://support.tuya.com/en/help")
 
-涂鸦智能全球化智能平台:[https://service.console.tuya.com ](https://service.console.tuya.com  "https://service.console.tuya.com ")
+* 涂鸦智能全球化智能平台:[https://service.console.tuya.com ](https://service.console.tuya.com  "https://service.console.tuya.com ")
 
 欢迎加入微信群参与讨论分享：
 
-![config](images/discussion-group.png)
+<img src="images/discussion-group.png" width="40%" height="40%" />
