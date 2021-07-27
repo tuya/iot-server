@@ -97,21 +97,21 @@ captcha.notice.resetPassword.mail.templateId.en=
 ### 构建 & 运行
    执行如下命令，构建并运行项目
 
-   > #maven 构建项目
-   > 
-   > cd ./iot-suite-server/iot-suite-server-web
-   >   
-   >  mvn -U clean package spring-boot:repackage -Dmaven.test.skip=true
-   >
-   >
-   >
-   > #执行可运行 jar
-   >
-   > java -jar ./target/iot-suite-server-web-{version}.jar
+* maven 构建项目
+
+  > cd ./iot-suite-server/iot-suite-server-web
+  >
+  > mvn -U clean package spring-boot:repackage -Dmaven.test.skip=true
+
+  
+
+* 执行可运行 jar 包
+
+  > java -jar ./target/iot-suite-server-web-{version}.jar
 
    等待终端输出如下信息，即服务运行成功，可结合前端项目体验整体系统流程
    ![quick start](images/deploy-result.png)
-   
+
 
    如果开发者使用 idea 导入，可以参照下面动图启动服务：
    ![quick start](images/iot-suite-server.gif)
