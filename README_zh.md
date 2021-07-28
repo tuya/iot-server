@@ -6,7 +6,7 @@
 [中文版](README_zh.md) | [English](README.md)
 
 ## 介绍
-Iot Suite Server 是实现云端行业能力，能灵活集成、扩展 IoT 的统一管控台后端服务应用。
+Iot Server 是实现云端行业能力，能灵活集成、扩展 IoT 的统一管控台后端服务应用。
 
 该统一管理平台与云开发平台项目的 projectCode 做关联，需要使用 projectCode 对应的用户信息登录，主要包括以下特性功能：
 
@@ -24,7 +24,7 @@ Iot Server 底层云端对接使用 [tuya-connector]() 实现，你可以参考�
 
 关于更多涂鸦云端 openapi 接口可以查看 [文档](https://developer.tuya.com/cn/docs/iot/api-reference?id=Ka7qb7vhber64) 。
 
-所有最新和长期的通知也可以在这里找到 [Github notice issue](https://github.com/tuya/iot-suite-server/issues) 。
+所有最新和长期的通知也可以在这里找到 [Github notice issue](https://github.com/tuya/iot-server/issues) 。
 
 
 
@@ -37,7 +37,7 @@ Iot Server 底层云端对接使用 [tuya-connector]() 实现，你可以参考�
 ### 准备工作
 
 #### 1. 拉取 git 项目代码
-   > git clone https://github.com/tuya/iot-suite-server.git
+   > git clone https://github.com/tuya/iot-server.git
 
    项目代码结构如下：
 
@@ -155,18 +155,23 @@ public class DeviceServiceImpl implements DeviceService {
 ```
 
 #### 3. web接口层
-在 iot-server-web 模块定义对外提供的 api 接口
+在 iot-server-web 模块定义对外提供前端可调用的 api 接口
 
 ```java
-@Service
-public class DeviceServiceImpl implements DeviceService {
-	@Autowired
-  private DeviceAbility deviceAbility;
-  
-  @Override
-  public Boolean commandDevice(String deviceId, DeviceCommandRequest request) {
-    return deviceAbility.commandDevice(deviceId, request);
-  }
+@RequestMapping("/device")
+@RestController
+public class DeviceController {
+    @Autowired
+    private DeviceService deviceService;
+
+    @RequestMapping(value = "/command/{device_id}", method = RequestMethod.POST)
+    @RequiresPermissions("2003")
+    public Response<Boolean> commandDevice(@PathVariable("device_id") String deviceId, @RequestBody List<DeviceCommandCriteria> criteriaList) {
+        List<DeviceCommandRequest.Command> convert = SimpleConvertUtil.convert(criteriaList, DeviceCommandRequest.Command.class);
+        DeviceCommandRequest request = new DeviceCommandRequest();
+        request.setCommands(convert);
+        return Response.buildSuccess(deviceService.commandDevice(deviceId, request));
+    }
 }
 ```
 
@@ -179,7 +184,7 @@ public class DeviceServiceImpl implements DeviceService {
 | iot-server| 1.0.0 ~ 1.1.2 | 1.8`↑` |  1.5.x.RELEASE `↑` |
 
 ## Bug 和 反馈
-对于错误报告，问题和讨论请提交到 [GitHub Issue](https://github.com/tuya/iot-suite-server/issues)
+对于错误报告，问题和讨论请提交到 [GitHub Issue](https://github.com/tuya/iot-server/issues)
 
 ## 如何获得技术支持
 
