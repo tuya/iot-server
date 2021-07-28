@@ -1,5 +1,5 @@
 
-<img src="images/tuya_logo.png" width="28%" height="28%" />
+<img src="doc/images/tuya_logo.png" width="28%" height="28%" />
 
 # Iot Server
 
@@ -27,9 +27,19 @@ Iot Server 底层云端对接使用 [tuya-connector](https://github.com/tuya/tuy
 所有最新和长期的通知也可以在这里找到 [Github notice issue](https://github.com/tuya/iot-server/issues) 。
 
 
-## TODO 文档结构
-//TODO 目录介绍，每个文件夹大概是做什么用的，关键配置文件功能
-   
+## 文档结构
+
+项目代码结构如下：
+
+* **iot-server-core**: 公共层，提供通用工具和模型
+* **iot-server-ability**: 能力层，定义云平台接口
+* **iot-server-service**: 业务逻辑层，实现开发者自定义业务逻辑
+* **iot-server-web**: web接口层，提供前端外部调用接口
+
+
+  ![config](doc/images/code-structure.png)
+
+Iot Server [快速入门指南](doc/images/quick_start.md)
 
 ## 版本列表
 
@@ -44,13 +54,13 @@ Iot Server 底层云端对接使用 [tuya-connector](https://github.com/tuya/tuy
 
 可以通过以下链接获得帮助
 
-* 涂鸦智能帮助中心:[https://support.tuya.com/en/help](https://support.tuya.com/en/help "https://support.tuya.com/en/help")
+* 涂鸦智能帮助中心: [https://support.tuya.com/en/help](https://support.tuya.com/en/help "https://support.tuya.com/en/help")
 
-* 涂鸦智能全球化智能平台:[https://service.console.tuya.com ](https://service.console.tuya.com  "https://service.console.tuya.com ")
+* 涂鸦智能全球化智能平台: [https://service.console.tuya.com ](https://service.console.tuya.com  "https://service.console.tuya.com ")
 
 欢迎加入微信群参与讨论分享：
 
-<img src="images/discussion-group.png" width="40%" height="40%" />
+<img src="doc/images/discussion-group.png" width="40%" height="40%" />
 
 
 ## Licenses

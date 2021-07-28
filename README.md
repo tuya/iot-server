@@ -17,7 +17,7 @@ This portal is linked with `projectCode` of projects on the [Cloud Development P
 
 - Front-end project address: [iot-portal](https://github.com/tuya/iot-portal)
 
-![Quick start](images/iot-server.gif)
+![Quick start](doc/images/iot-server.gif)
 
 ## Start a project
 ### 1. Pull the project code and import it into the IDE.

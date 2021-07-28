@@ -14,9 +14,14 @@
 
    项目代码结构如下：
 
+* **iot-server-core**: 公共层，提供通用工具和模型
+* **iot-server-ability**: 能力层，定义云平台接口
+* **iot-server-service**: 业务逻辑层，实现开发者自定义业务逻辑
+* **iot-server-web**: web接口层，提供前端外部调用接口
+
    ![config](images/code-structure.png)
 
-//TODO 目录介绍，每个文件夹大概是做什么用的，关键配置文件功能，和README相同
+
 
 
 #### 2. 创建云项目
@@ -33,7 +38,7 @@
 * 行业通用设备控制
 * 行业通用用户管理
 * 行业通用资产管理
-* 行业通用的权限挂历
+* 行业通用的权限管理
 
    ![config](images/services.png)
    更多关于创建云开发项目的内容请查看[云开发快速入门](https://developer.tuya.com/cn/docs/iot/quick-start1?id=K95ztz9u9t89n) 步骤四
@@ -74,6 +79,7 @@ captcha.notice.resetPassword.mail.templateId.en=
 * 如果不使用找回密码功能，无需申请模板
 
 更多关于邮件服务请查看[邮件服务](https://developer.tuya.com/cn/docs/cloud/email-service?id=Kaiuyee8icw7y)
+
 更多关于短信服务请查看[短信服务](https://developer.tuya.com/cn/docs/cloud/massage-service?id=Kaiuyejehar00)
 
 
@@ -87,7 +93,6 @@ captcha.notice.resetPassword.mail.templateId.en=
   >
   > mvn -U clean package spring-boot:repackage -Dmaven.test.skip=true
 
-  
 * 执行可运行 jar 包
 
   > java -jar ./target/iot-server-web-{version}.jar
@@ -102,7 +107,9 @@ captcha.notice.resetPassword.mail.templateId.en=
 
 ## 二次开发示例
 
-一下内容将按步骤示例开发 iot-server 已支持的设备指令下发功能：
+比如通过远程控制设备灯的开关
+
+以下内容将按步骤示例开发 iot-server 已支持的设备指令下发功能：
 
 ![quick start](images/case-analysis.png)
 
@@ -121,18 +128,18 @@ public interface DeviceAbility {
 
 #### 2. 实现业务逻辑
 
-在 iot-server-service 模块中实现业务层逻辑，可以使用 @Autowired 方式注入 ablity 接口
+在 iot-server-service 模块中实现业务层逻辑，可以使用 @Autowired 方式注入 ability 接口
 
 ```java
 @Service
-public class DeviceServiceImpl implements DeviceService {
-	@Autowired
-  private DeviceAbility deviceAbility;
-  
-  @Override
-  public Boolean commandDevice(String deviceId, DeviceCommandRequest request) {
-    return deviceAbility.commandDevice(deviceId, request);
-  }
+public class DeviceServiceImpl implements DeviceService { 
+    @Autowired 
+    private DeviceAbility deviceAbility;
+    
+    @Override 
+    public Boolean commandDevice(String deviceId, DeviceCommandRequest request) {
+        return deviceAbility.commandDevice(deviceId, request);
+    }
 }
 ```
 
@@ -157,8 +164,7 @@ public class DeviceController {
 }
 ```
 
-
-#### TODO 最后实现了什么，做一个总结
+通过上面基于 iot-server 的二次开发，可以实现对设备灯的远程操作（开/关），当然您也可以通过此接口操作其他的任意设备。
 
 
 ### 小结
