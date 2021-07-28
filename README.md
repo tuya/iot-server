@@ -17,7 +17,7 @@ This portal is linked with `projectCode` of projects on the [Cloud Development P
 
 - Front-end project address: [iot-portal](https://github.com/tuya/iot-portal)
 
-![Quick start](images/iot-suite-server.gif)
+![Quick start](images/iot-server.gif)
 
 ## Start a project
 ### 1. Pull the project code and import it into the IDE.
@@ -75,7 +75,7 @@ Run the following command to build a executable .jar package. The output path un
 
 | Framework   | Version | Spring-boot Dependencies | 
 | -------------- | ------------- |------------- |
-| iot-suite-server           | 1.0.0 ~ 1.1.2         | 1.x.x |
+| iot-server           | 1.0.0 ~ 1.1.2         | 1.x.x |
 
 ### Technical support
 

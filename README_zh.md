@@ -1,7 +1,7 @@
 
 <img src="images/tuya_logo.png" width="28%" height="28%" />
 
-# Iot Suite Server
+# Iot Server
 
 [中文版](README_zh.md) | [English](README.md)
 
@@ -20,7 +20,7 @@ Iot Suite Server 是实现云端行业能力，能灵活集成、扩展 IoT 的�
 
 前端项目地址请参阅: [iot-portal](https://github.com/tuya/iot-portal)
 
-iot-suite-server 底层云端对接使用 [tuya-connector]() 实现，你可以参考文档获得更多的信息。
+Iot Server 底层云端对接使用 [tuya-connector]() 实现，你可以参考文档获得更多的信息。
 
 关于更多涂鸦云端 openapi 接口可以查看 [文档](https://developer.tuya.com/cn/docs/iot/api-reference?id=Ka7qb7vhber64) 。
 
@@ -30,11 +30,12 @@ iot-suite-server 底层云端对接使用 [tuya-connector]() 实现，你可以�
 
 ## 快速启动
 
-下面是一个简单的演示步骤，指导新用户如何配置并启动项目。
+下面是一个简单的演示步骤，指导新用户如何启动项目并基于 Iot Server 做二次开发和自定义功能拓展。
 
 注意： 开发预先安装 <b>mavenM</b> 和 <b>jdk</b> 环境（jdk版本需要 1.8 或更高版本）
 
 ### 准备工作
+
 #### 1. 拉取 git 项目代码
    > git clone https://github.com/tuya/iot-suite-server.git
 
@@ -64,7 +65,7 @@ iot-suite-server 底层云端对接使用 [tuya-connector]() 实现，你可以�
    #### 1. 云项目账号（必填）
    开发者需要将上面步骤创建的云项目账号信息填写到项目中，如下图所示:   ![config](images/param-config.png)
 
-   配置文件路径为：`iot-suite-server/iot-suite-server-web/application.properties`
+   配置文件路径为：`iot-server/iot-server-web/application.properties`
 
    ```properties
    # 在云开发平台申请的Access ID/Client ID/Project Code
@@ -78,7 +79,7 @@ iot-suite-server 底层云端对接使用 [tuya-connector]() 实现，你可以�
    * 邮件模板申请：[https://developer.tuya.com/cn/docs/cloud/3f377cbcd3?id=Kagouv5mzqgdb](https://developer.tuya.com/cn/docs/cloud/3f377cbcd3?id=Kagouv5mzqgdb)
    * 短信模板申请：[https://developer.tuya.com/cn/docs/cloud/7a37355b05?id=Kagp29so0orah](https://developer.tuya.com/cn/docs/cloud/7a37355b05?id=Kagp29so0orah)
 
-   将申请好的模板 ID 填入配置文件，配置文件路径为：`iot-suite-server/iot-suite-server-web/application.properties`
+   将申请好的模板 ID 填入配置文件，配置文件路径为：`iot-server/iot-server-web/application.properties`
 
    ```properties
 #短信中文模板
@@ -99,7 +100,7 @@ captcha.notice.resetPassword.mail.templateId.en=
 
 * maven 构建项目
 
-  > cd ./iot-suite-server/iot-suite-server-web
+  > cd ./iot-server/iot-server-web
   >
   > mvn -U clean package spring-boot:repackage -Dmaven.test.skip=true
 
@@ -107,23 +108,75 @@ captcha.notice.resetPassword.mail.templateId.en=
 
 * 执行可运行 jar 包
 
-  > java -jar ./target/iot-suite-server-web-{version}.jar
+  > java -jar ./target/iot-server-web-{version}.jar
 
    等待终端输出如下信息，即服务运行成功，可结合前端项目体验整体系统流程
    ![quick start](images/deploy-result.png)
 
 
    如果开发者使用 idea 导入，可以参照下面动图启动服务：
-   ![quick start](images/iot-suite-server.gif)
+   ![quick start](images/iot-server.gif)
 
 
+### 案例分析
 
+比如目前 iot-server 已支持的设备指令下发功能：
+
+![quick start](images/case-analysis.png)
+
+#### 1. 定义 ability
+对于设备控制的 API 接口可以查看[云开发平台文档](https://developer.tuya.com/cn/docs/cloud/e2512fb901?id=Kag2yag3tiqn5)
+
+在 iot-web-ability 模块根据接口文档定义 ability 接口：
+
+```java
+public interface DeviceAbility {
+  @Override
+	@POST("/v1.0/iot-03/devices/{device_id}/commands")
+	Boolean commandDevice(@Path("device_id") String deviceId, @Body DeviceCommandRequest request);
+}
+```
+
+#### 2. 实现业务逻辑
+
+在 iot-server-service 模块中实现业务层逻辑，可以使用 @Autowired 方式注入 ablity 接口
+
+```java
+@Service
+public class DeviceServiceImpl implements DeviceService {
+	@Autowired
+  private DeviceAbility deviceAbility;
+  
+  @Override
+  public Boolean commandDevice(String deviceId, DeviceCommandRequest request) {
+    return deviceAbility.commandDevice(deviceId, request);
+  }
+}
+```
+
+#### 3. web接口层
+在 iot-server-web 模块定义对外提供的 api 接口
+
+```java
+@Service
+public class DeviceServiceImpl implements DeviceService {
+	@Autowired
+  private DeviceAbility deviceAbility;
+  
+  @Override
+  public Boolean commandDevice(String deviceId, DeviceCommandRequest request) {
+    return deviceAbility.commandDevice(deviceId, request);
+  }
+}
+```
+
+   
 
 ## 版本列表
 
 | 框架 | release 版本 | JDK 版本 | Spring-boot 依赖 | 
 | -------------- | ------------- |------------- |------------- |
-| iot-suite-server| 1.0.0 ~ 1.1.2 | 1.8`↑` |  1.5.x.RELEASE `↑` |
+| iot-server| 1.0.0 ~ 1.1.2 | 1.8`↑` |  1.5.x.RELEASE `↑` |
 
 ## Bug 和 反馈
 对于错误报告，问题和讨论请提交到 [GitHub Issue](https://github.com/tuya/iot-suite-server/issues)

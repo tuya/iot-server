@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.tuya</groupId>
-    <artifactId>iot-suite-server</artifactId>
+    <artifactId>iot-server</artifactId>
     <version>${revision}</version>
     <packaging>pom</packaging>
 
@@ -30,10 +30,10 @@
     </properties>
 
     <modules>
-        <module>iot-suite-server-core</module>
-        <module>iot-suite-server-service</module>
-        <module>iot-suite-server-ability</module>
-        <module>iot-suite-server-web</module>
+        <module>iot-server-core</module>
+        <module>iot-server-service</module>
+        <module>iot-server-ability</module>
+        <module>iot-server-web</module>
     </modules>
 
     <dependencyManagement>
@@ -48,25 +48,25 @@
 
             <dependency>
                 <groupId>com.tuya</groupId>
-                <artifactId>iot-suite-server-core</artifactId>
+                <artifactId>iot-server-core</artifactId>
                 <version>${revision}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.tuya</groupId>
-                <artifactId>iot-suite-server-ability</artifactId>
+                <artifactId>iot-server-ability</artifactId>
                 <version>${revision}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.tuya</groupId>
-                <artifactId>iot-suite-server-service</artifactId>
+                <artifactId>iot-server-service</artifactId>
                 <version>${revision}</version>
             </dependency>
 
             <dependency>
                 <groupId>com.tuya</groupId>
-                <artifactId>iot-suite-server-web</artifactId>
+                <artifactId>iot-server-web</artifactId>
                 <version>${revision}</version>
             </dependency>
 
