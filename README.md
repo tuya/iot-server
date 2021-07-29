@@ -1,13 +1,14 @@
 
+<img src="doc/images/tuya_logo.png" width="28%" height="28%" />
+
+# Iot Server
+
 [中文版](README_zh.md) | [English](README.md)
 
+## 介绍
+`iot-server` is a Saas public version unified control console application based on Tuya Cloud, which allows developers to quickly implement, flexibly integrate, and freely expand Tuya Cloud’s industry capabilities. At present, the framework has built-in and integrated features common to the Tuya cloud industry, which can be used out of the box and deployed with one click.
 
-# General Management Portal
-## Overview
-
-General Management Portal implements the industry capabilities of the cloud, flexibly integrates and extends the IoT applications.
-
-This portal is linked with `projectCode` of projects on the [Cloud Development Platform](https://iot.tuya.com/cloud/). You need to log in with the user information corresponding to the `projectCode`. The following features are supported
+The unified management platform is associated with the projectCode of the cloud development platform project, and you need to log in with the user information corresponding to the projectCode, which mainly includes the following features:
 
 - Account management: Modify and reset passwords.
 
@@ -15,67 +16,46 @@ This portal is linked with `projectCode` of projects on the [Cloud Development P
 
 - Device management: Add, edit, control, and remove devices.
 
-- Front-end project address: [iot-portal](https://github.com/tuya/iot-portal)
+- Permission control: create a new role, set permission items, and remake permissions
 
-![Quick start](doc/images/iot-server.gif)
 
-## Start a project
-### 1. Pull the project code and import it into the IDE.
+##  How to use IoT Server
+  We have prepared an article for you [IOT Server Quick Start](https://developer.tuya.com/cn/docs/iot/SaaSDevelopmentFramework_backend?id=Kaqcx9hwc9i62)
 
-    > git clone https://github.com/tuya/iot-suite-server.git
+  You can also learn about the complete SaaS Development Framework system [SaaS Development Dramework](https://developer.tuya.com/cn/docs/iot/SaaSDevelopmentFramework?id=Kaps8jd0mowem)
 
-### 2. Configure parameters
-#### Account of the Cloud Development Platform (required)
-    Configure the account of the Cloud Development Platform application in the `application.properties` file under `iot-suite-server-web`.
 
-    ```properties
-    # The Access ID/Client ID/Project Code that you have applied for and obtained on the Cloud Development Platform
-    connector.ak=
-    connector.sk=
-    project.code=
-    ```
-![Config.png](https://airtake-public-data-1254153901.cos.ap-shanghai.myqcloud.com/content-platform/hestia/1625642228a9c1cb190dd.png)
+## Documents
 
-#### Template ID (optional)
+Please refer to the front-end project address: [iot-portal](https://github.com/tuya/iot-portal).
 
-To retrieve your password, you need to enable push notifications by <b>SMS</b> and <b>email</b>. You must apply for the template in advance.
-* Apply for the email template: https://developer.tuya.com/en/docs/cloud/3f377cbcd3?id=Kagouv5mzqgdb
-* Apply for the SMS template: https://developer.tuya.com/en/docs/cloud/7a37355b05?id=Kagp29so0orah
+Iot Server bottom cloud docking [tuya-connector](https://github.com/tuya/tuya-connector/tree/f62deb6c4738d7e80868268b29379c647798ed9c) You can refer to the documentation for more information.
 
-Enter the template ID in `application.properties` under `iot-suite-server-web`.
+More about Tuya Cloud openapi interface can be viewed [Doc](https://developer.tuya.com/cn/docs/iot/api-reference?id=Ka7qb7vhber64).
 
-    ```properties
-    # SMS template in Chinese
-    captcha.notice.resetPassword.sms.templateId.cn=
-    # SMS template in English
-    captcha.notice.resetPassword.sms.templateId.en=
-    # Email template in Chinese
-    captcha.notice.resetPassword.mail.templateId.cn=
-    # Email template in English
-    captcha.notice.resetPassword.mail.templateId.en=
-    ```
+All notifications can also be found here [Github notice issue](https://github.com/tuya/iot-server/issues).
 
-**Note**:
-* The template application parameter format is `{"code": "%s","timeLimit": "%d"}`.
-* The template is not required if you do not use the password retrieval function.
+## File structure
 
-### 3. Build a project
-Run the following command to build a executable .jar package. The output path under the module of `iot-suite-we` in current project:
-`./iot-suite-server/iot-suite-server-web/target`.
+The project code structure is as follows:
 
-    > mvn clean install -U -Dmaven.test.skip=true
+* **iot-server-core**: Common layer, providing common tools and models
+* **iot-server-ability**: Capability layer, which defines the cloud platform interface
+* **iot-server-service**: The business logic layer, which implements the developer's custom business logic
+* **iot-server-web**: web interface layer, providing front-end external call interface
 
-### 4. Run the project
 
-    > cd ./iot-suite-server/iot-suite-server-web/target
-    > 
-    > java -jar iot-suite-server-web/target/iot-suite-server-{version}.jar
+  ![config](doc/images/code-structure.png)
 
-#### Dependencies & Compatibility
+## Version
 
-| Framework   | Version | Spring-boot Dependencies | 
-| -------------- | ------------- |------------- |
-| iot-server           | 1.0.0 ~ 1.1.2         | 1.x.x |
+| Framework | release Version | JDK Version | Spring-boot dependence | 
+| -------------- | ------------- |------------- |------------- |
+| iot-server| 1.0.0 ~ 1.1.2 | 1.8`↑` |  1.5.x.RELEASE `↑` |
+
+## Bug 和 Feedback
+For bug reports, questions and discussions please submit to [GitHub Issue](https://github.com/tuya/iot-server/issues)
+
 
 ### Technical support
 
@@ -84,3 +64,9 @@ You can get technical support from Tuya in the following services:
 Help Center: https://support.tuya.com/en/help
 
 Service & Support: https://service.console.tuya.com
+
+## Licenses
+
+For more information, please refer to the [LICENSE](LICENSE).
+
+

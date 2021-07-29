@@ -6,7 +6,7 @@
 [中文版](README_zh.md) | [English](README.md)
 
 ## 介绍
-Iot Server 是实现云端行业能力，能灵活集成、扩展 IoT 的统一管控台后端服务应用。
+`iot-server` 是基于涂鸦云的 Saas 公版统一管控台应用，能够让开发者快速实现、灵活集成、自由扩展涂鸦云端的行业能力。目前框架已内置集成涂鸦云端行业通用的功能特性，能够做到开箱即用，一键部署。
 
 该统一管理平台与云开发平台项目的 projectCode 做关联，需要使用 projectCode 对应的用户信息登录，主要包括以下特性功能：
 
@@ -14,6 +14,11 @@ Iot Server 是实现云端行业能力，能灵活集成、扩展 IoT 的统一�
 * 资产管理：创建资产、修改资产、删除资产等
 * 设备管理：增加设备、移除设备、编辑设备、控制设备
 * 权限控制：新建角色，设置权限项、重制权限
+
+##  如何使用 IOT Server
+  我们为您准备了一篇[快速入门IOT Server](https://developer.tuya.com/cn/docs/iot/SaaSDevelopmentFramework_backend?id=Kaqcx9hwc9i62)的文档
+
+  您也可以了解完整的 SaaS 开发框架体系[SaaS 开发框架](https://developer.tuya.com/cn/docs/iot/SaaSDevelopmentFramework?id=Kaps8jd0mowem)的文档
 
 
 ## 文档
@@ -61,7 +66,6 @@ Iot Server [快速入门指南](doc/images/quick_start.md)
 欢迎加入微信群参与讨论分享：
 
 <img src="doc/images/discussion-group.png" width="40%" height="40%" />
-
 
 ## Licenses
 
