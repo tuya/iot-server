@@ -75,8 +75,12 @@ captcha.notice.resetPassword.mail.templateId.cn=
 captcha.notice.resetPassword.mail.templateId.en=
    ```
 注意：
-* 申请的模板参数格式固定为： `{"code": "%s","timeLimit": "%d"}`
 * 如果不使用找回密码功能，无需申请模板
+
+* 申请模板时需要<b>模板内容</b>参数 content 需要带有： `${code}` 和 `${timeLimit}`
+  
+  例如 `您的验证码为：${code}，${timeLimit} 分钟内有效！`
+
 
 更多关于邮件服务请查看[邮件服务](https://developer.tuya.com/cn/docs/cloud/email-service?id=Kaiuyee8icw7y)
 
