@@ -51,7 +51,7 @@
    配置文件路径为：`iot-server/iot-server-web/application.properties`
 
    ```properties
-   # 在云开发平台申请的Access ID/Client ID/Project Code
+   # 在云开发平台申请的Access ID/Access Secret/Project Code
    connector.ak=
    connector.sk=
    project.code=
