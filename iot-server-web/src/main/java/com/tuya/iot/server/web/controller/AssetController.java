@@ -13,6 +13,7 @@ import com.tuya.iot.server.web.config.ProjectProperties;
 import com.tuya.iot.server.web.model.criteria.AssetCriteria;
 import com.tuya.iot.server.web.model.request.asset.AssetAuths;
 import com.tuya.iot.server.web.model.response.device.DeviceInfoVO;
+import com.tuya.iot.server.web.util.SessionContext;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -44,7 +45,7 @@ public class AssetController {
     @PostMapping
     @RequiresPermissions("1002")
     public Response addAsset(@RequestBody AssetCriteria criteria) {
-        return assetService.addAsset(projectProperties.getPermissionSpaceId(),criteria.getAsset_name(), criteria.getParent_asset_id(), ContextUtil.getUserId());
+        return assetService.addAsset(projectProperties.getPermissionSpaceId(),criteria.getAsset_name(), criteria.getParent_asset_id(), SessionContext.getUserToken().getUserId());
     }
 
     @ApiOperation(value = "更新资产信息")
@@ -58,21 +59,21 @@ public class AssetController {
     @DeleteMapping(value = "/{asset_id}")
     @RequiresPermissions("1004")
     public Response deleteAsset(@PathVariable("asset_id") String assetId) {
-        return assetService.deleteAsset(ContextUtil.getUserId(), assetId);
+        return assetService.deleteAsset(SessionContext.getUserToken().getUserId(), assetId);
     }
 
     @ApiOperation(value = "获取树形资产结构")
     @GetMapping(value = "/tree/{asset_id}")
     @RequiresPermissions("1001")
     public Response<AssetVO> getTreeBy(@PathVariable("asset_id") String assetId) {
-        return Response.buildSuccess(AssetConvertor.$.toAssetVO(assetService.getTreeByV2(assetId, ContextUtil.getUserId())));
+        return Response.buildSuccess(AssetConvertor.$.toAssetVO(assetService.getTreeByV2(assetId, SessionContext.getUserToken().getUserId())));
     }
 
     @ApiOperation(value = "资产树接口")
     @GetMapping(value = "/tree-fast/{asset_id}")
     @RequiresPermissions("1001")
     public Response<List<AssetVO>> getTreeFastBy(@PathVariable("asset_id") String assetId) {
-        return Response.buildSuccess(AssetConvertor.$.toAssetVOList(assetService.getTreeFast(assetId, ContextUtil.getUserId())));
+        return Response.buildSuccess(AssetConvertor.$.toAssetVOList(assetService.getTreeFast(assetId, SessionContext.getUserToken().getUserId())));
     }
 
     @ApiOperation(value = "通过资产名称获取资产列表")
@@ -83,14 +84,14 @@ public class AssetController {
     @GetMapping
     @RequiresPermissions("1001")
     public Response<List<AssetVO>> getAssetByName(@RequestParam("asset_name") String assetName) {
-        return Response.buildSuccess(AssetConvertor.$.toAssetVOList(assetService.getAssetByNameV2(assetName, ContextUtil.getUserId())));
+        return Response.buildSuccess(AssetConvertor.$.toAssetVOList(assetService.getAssetByNameV2(assetName, SessionContext.getUserToken().getUserId())));
     }
 
     @ApiOperation(value = "通过资产ID获取子资产")
     @GetMapping(value = "/{asset_id}")
     @RequiresPermissions("1001")
     public Response<List<AssetVO>> getChildAssetListBy(@PathVariable("asset_id") String assetId) {
-        return Response.buildSuccess(AssetConvertor.$.toAssetVOList(assetService.getTreeFast(assetId, ContextUtil.getUserId())));
+        return Response.buildSuccess(AssetConvertor.$.toAssetVOList(assetService.getTreeFast(assetId, SessionContext.getUserToken().getUserId())));
     }
 
     @ApiOperation(value = "通过资产ID获取下级设备信息")
@@ -106,7 +107,7 @@ public class AssetController {
         PageDataVO<DeviceInfoVO> vo = new PageDataVO<>();
         vo.setPage_no(pageNo);
         vo.setPage_size(pageSize);
-        PageDataVO<DeviceDTO> resultPage = assetService.getChildDeviceInfoPage(ContextUtil.getUserId(), assetId, pageNo, pageSize);
+        PageDataVO<DeviceDTO> resultPage = assetService.getChildDeviceInfoPage(SessionContext.getUserToken().getUserId(), assetId, pageNo, pageSize);
         vo.setTotal(resultPage.getTotal());
         vo.setData(DeviceInfoConvert.INSTANCE.deviceDTO2VO(resultPage.getData()));
         return Response.buildSuccess(vo);

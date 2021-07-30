@@ -298,7 +298,7 @@
         },
         {
           "permissionName": "More operations",
-          "permissionType": "menu",
+          "permissionType": "api",
           "permissionCode": "4008",
           "parentCode": "4000",
           "order": "8",
