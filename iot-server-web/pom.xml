@@ -134,13 +134,13 @@
                     <mainClass>com.tuya.iot.server.web.IotServerApplication</mainClass>
                     <executable>true</executable>
                 </configuration>
-              <!--  <executions>
+                <executions>
                     <execution>
                         <goals>
                             <goal>repackage</goal>
                         </goals>
                     </execution>
-                </executions>-->
+                </executions>
             </plugin>
         </plugins>
     </build>
