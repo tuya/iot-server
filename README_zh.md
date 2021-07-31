@@ -44,8 +44,6 @@ Iot Server 底层云端对接使用 [tuya-connector](https://github.com/tuya/tuy
 
   ![config](doc/images/code-structure.png)
 
-Iot Server [快速入门指南](doc/images/quick_start.md)
-
 ## 版本列表
 
 | 框架 | release 版本 | JDK 版本 | Spring-boot 依赖 | 
