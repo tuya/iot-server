@@ -93,13 +93,13 @@ captcha.notice.resetPassword.mail.templateId.en=
 
 * maven 构建项目
 
-  > cd ./iot-server/iot-server-web
+  > cd ./iot-server
   >
-  > mvn -U clean package spring-boot:repackage -Dmaven.test.skip=true
+  > mvn -U clean package -Dmaven.test.skip=true
 
 * 执行可运行 jar 包
 
-  > java -jar ./target/iot-server-web-{version}.jar
+  > java -jar ./iot-server/iot-server-web/target/iot-server-web-{version}.jar
 
    等待终端输出如下信息，即服务运行成功，可结合前端项目体验整体系统流程
    ![quick start](images/deploy-result.png)
