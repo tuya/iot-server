@@ -9,12 +9,12 @@
     <packaging>pom</packaging>
 
     <properties>
-        <revision>1.1.2</revision>
+        <revision>1.1.3</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <spring-boot.version>1.5.8.RELEASE</spring-boot.version>
-        <tuya.spring.boot.starter.version>1.0.17</tuya.spring.boot.starter.version>
+        <spring-boot.version>2.5.3</spring-boot.version>
+        <tuya.spring.boot.starter.version>1.0.20</tuya.spring.boot.starter.version>
         <mapstruct.version>1.4.1.Final</mapstruct.version>
         <lombok.version>1.18.18</lombok.version>
         <swagger.version>2.4.0</swagger.version>
@@ -24,9 +24,9 @@
         <geocoder.version>2.157</geocoder.version>
         <carrier.version>1.147</carrier.version>
         <prefixmapper.version>2.157</prefixmapper.version>
-        <jackson.version>2.10.5</jackson.version>
-        <shiro.springboot.stater.version>1.4.2</shiro.springboot.stater.version>
-        <groovy.verson>2.5.2</groovy.verson>
+        <jackson.version>2.12.4</jackson.version>
+        <shiro.springboot.stater.version>1.7.1</shiro.springboot.stater.version>
+        <groovy.verson>2.5.14</groovy.verson>
     </properties>
 
     <modules>

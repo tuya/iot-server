@@ -49,6 +49,7 @@ Iot Server 底层云端对接使用 [tuya-connector](https://github.com/tuya/tuy
 | 框架 | release 版本 | JDK 版本 | Spring-boot 依赖 | 
 | -------------- | ------------- |------------- |------------- |
 | iot-server| 1.0.0 ~ 1.1.2 | 1.8`↑` |  1.5.x.RELEASE `↑` |
+| iot-server| 1.1.3 ~ 1.1.x| 1.8`↑` |  2.5.3.RELEASE `↑` |
 
 ## Bug 和 反馈
 对于错误报告，问题和讨论请提交到 [GitHub Issue](https://github.com/tuya/iot-server/issues)
