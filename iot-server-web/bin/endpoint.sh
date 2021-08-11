@@ -2,14 +2,14 @@
 
 CURRENT_DIR=`dirname $0`
 API_HOME=`cd "$CURRENT_DIR/.." >/dev/null; pwd`
-Jar=`ls $API_HOME/lib/*.jar`
+Jar=`ls $API_HOME/lib/iot-server-web-*[0-9].jar`
 RETVAL="0"
 LOG="api_stdout.log"
 
 # run redis
 nohup /usr/bin/redis-server /etc/redis.conf &
 # run nginx
-cd /usr/bin
+cd /usr/sbin
 nginx
 
 base_param="-Dconnector.ak="$AK" -Dconnector.sk="$SK" -Dproject.code="$PC
