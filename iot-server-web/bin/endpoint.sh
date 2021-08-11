@@ -68,7 +68,7 @@ if [ "$PERMISSION_SPACE_CODE" != "" ]
 then
   base_param=${base_param}" -Dproject.permission-space-code"=$PERMISSION_SPACE_CODE
 else
-    base_param=${base_param}" -Dproject.permission-space-code=iot-app-smart-office"
+    base_param=${base_param}" -Dproject.permission-space-code=iot-server"
 fi
 
 if [ "$PERMISSION_AUTO_INIT" != "" ]
@@ -83,13 +83,6 @@ then
   base_param=${base_param}" -Dproject.permission-space-authentication"=$PERMISSION_SPACE_AUTHENTICATION
 else
     base_param=${base_param}" -Dproject.permission-space-authentication=2"
-fi
-
-if [ "$SPRING_REDIS_NAMESPACE" != "" ]
-then
-  base_param=${base_param}" -Dspring.session.redis.namespace"=$SPRING_REDIS_NAMESPACE
-else
-    base_param=${base_param}" -Dspring.session.redis.namespace=iot-server"
 fi
 
 if [ "$SERVER_SESSION_TIMEOUT" != "" ]
