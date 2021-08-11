@@ -166,6 +166,12 @@
                 <version>${jackson.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.codehaus.groovy</groupId>
+                <artifactId>groovy</artifactId>
+                <version>${groovy.verson}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
