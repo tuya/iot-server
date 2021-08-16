@@ -24,6 +24,19 @@ The unified management platform is associated with the projectCode of the cloud 
 
   You can also learn about the complete SaaS Development Framework system [SaaS Development Dramework](https://developer.tuya.com/cn/docs/iot/SaaSDevelopmentFramework?id=Kaps8jd0mowem)
 
+### How to start the front-end static resources
+    1.install node environment
+    2.Enter the command line interface cd ${project.dir}/iot-portal-dist/bin/
+    3.Enter node server.js Start the reverse proxy for the front-end resource
+    4.open http://127.0.0.1:8888 going to the front page
+---
+If you want to learn and customize your front-end code, take a look at our front-end project: [iot-portal](https:github.comtuyaiot-portal)
+### How to start back-end service：
+    1.Open the iot-Server project with IntelliJ IDEA
+    2.Configure connector.ak, connector.sk, and project.code in the iot-server-Web
+    3.Start IotServerApplication
+
+### Front and back interaction
 
 ## Documents
 
@@ -38,20 +51,22 @@ All notifications can also be found here [Github notice issue](https://github.co
 ## File structure
 
 The project code structure is as follows:
-
+* **iot-portal-dist**: The front end is a packaged resource file containing the server.js script used as a reverse proxy. 
+---
 * **iot-server-core**: Common layer, providing common tools and models
 * **iot-server-ability**: Capability layer, which defines the cloud platform interface
 * **iot-server-service**: The business logic layer, which implements the developer's custom business logic
 * **iot-server-web**: web interface layer, providing front-end external call interface
 
 
-  ![config](doc/images/code-structure.png)
+  ![config](doc/images/iot-server-structure.png)
 
 ## Version
 
 | Framework | release Version | JDK Version | Spring-boot dependence | 
 | -------------- | ------------- |------------- |------------- |
 | iot-server| 1.0.0 ~ 1.1.2 | 1.8`↑` |  1.5.x.RELEASE `↑` |
+| iot-server| 1.1.3 ~ 1.1.x| 1.8`↑` |  2.5.3.RELEASE `↑` |
 
 ## Bug 和 Feedback
 For bug reports, questions and discussions please submit to [GitHub Issue](https://github.com/tuya/iot-server/issues)
