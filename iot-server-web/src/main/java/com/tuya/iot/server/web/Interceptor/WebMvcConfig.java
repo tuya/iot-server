@@ -24,19 +24,19 @@ public class WebMvcConfig {
                         .excludePathPatterns("/hc.do")
                         .excludePathPatterns("/v2/api-docs")
                         .addPathPatterns("/**");
-                registry.addInterceptor(new LoginInterceptor(i18nMessage))
-                        //排除拦截
-                        .excludePathPatterns("/login")
-                        .excludePathPatterns("/mobile/countries")
-                        .excludePathPatterns("/hc.do")
-                        .excludePathPatterns("/v2/api-docs")
-                        .excludePathPatterns("/swagger-resources/**")
-                        .excludePathPatterns("/configuration/ui")
-                        .excludePathPatterns("/configuration/security")
-                        .excludePathPatterns("/user/password/reset/captcha")
-                        .excludePathPatterns("/user/password/reset")
-                        //拦截路径
-                        .addPathPatterns("/**");
+//                registry.addInterceptor(new LoginInterceptor(i18nMessage))
+//                        //排除拦截
+//                        .excludePathPatterns("/login")
+//                        .excludePathPatterns("/mobile/countries")
+//                        .excludePathPatterns("/hc.do")
+//                        .excludePathPatterns("/v2/api-docs")
+//                        .excludePathPatterns("/swagger-resources/**")
+//                        .excludePathPatterns("/configuration/ui")
+//                        .excludePathPatterns("/configuration/security")
+//                        .excludePathPatterns("/user/password/reset/captcha")
+//                        .excludePathPatterns("/user/password/reset")
+//                        //拦截路径
+//                        .addPathPatterns("/**");
             }
         };
     }

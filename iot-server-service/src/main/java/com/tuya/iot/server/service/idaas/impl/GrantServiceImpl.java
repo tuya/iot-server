@@ -105,7 +105,7 @@ public class GrantServiceImpl implements GrantService {
             success &= grantAbility.grantPermissionsToRole(RoleGrantPermissionsReq.builder()
                     .spaceId(req.getSpaceId())
                     .roleCode(req.getRoleCode())
-                    .permissionCodes(permsToGrant.stream().collect(Collectors.toList()))
+                    .permissionCodes(permsToSet.stream().collect(Collectors.toList()))
                     .build());
         }
 
