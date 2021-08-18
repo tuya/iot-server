@@ -37,6 +37,12 @@ The project code structure is as follows:
 
 ![config](doc/images/iot-server-structure.png)
 
+##  How to use IoT Server
+We have prepared an article for you [IOT Server Quick Start](https://developer.tuya.com/cn/docs/iot/SaaSDevelopmentFramework_backend?id=Kaqcx9hwc9i62)
+
+You can also learn about the complete SaaS Development Framework system [SaaS Development Dramework](https://developer.tuya.com/cn/docs/iot/SaaSDevelopmentFramework?id=Kaps8jd0mowem)
+
+
 ## Quick start：
 ### Start front-end static resources：
     1.Installing the Node Environment
@@ -56,11 +62,6 @@ Take a look at all of our front-end projects if you want to learn and customize 
     Default Administrator account：admin@tuya.com
     Default Administrator password：Admin123456
 ---
-
-##  How to use IoT Server
-  We have prepared an article for you [IOT Server Quick Start](https://developer.tuya.com/cn/docs/iot/SaaSDevelopmentFramework_backend?id=Kaqcx9hwc9i62)
-
-  You can also learn about the complete SaaS Development Framework system [SaaS Development Dramework](https://developer.tuya.com/cn/docs/iot/SaaSDevelopmentFramework?id=Kaps8jd0mowem)
 
 ## Documents
 
