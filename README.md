@@ -5,7 +5,7 @@
 
 [中文版](README_zh.md) | [English](README.md)
 
-## 介绍
+## Introduce
 `iot-server` is a Saas public version unified control console application based on Tuya Cloud, which allows developers to quickly implement, flexibly integrate, and freely expand Tuya Cloud’s industry capabilities. At present, the framework has built-in and integrated features common to the Tuya cloud industry, which can be used out of the box and deployed with one click.
 
 The unified management platform is associated with the projectCode of the cloud development platform project, and you need to log in with the user information corresponding to the projectCode, which mainly includes the following features:
