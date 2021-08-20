@@ -18,6 +18,8 @@ then
   base_param=${base_param}" -Dconnector.region"=$REGION
 fi
 
+base_param=${base_param}" -Dconnector.entry=Docker"
+
 if [ "$SMS_TEMPLATEID_CN" != "" ]
 then
   base_param=${base_param}" -Dcaptcha.notice.resetPassword.sms.templateId.cn"=$SMS_TEMPLATEID_CN
