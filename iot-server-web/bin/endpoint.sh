@@ -2,14 +2,14 @@
 
 CURRENT_DIR=`dirname $0`
 API_HOME=`cd "$CURRENT_DIR/.." >/dev/null; pwd`
-Jar=`ls $API_HOME/lib/*.jar`
+Jar=`ls $API_HOME/lib/iot-server-web-*[0-9].jar`
 RETVAL="0"
 LOG="api_stdout.log"
 
 # run redis
 nohup /usr/bin/redis-server /etc/redis.conf &
 # run nginx
-cd /usr/bin
+cd /usr/sbin
 nginx
 
 base_param="-Dconnector.ak="$AK" -Dconnector.sk="$SK" -Dproject.code="$PC
@@ -17,6 +17,8 @@ if [ "$REGION" != "" ]
 then
   base_param=${base_param}" -Dconnector.region"=$REGION
 fi
+
+base_param=${base_param}" -Dconnector.entry=Docker"
 
 if [ "$SMS_TEMPLATEID_CN" != "" ]
 then
@@ -68,7 +70,7 @@ if [ "$PERMISSION_SPACE_CODE" != "" ]
 then
   base_param=${base_param}" -Dproject.permission-space-code"=$PERMISSION_SPACE_CODE
 else
-    base_param=${base_param}" -Dproject.permission-space-code=iot-app-smart-office"
+    base_param=${base_param}" -Dproject.permission-space-code=iot-server"
 fi
 
 if [ "$PERMISSION_AUTO_INIT" != "" ]
@@ -83,13 +85,6 @@ then
   base_param=${base_param}" -Dproject.permission-space-authentication"=$PERMISSION_SPACE_AUTHENTICATION
 else
     base_param=${base_param}" -Dproject.permission-space-authentication=2"
-fi
-
-if [ "$SPRING_REDIS_NAMESPACE" != "" ]
-then
-  base_param=${base_param}" -Dspring.session.redis.namespace"=$SPRING_REDIS_NAMESPACE
-else
-    base_param=${base_param}" -Dspring.session.redis.namespace=iot-server"
 fi
 
 if [ "$SERVER_SESSION_TIMEOUT" != "" ]

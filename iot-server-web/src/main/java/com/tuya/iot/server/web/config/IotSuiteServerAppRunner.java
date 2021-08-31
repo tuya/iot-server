@@ -62,7 +62,7 @@ public class IotSuiteServerAppRunner implements ApplicationRunner {
 
     String adminUserName = "admin@tuya.com";
     String adminUserId = "superAdmin";
-    String adminUserPwd = Sha256Utils.getSHA256("Test123456");
+    String adminUserPwd = Sha256Utils.getSHA256("Admin123456");
     String adminUserCountryCode = "86";
 
     String adminRoleCode = "admin";
