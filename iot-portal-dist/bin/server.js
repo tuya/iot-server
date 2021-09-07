@@ -12,10 +12,10 @@ app.use(
     proxyReqPathResolver(req) {
       const { originalUrl } = req;
       // 后端服务的路径无/api，需在前端剔除此部分
-      return originalUrl.replace('/api', '');
+      // return originalUrl.replace('/api', '');
 
       // docker 请求不转译
-      // return originalUrl;
+      return originalUrl;
     },
   }),
 );
