@@ -61,9 +61,7 @@ public class UserController {
     @Autowired
     private PermissionService permissionService;
 
-    /**
-     * 神逻辑：用户改自己密码还需要权限？
-     */
+
     @ApiOperation(value = "修改密码")
     @SneakyThrows
     @PutMapping(value = "/user/password")
@@ -74,9 +72,7 @@ public class UserController {
                 ResponseI18n.buildFailure(USER_NOT_EXIST);
     }
 
-    /**
-     * 这个还需要吗？要验证码的
-     */
+
     @ApiOperation(value = "用户密码重置")
     @PostMapping(value = "/user/password/reset")
     public Response<Boolean> resetPassword(@RequestBody @Valid ResetPasswordReq req) {
@@ -178,7 +174,7 @@ public class UserController {
     }
 
     /**
-     * 批量操作，统一按"resources-batch"方式定义路径。（谁有好的建议可以提出来）
+     * 批量操作，统一按"resources-batch"方式定义路径。
      */
     @ApiOperation("批量删除用户")
     @DeleteMapping("/users")

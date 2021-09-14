@@ -43,10 +43,7 @@ public class ShiroConfig {
         fac.setFilterChainDefinitionMap(getFilterChainDefinitionMap());
         Map<String,Filter> filterMap = fac.getFilters();
 
-        /**这里有坑，需要自己new，不能使用spring的@Bean创建。
-         * 否则shiro的过滤器链逻辑有问题。
-         * 否则anon匹配上了某个路径，却还是会和后面的/**匹配
-         * */
+
         LoginFilter loginFilter = new LoginFilter();
         loginFilter.setI18nMessage(i18nMessage);
         filterMap.put("authc", loginFilter);
@@ -106,11 +103,7 @@ public class ShiroConfig {
         return manager;
     }
 
-    /**
-     * 我们已经用spring整合redis实现了分布式会话，shiro的会话直接交给容器管理。
-     * ServletContainerSessionManager 会获取request对象，然后调用其getSession方法获取会话。
-     * 这样获取到的会话，实际上就是spring整合redis的分布式会话。
-     * */
+
     @Bean
     public ServletContainerSessionManager sessionManager() {
         ServletContainerSessionManager sessionManager = new ServletContainerSessionManager();

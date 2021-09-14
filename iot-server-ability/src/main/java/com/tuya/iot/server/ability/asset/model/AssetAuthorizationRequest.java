@@ -18,7 +18,7 @@ public class AssetAuthorizationRequest implements Serializable {
     private static final long serialVersionUID = 8392308577501227408L;
 
     /**
-     * 资产ID
+     * 用户ID
      */
     private String uid;
     /**

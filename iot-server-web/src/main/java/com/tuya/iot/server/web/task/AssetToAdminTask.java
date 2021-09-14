@@ -23,7 +23,8 @@ public class AssetToAdminTask {
     private ProjectProperties projectProperties;
 
     /**
-     * 系统管理员授权临时方案
+     * 系统管理员定时授权方案
+     *
      * @author mickey
      * @date 2021/6/14 18:19
      */

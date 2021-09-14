@@ -70,7 +70,7 @@ public class TuyaCloudRealm extends AuthorizingRealm {
         UserToken userToken = userService.login(projectProperties.getPermissionSpaceId(), username, password);
         HttpSession session = HttpRequestUtils.getHttpSession();
         userToken.setToken(session.getId());
-        //小心，有两个类叫UserToken，在不同包下面，不要搞混了
+        //有两个类叫UserToken，在不同包下
         SessionContext.setUserToken(userToken);
         return new SimpleAuthenticationInfo(username, password, getName());
     }

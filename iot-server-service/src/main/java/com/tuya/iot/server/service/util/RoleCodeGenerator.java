@@ -5,7 +5,7 @@ import com.tuya.iot.server.service.enums.RoleTypeEnum;
 import java.util.UUID;
 
 /**
- * @description 由于没有云端没有 角色类型，所以我们通过角色编码来实现。
+ * @description 由于云端没有 角色类型，所以通过角色编码来实现。
  * @author benguan.zhou@tuya.com
  * @date 2021/06/01
  */
