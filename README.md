@@ -50,7 +50,7 @@ You can also learn about the complete SaaS Development Framework system [SaaS De
     3.Enter node server.js Start the reverse proxy for the front-end resource
     4.Open http://127.0.0.1:8888 and going to the front page
 ---
-![config](doc/images/iot-portal-preview-1.png)
+![config](doc/images/iot-portal-preview-en.png)
 Take a look at all of our front-end projects if you want to learn and customize your front-end code： [iot-portal](https://github.com/tuya/iot-portal)
 
 ### Start back-end services：
